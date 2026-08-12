@@ -1,7 +1,13 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { PhArrowRight, PhCheck, PhMagnifyingGlass } from '@phosphor-icons/vue'
+import {
+  PhArrowRight,
+  PhBuildings,
+  PhCheck,
+  PhListChecks,
+  PhMagnifyingGlass,
+} from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
 import { departments } from '../data/siteData'
 
@@ -45,37 +51,53 @@ const filteredDepartments = computed(() => {
 
     <section class="bg-canvas pb-24 pt-10 sm:pb-28 sm:pt-14 lg:pt-16">
       <div class="site-container">
-        <div class="grid overflow-hidden bg-white shadow-[0_20px_70px_rgba(7,59,44,0.07)] md:grid-cols-[auto_auto_1fr]">
-          <div class="flex items-center gap-3 border-b border-ink/8 px-5 py-5 md:border-b-0 md:border-r md:px-7">
-            <strong class="text-2xl font-extrabold tracking-[-0.04em] text-civic-800">{{ departments.length }}</strong>
-            <span class="text-xs font-bold leading-4 text-ink/48">Municipal<br />departments</span>
+        <div class="grid grid-cols-2 gap-3 lg:grid-cols-[minmax(11rem,0.34fr)_minmax(11rem,0.34fr)_minmax(25rem,1fr)] lg:gap-4">
+          <div class="flex min-h-28 items-center gap-4 bg-white px-5 py-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:px-6">
+            <span class="hidden size-11 shrink-0 items-center justify-center bg-sage-50 text-civic-700 sm:flex">
+              <PhBuildings :size="22" weight="duotone" />
+            </span>
+            <div>
+              <strong class="block text-3xl font-extrabold leading-none tracking-[-0.05em] text-civic-800">{{ departments.length }}</strong>
+              <span class="mt-2 block text-xs font-bold leading-4 text-ink/66">Municipal departments</span>
+            </div>
           </div>
-          <div class="flex items-center gap-3 border-b border-ink/8 px-5 py-5 md:border-b-0 md:border-r md:px-7">
-            <strong class="text-2xl font-extrabold tracking-[-0.04em] text-civic-800">{{ totalServices }}</strong>
-            <span class="text-xs font-bold leading-4 text-ink/48">Listed<br />services</span>
+
+          <div class="flex min-h-28 items-center gap-4 bg-white px-5 py-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:px-6">
+            <span class="hidden size-11 shrink-0 items-center justify-center bg-sage-50 text-civic-700 sm:flex">
+              <PhListChecks :size="22" weight="duotone" />
+            </span>
+            <div>
+              <strong class="block text-3xl font-extrabold leading-none tracking-[-0.05em] text-civic-800">{{ totalServices }}</strong>
+              <span class="mt-2 block text-xs font-bold leading-4 text-ink/66">Listed services</span>
+            </div>
           </div>
-          <div class="relative min-h-16">
-            <label class="sr-only" for="service-search">Search departments or services</label>
-            <PhMagnifyingGlass
-              class="absolute left-5 top-1/2 -translate-y-1/2 text-civic-700 md:left-7"
-              :size="21"
-              weight="bold"
-            />
-            <input
-              id="service-search"
-              v-model="search"
-              class="h-full min-h-16 w-full border-0 bg-white py-5 pl-13 pr-5 text-sm font-semibold text-ink outline-none transition placeholder:text-ink/38 focus:bg-sage-50 md:pl-16"
-              type="search"
-              placeholder="Search a department or service"
-            />
+
+          <div class="col-span-2 flex min-h-28 flex-col justify-center bg-white px-5 py-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:px-6 lg:col-span-1">
+            <label class="mb-2 block text-xs font-extrabold text-ink/66" for="service-search">
+              Search the service directory
+            </label>
+            <div class="relative">
+              <PhMagnifyingGlass
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-civic-700"
+                :size="19"
+                weight="bold"
+              />
+              <input
+                id="service-search"
+                v-model="search"
+                class="min-h-12 w-full border-0 bg-canvas py-3 pl-12 pr-4 text-sm font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.08)] outline-none transition placeholder:text-ink/50 focus:bg-sage-50 focus:shadow-[inset_0_0_0_2px_rgba(23,99,76,0.7)]"
+                type="search"
+                placeholder="Enter a department or service"
+              />
+            </div>
           </div>
         </div>
 
-        <div v-if="filteredDepartments.length" class="mt-10 bg-white px-5 sm:px-8 lg:px-12">
+        <div v-if="filteredDepartments.length" class="mt-12 space-y-5 sm:mt-14 sm:space-y-6">
           <article
             v-for="(department, index) in filteredDepartments"
             :key="department.slug"
-            class="grid gap-8 border-b border-ink/10 py-10 last:border-b-0 sm:py-12 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-16 lg:py-14"
+            class="grid gap-9 bg-white px-5 py-10 shadow-[0_14px_48px_rgba(7,59,44,0.045)] sm:px-8 sm:py-12 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-16 lg:px-12 lg:py-14"
           >
             <div class="relative lg:pl-14">
               <span class="mb-5 block font-mono text-xs font-bold tabular-nums text-civic-700 lg:absolute lg:left-0 lg:top-1">
@@ -84,18 +106,18 @@ const filteredDepartments = computed(() => {
               <h2 class="max-w-md text-2xl font-extrabold leading-[1.08] tracking-[-0.04em] text-ink sm:text-[1.75rem]">
                 {{ department.name }}
               </h2>
-              <p class="mt-4 max-w-md text-sm leading-6 text-ink/58">{{ department.summary }}</p>
+              <p class="mt-5 max-w-md text-sm font-medium leading-7 text-ink/72">{{ department.summary }}</p>
 
-              <div class="mt-7 border-l-2 border-civic-700/25 pl-4">
-                <p class="text-xs font-bold text-ink/45">Mandate</p>
-                <p class="mt-2 max-w-md text-xs leading-5 text-ink/52">{{ department.mandate }}</p>
+              <div class="mt-8 border-l-2 border-civic-700/35 pl-4">
+                <p class="text-xs font-extrabold text-ink/65">Mandate</p>
+                <p class="mt-2 max-w-md text-xs font-medium leading-5 text-ink/66">{{ department.mandate }}</p>
               </div>
             </div>
 
             <div class="lg:border-l lg:border-ink/10 lg:pl-12">
               <div class="flex items-center justify-between gap-4">
                 <h3 class="text-sm font-extrabold text-ink">Services offered</h3>
-                <span class="text-xs font-bold tabular-nums text-ink/40">
+                <span class="text-xs font-bold tabular-nums text-ink/60">
                   {{ department.visibleServices.length }} {{ department.visibleServices.length === 1 ? 'service' : 'services' }}
                 </span>
               </div>
@@ -104,7 +126,7 @@ const filteredDepartments = computed(() => {
                 <li
                   v-for="service in department.visibleServices"
                   :key="service"
-                  class="flex min-h-12 items-start gap-3 bg-canvas px-4 py-3 text-sm font-semibold leading-6 text-ink/70"
+                  class="flex min-h-12 items-start gap-3 bg-canvas px-4 py-3 text-sm font-semibold leading-6 text-ink/78"
                 >
                   <PhCheck class="mt-1 shrink-0 text-civic-700" :size="15" weight="bold" />
                   <span>{{ service }}</span>
