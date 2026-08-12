@@ -50,6 +50,30 @@ const router = createRouter({
       component: () => import('../views/ContactView.vue'),
     },
     {
+      path: '/privacy',
+      name: 'privacy',
+      component: () => import('../views/GovernmentInfoView.vue'),
+      meta: { title: 'Privacy statement', eyebrow: 'Legal information', kind: 'privacy' },
+    },
+    {
+      path: '/accessibility',
+      name: 'accessibility',
+      component: () => import('../views/GovernmentInfoView.vue'),
+      meta: { title: 'Accessibility', eyebrow: 'Using this website', kind: 'accessibility' },
+    },
+    {
+      path: '/disclaimer',
+      name: 'disclaimer',
+      component: () => import('../views/GovernmentInfoView.vue'),
+      meta: { title: 'Disclaimer', eyebrow: 'Legal information', kind: 'disclaimer' },
+    },
+    {
+      path: '/site-map',
+      name: 'site-map',
+      component: () => import('../views/GovernmentInfoView.vue'),
+      meta: { title: 'Site map', eyebrow: 'Website navigation', kind: 'sitemap' },
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('../views/NotFoundView.vue'),

@@ -1,117 +1,219 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
-  PhArrowRight, PhArrowUpRight, PhBlueprint, PhBuildings, PhIdentificationCard,
-  PhMagnifyingGlass, PhMapPinArea, PhMegaphone, PhBookOpenUser, PhReceipt, PhUsers,
+  PhArrowRight,
+  PhArrowUpRight,
+  PhBlueprint,
+  PhBookOpenText,
+  PhBuildings,
+  PhCaretLeft,
+  PhCaretRight,
+  PhChatCircleText,
+  PhIdentificationCard,
+  PhMegaphone,
+  PhPause,
+  PhPlay,
+  PhBookOpenUser,
+  PhBriefcase,
+  PhReceipt,
+  PhUsers,
 } from '@phosphor-icons/vue'
-import { citizenActions, departments, projects, stats, updates } from '../data/siteData'
+import { citizenActions, projects, updates } from '../data/siteData'
 
-const router = useRouter()
-const query = ref('')
-const actionIcons = { buildings: PhBuildings, users: PhUsers, blueprint: PhBlueprint, identification: PhIdentificationCard, passport: PhBookOpenUser, receipt: PhReceipt }
-const actionClasses = ['service-land', 'service-hr', 'service-bims', 'service-id', 'service-passport', 'service-taxes']
-const submitSearch = () => router.push({ path: '/services', query: query.value ? { q: query.value } : {} })
+const slides = [
+  {
+    eyebrow: 'Roads & drainage',
+    title: 'Building a better connected municipality',
+    description: 'Road and drainage improvements are opening safer routes for residents, businesses and public services.',
+    image: '/images/road-project.jpg',
+    alt: 'Road rehabilitation and drainage works in Makindye Ssabagabo Municipality',
+  },
+  {
+    eyebrow: 'Education infrastructure',
+    title: 'Better learning spaces for our children',
+    description: 'New classroom facilities are expanding safe, practical learning environments for growing communities.',
+    image: '/images/school-project.jpg',
+    alt: 'Construction work on a municipal classroom block',
+  },
+  {
+    eyebrow: 'Urban development',
+    title: 'Investing in the places people use every day',
+    description: 'Municipal projects are strengthening public infrastructure and supporting orderly urban growth.',
+    image: '/images/municipal-project.jpg',
+    alt: 'Municipal public infrastructure project in Makindye Ssabagabo',
+  },
+]
+
+const actionIcons = {
+  buildings: PhBuildings,
+  users: PhUsers,
+  blueprint: PhBlueprint,
+  identification: PhIdentificationCard,
+  passport: PhBookOpenUser,
+  receipt: PhReceipt,
+}
+
+const actionClasses = ['gov-service-land', 'gov-service-hr', 'gov-service-bims', 'gov-service-id', 'gov-service-passport', 'gov-service-taxes']
+const publicLinks = [
+  { title: 'Publications', description: 'Reports, plans and public documents.', to: '/news#publications', icon: PhBookOpenText },
+  { title: 'Tenders & opportunities', description: 'Current procurement and work opportunities.', to: '/opportunities', icon: PhBriefcase },
+  { title: 'Council notices', description: 'Official notices and announcements.', to: '/news', icon: PhMegaphone },
+  { title: 'Contact & feedback', description: 'Ask a question or share feedback.', to: '/contact', icon: PhChatCircleText },
+]
+
+const currentSlide = ref(0)
+const isPlaying = ref(true)
+let slideTimer
+
+const clearSlideTimer = () => {
+  if (slideTimer) window.clearInterval(slideTimer)
+  slideTimer = undefined
+}
+
+const startSlideTimer = () => {
+  clearSlideTimer()
+  if (!isPlaying.value) return
+  slideTimer = window.setInterval(() => {
+    currentSlide.value = (currentSlide.value + 1) % slides.length
+  }, 8000)
+}
+
+const showSlide = (index) => {
+  currentSlide.value = (index + slides.length) % slides.length
+  startSlideTimer()
+}
+
+const togglePlayback = () => {
+  isPlaying.value = !isPlaying.value
+}
+
+const handleCarouselKeydown = (event) => {
+  if (event.key === 'ArrowLeft') showSlide(currentSlide.value - 1)
+  if (event.key === 'ArrowRight') showSlide(currentSlide.value + 1)
+}
+
+watch(isPlaying, startSlideTimer)
+
+onMounted(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) isPlaying.value = false
+  startSlideTimer()
+})
+
+onBeforeUnmount(clearSlideTimer)
 </script>
 
 <template>
-  <div class="home-page">
-    <section class="urban-hero">
-      <div class="urban-hero__map" aria-hidden="true"></div>
-      <div class="urban-hero__layout">
-        <div class="urban-hero__content">
-          <div class="uganda-marker" aria-hidden="true"><i></i><i></i><i></i></div>
-          <p class="urban-hero__eyebrow">Makindye Ssabagabo Municipal Council</p>
-          <h1>A city that<br />works for you.</h1>
-          <p class="urban-hero__copy">Services, projects and public information—made easier to find.</p>
-          <form class="urban-search" role="search" @submit.prevent="submitSearch">
-            <label class="sr-only" for="home-search">Search municipal services and information</label>
-            <PhMagnifyingGlass :size="25" weight="regular" aria-hidden="true" />
-            <input id="home-search" v-model="query" type="search" placeholder="Find a service or information" />
-            <button type="submit" aria-label="Search"><PhArrowRight :size="23" weight="bold" /></button>
-          </form>
-          <div class="urban-hero__actions">
-            <RouterLink class="hero-button hero-button--gold" to="/services">Explore services <span><PhArrowRight :size="17" weight="bold" /></span></RouterLink>
-            <RouterLink class="hero-button hero-button--outline" to="/contact">Report an issue <span><PhArrowUpRight :size="17" weight="bold" /></span></RouterLink>
+  <div class="civic-home">
+    <section class="works-carousel" aria-roledescription="carousel" aria-label="Municipal works" tabindex="0" @keydown="handleCarouselKeydown">
+      <div class="works-carousel__slides">
+        <figure v-for="(slide, index) in slides" :key="slide.title" class="works-slide" :class="{ 'is-active': currentSlide === index }" :aria-hidden="currentSlide !== index">
+          <img :src="slide.image" :alt="currentSlide === index ? slide.alt : ''" />
+        </figure>
+      </div>
+
+      <div class="site-container works-carousel__inner">
+        <div class="works-carousel__copy" aria-live="polite" aria-atomic="true">
+          <p>{{ slides[currentSlide].eyebrow }}</p>
+          <h1>{{ slides[currentSlide].title }}</h1>
+          <span class="identity-rule" aria-hidden="true"><i></i><i></i><i></i></span>
+          <p class="works-carousel__description">{{ slides[currentSlide].description }}</p>
+          <div class="works-carousel__actions">
+            <RouterLink class="civic-button civic-button--primary" to="/projects">Explore our projects <PhArrowRight :size="18" weight="bold" /></RouterLink>
+            <RouterLink class="civic-button civic-button--secondary" to="/contact">Report an issue</RouterLink>
           </div>
         </div>
-        <div class="urban-hero__media">
-          <img src="/images/urban-road.jpg" alt="Urban road corridor in Makindye Ssabagabo Municipality" />
-          <div class="hero-location"><PhMapPinArea :size="18" weight="fill" /> Kigo–Lweza corridor</div>
-          <RouterLink class="hero-notice" to="/news">
-            <span class="hero-notice__icon"><PhMegaphone :size="27" weight="regular" /></span>
-            <span><small>Public notice</small><strong>Municipal complaints and grievance policy</strong></span>
-            <PhArrowRight class="hero-notice__arrow" :size="20" weight="bold" />
-          </RouterLink>
+
+        <button class="carousel-arrow carousel-arrow--previous" type="button" aria-label="Previous project" @click="showSlide(currentSlide - 1)"><PhCaretLeft :size="25" weight="bold" /></button>
+        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next project" @click="showSlide(currentSlide + 1)"><PhCaretRight :size="25" weight="bold" /></button>
+
+        <div class="carousel-status">
+          <span>{{ String(currentSlide + 1).padStart(2, '0') }} / {{ String(slides.length).padStart(2, '0') }}</span>
+          <div class="carousel-indicators" aria-label="Choose a project slide">
+            <button v-for="(_, index) in slides" :key="index" type="button" :class="{ 'is-active': currentSlide === index }" :aria-label="`Show project ${index + 1}`" :aria-current="currentSlide === index ? 'true' : undefined" @click="showSlide(index)"></button>
+          </div>
+          <button class="carousel-playback" type="button" :aria-label="isPlaying ? 'Pause slideshow' : 'Play slideshow'" @click="togglePlayback">
+            <PhPause v-if="isPlaying" :size="18" weight="fill" />
+            <PhPlay v-else :size="18" weight="fill" />
+          </button>
         </div>
       </div>
     </section>
 
-    <section class="service-gateway">
+    <RouterLink class="public-notice-bar" to="/news">
+      <span class="public-notice-bar__label"><PhMegaphone :size="22" /> Public notice</span>
+      <strong>Municipal complaints and grievance policy</strong>
+      <span class="public-notice-bar__action">Read notice <PhArrowRight :size="18" weight="bold" /></span>
+    </RouterLink>
+
+    <section class="government-services" aria-labelledby="services-heading">
       <div class="site-container">
-        <div class="editorial-heading">
-          <div><div class="uganda-marker" aria-hidden="true"><i></i><i></i><i></i></div><h2>Start with<br />what you need</h2></div>
-          <p>Direct access to the public services residents use most.</p>
+        <div class="government-services__heading">
+          <div><p>Citizen services</p><h2 id="services-heading">Access government services</h2></div>
+          <span>Start with the service you need.</span>
         </div>
-        <div class="service-mosaic">
-          <a v-for="(action, index) in citizenActions" :key="action.title" class="service-tile group" :class="actionClasses[index]" :href="action.href" target="_blank" rel="noreferrer">
-            <span class="service-tile__number">{{ String(index + 1).padStart(2, '0') }}</span>
-            <span class="service-tile__graphic"><component class="service-tile__icon" :is="actionIcons[action.icon]" :size="58" weight="regular" /></span>
-            <span class="service-tile__body"><strong>{{ action.title }}</strong><small>{{ action.description }}</small></span>
-            <span class="service-tile__arrow"><PhArrowUpRight :size="18" weight="bold" /></span>
+
+        <div class="government-services__grid">
+          <a v-for="(action, index) in citizenActions" :key="action.title" class="government-service" :class="actionClasses[index]" :href="action.href" target="_blank" rel="noreferrer">
+            <span class="government-service__icon"><component :is="actionIcons[action.icon]" :size="64" weight="regular" /></span>
+            <span class="government-service__content"><strong>{{ action.title }}</strong><small>{{ action.description }}</small><em>{{ action.domain }}</em></span>
+            <span class="government-service__arrow"><PhArrowUpRight :size="20" weight="bold" /></span>
           </a>
         </div>
-        <RouterLink class="service-help" to="/contact"><span>Not sure where to start?</span><strong>Contact the council</strong><span class="service-help__arrow"><PhArrowRight :size="20" weight="bold" /></span></RouterLink>
-      </div>
-    </section>
 
-    <section class="municipal-facts" aria-label="Municipal facts">
-      <div class="site-container municipal-facts__grid"><div v-for="item in stats" :key="item.label" class="municipal-fact"><strong>{{ item.value }}</strong><span>{{ item.label }}</span></div></div>
-    </section>
-
-    <section class="department-index">
-      <div class="department-index__map" aria-hidden="true"></div>
-      <div class="site-container department-index__layout">
-        <div class="department-index__intro">
-          <div class="uganda-marker uganda-marker--light" aria-hidden="true"><i></i><i></i><i></i></div>
-          <h2>The offices<br />behind the city</h2>
-          <p>Clear mandates. Practical services.<br />People you can reach.</p>
-          <div class="department-index__image"><img src="/images/contract-signing.jpg" alt="Municipal officers at an official project contract event" /></div>
-        </div>
-        <div class="department-index__list">
-          <RouterLink v-for="(department, index) in departments.slice(0, 6)" :key="department.slug" class="department-index__row group" :to="`/departments/${department.slug}`">
-            <span>{{ String(index + 1).padStart(2, '0') }}</span><strong>{{ department.shortName }}</strong><i><PhArrowRight :size="19" weight="bold" /></i>
-          </RouterLink>
-          <RouterLink class="department-index__all" to="/departments">View all departments <PhArrowRight :size="19" weight="bold" /></RouterLink>
+        <div class="government-services__help">
+          <span>Need help finding the right service?</span>
+          <RouterLink to="/contact">Contact the council <PhArrowRight :size="17" weight="bold" /></RouterLink>
+          <RouterLink class="government-services__all" to="/services">View all service information</RouterLink>
         </div>
       </div>
     </section>
 
-    <section class="progress-section">
-      <div class="site-container">
-        <div class="editorial-heading editorial-heading--progress">
-          <div><div class="uganda-marker" aria-hidden="true"><i></i><i></i><i></i></div><h2>Progress you<br />can see</h2></div>
-          <p>Follow the roads, schools and public facilities being delivered across the municipality.</p>
+    <section class="municipality-story" aria-labelledby="municipality-heading">
+      <div class="site-container municipality-story__layout">
+        <figure class="municipality-story__media">
+          <img src="/images/municipality-aerial.jpg" alt="Aerial view of an urban centre in Makindye Ssabagabo Municipality" />
+          <figcaption>Masajja <i></i> Ndejje <i></i> Bunamwaya</figcaption>
+        </figure>
+        <div class="municipality-story__content">
+          <span class="section-rule" aria-hidden="true"></span>
+          <p class="municipality-story__eyebrow">Our municipality</p>
+          <h2 id="municipality-heading">A growing urban centre in Greater Kampala</h2>
+          <p>Makindye Ssabagabo brings together established communities, new neighbourhoods, commerce and public infrastructure across three divisions.</p>
+          <dl class="municipality-facts">
+            <div><dt>3</dt><dd>Municipal divisions</dd></div>
+            <div><dt>84.7 km²</dt><dd>Municipal area</dd></div>
+            <div><dt>9</dt><dd>Departments</dd></div>
+          </dl>
+          <div class="municipality-story__links">
+            <RouterLink to="/about">Learn about the municipality <PhArrowRight :size="17" weight="bold" /></RouterLink>
+            <RouterLink to="/departments">Explore departments <PhArrowRight :size="17" weight="bold" /></RouterLink>
+          </div>
         </div>
-        <div class="progress-layout">
-          <article class="progress-feature">
+      </div>
+    </section>
+
+    <section class="council-information">
+      <div class="site-container council-information__layout">
+        <div class="council-updates">
+          <div class="council-updates__heading"><p>News & notices</p><h2>Latest from the council</h2><span>Current notices, decisions and municipal progress.</span></div>
+          <article class="featured-update">
             <img :src="projects[0].image" :alt="projects[0].title" />
-            <div class="progress-feature__caption"><small>{{ projects[0].sector }}</small><h3>{{ projects[0].title }}</h3><p>{{ projects[0].status }}</p><RouterLink to="/projects">View all projects <PhArrowRight :size="17" weight="bold" /></RouterLink></div>
+            <div><p>{{ updates[0].type }} <i></i> {{ updates[0].date }}</p><h3>{{ updates[0].title }}</h3><span>{{ updates[0].excerpt }}</span><RouterLink to="/news">View all updates <PhArrowRight :size="17" weight="bold" /></RouterLink></div>
           </article>
-          <aside class="council-latest">
-            <img :src="projects[1].image" :alt="projects[1].title" />
-            <div class="council-latest__content">
-              <p class="section-kicker">Latest from the council</p><h3>News, notices and decisions</h3>
-              <RouterLink v-for="update in updates.slice(0, 2)" :key="update.title" class="latest-row" to="/news"><small>{{ update.date }}</small><strong>{{ update.title }}</strong><PhArrowUpRight :size="17" weight="bold" /></RouterLink>
-              <RouterLink class="latest-all" to="/news">All updates <PhArrowRight :size="17" weight="bold" /></RouterLink>
-            </div>
-          </aside>
+          <RouterLink v-for="update in updates.slice(1)" :key="update.title" class="compact-update" to="/news">
+            <time>{{ update.date }}</time><span>{{ update.type }}</span><strong>{{ update.title }}</strong><PhArrowRight :size="19" weight="bold" />
+          </RouterLink>
         </div>
-      </div>
-    </section>
 
-    <section class="civic-cta">
-      <div class="site-container civic-cta__layout"><div><p>We are here to help</p><h2>Talk to the right municipal office.</h2></div><RouterLink class="civic-cta__button" to="/contact">Contact the council <span><PhArrowUpRight :size="19" weight="bold" /></span></RouterLink></div>
+        <aside class="public-information" aria-labelledby="public-info-heading">
+          <p>Resources</p><h2 id="public-info-heading">Public information</h2>
+          <RouterLink v-for="item in publicLinks" :key="item.title" class="public-information__link" :to="item.to">
+            <span><component :is="item.icon" :size="30" weight="regular" /></span>
+            <span><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
+            <PhArrowRight :size="21" weight="bold" />
+          </RouterLink>
+        </aside>
+      </div>
     </section>
   </div>
 </template>

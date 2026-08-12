@@ -1,17 +1,14 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import {
-  PhCaretDown,
-  PhEnvelopeSimple,
-  PhMagnifyingGlass,
-  PhPhone,
-} from '@phosphor-icons/vue'
+import { useRoute, useRouter } from 'vue-router'
+import { PhCaretDown, PhEnvelopeSimple, PhMagnifyingGlass, PhPhone } from '@phosphor-icons/vue'
 
 const route = useRoute()
+const router = useRouter()
 const menuOpen = ref(false)
 const activeDesktopMenu = ref(null)
 const openMobileGroup = ref(null)
+const searchQuery = ref('')
 
 const navigation = [
   { label: 'Home', to: '/' },
@@ -49,6 +46,7 @@ const navigation = [
     ],
   },
   { label: 'Opportunities', to: '/opportunities' },
+  { label: 'Contact', to: '/contact' },
 ]
 
 const closeMenus = () => {
@@ -69,9 +67,12 @@ const handleKeydown = (event) => {
   if (event.key === 'Escape') closeMenus()
 }
 
+const submitSiteSearch = () => {
+  router.push({ path: '/services', query: searchQuery.value ? { q: searchQuery.value } : {} })
+}
+
 watch(() => route.fullPath, closeMenus)
 watch(menuOpen, (open) => { document.body.style.overflow = open ? 'hidden' : '' })
-
 onMounted(() => window.addEventListener('keydown', handleKeydown))
 onBeforeUnmount(() => {
   document.body.style.overflow = ''
@@ -82,74 +83,77 @@ onBeforeUnmount(() => {
 <template>
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  <header class="site-header">
+  <header class="site-header official-header">
     <div class="national-stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
 
-    <div class="government-bar">
-      <div class="site-container government-bar__inner">
-        <div class="government-bar__identity">
-          <img src="/images/uganda-flag.png" alt="Flag of Uganda" />
-          <span class="hidden sm:inline">An official Government of Uganda website</span>
-          <span class="sm:hidden">Government of Uganda</span>
-        </div>
-        <div class="government-bar__contacts">
-          <a href="mailto:info@msabagabo.go.ug"><PhEnvelopeSimple :size="15" /><span class="hidden md:inline">info@msabagabo.go.ug</span></a>
-          <a href="tel:0800256260"><PhPhone :size="15" /><span class="hidden sm:inline">Toll free</span> 0800 256 260</a>
-        </div>
+    <div class="official-gov-bar">
+      <div class="site-container official-gov-bar__inner">
+        <span class="official-gov-bar__owner"><img src="/images/uganda-flag.png" alt="Flag of Uganda" /> An official Government of Uganda website</span>
+        <a href="https://www.gou.go.ug/" target="_blank" rel="noreferrer">Government of Uganda portal <span aria-hidden="true">↗</span></a>
       </div>
     </div>
 
-    <div class="main-navigation">
-      <div class="site-container main-navigation__inner">
-        <RouterLink class="municipal-brand" to="/" aria-label="Makindye Ssabagabo Municipal Council home">
+    <div class="government-masthead">
+      <div class="site-container government-masthead__inner">
+        <RouterLink class="government-brand" to="/" aria-label="Makindye Ssabagabo Municipal Council home">
           <img src="/images/municipal-logo.png" alt="Makindye Ssabagabo Municipal Council logo" />
-          <span><small>Wakiso District</small><strong>Makindye Ssabagabo<br />Municipal Council</strong></span>
+          <span><small>Wakiso District Local Government</small><strong>Makindye Ssabagabo<br />Municipal Council</strong></span>
         </RouterLink>
 
-        <nav class="primary-navigation" aria-label="Primary navigation">
-          <div v-for="item in navigation" :key="item.label" class="primary-navigation__item">
-            <RouterLink v-if="!item.children" class="primary-navigation__link" :class="{ 'is-active': route.path === item.to }" :to="item.to">{{ item.label }}</RouterLink>
-            <button v-else class="primary-navigation__link" :class="{ 'is-active': route.path.startsWith(item.to) }" type="button" :aria-expanded="activeDesktopMenu === item.label" @click="toggleDesktopMenu(item.label)">
-              {{ item.label }}
-              <PhCaretDown :size="12" weight="bold" :class="{ 'rotate-180': activeDesktopMenu === item.label }" />
+        <div class="government-masthead__utilities">
+          <a href="tel:0800256260"><span class="masthead-utility-icon"><PhPhone :size="19" /></span><span><small>Toll free</small><strong>0800 256 260</strong></span></a>
+          <a href="mailto:info@msabagabo.go.ug"><span class="masthead-utility-icon"><PhEnvelopeSimple :size="19" /></span><span><small>Email</small><strong>info@msabagabo.go.ug</strong></span></a>
+          <form class="masthead-search" role="search" @submit.prevent="submitSiteSearch">
+            <label class="sr-only" for="site-search">Search this website</label>
+            <PhMagnifyingGlass :size="19" />
+            <input id="site-search" v-model="searchQuery" type="search" placeholder="Search" />
+            <button type="submit" aria-label="Submit search">→</button>
+          </form>
+        </div>
+
+        <button class="official-menu-trigger" type="button" :aria-expanded="menuOpen" aria-controls="mobile-navigation" :aria-label="menuOpen ? 'Close menu' : 'Open menu'" @click="menuOpen = !menuOpen"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+
+    <nav class="government-navigation" aria-label="Primary navigation">
+      <div class="site-container government-navigation__inner">
+        <div class="government-navigation__links">
+          <div v-for="item in navigation" :key="item.label" class="government-navigation__item">
+            <RouterLink v-if="!item.children" class="government-navigation__link" :class="{ 'is-active': route.path === item.to }" :to="item.to">{{ item.label }}</RouterLink>
+            <button v-else class="government-navigation__link" :class="{ 'is-active': route.path.startsWith(item.to) }" type="button" :aria-expanded="activeDesktopMenu === item.label" @click="toggleDesktopMenu(item.label)">
+              {{ item.label }} <PhCaretDown :size="12" weight="bold" :class="{ 'rotate-180': activeDesktopMenu === item.label }" />
             </button>
             <Transition name="dropdown-reveal">
-              <div v-if="item.children && activeDesktopMenu === item.label" class="nav-dropdown">
+              <div v-if="item.children && activeDesktopMenu === item.label" class="official-nav-dropdown">
                 <p>{{ item.label }}</p>
-                <RouterLink v-for="child in item.children" :key="child.label" class="nav-dropdown-link" :to="child.to">{{ child.label }}</RouterLink>
+                <RouterLink v-for="child in item.children" :key="child.label" :to="child.to">{{ child.label }} <span>→</span></RouterLink>
               </div>
             </Transition>
           </div>
-        </nav>
-
-        <div class="navigation-actions">
-          <RouterLink class="navigation-search" to="/services" aria-label="Find a service"><PhMagnifyingGlass :size="21" weight="bold" /></RouterLink>
-          <RouterLink class="navigation-report" to="/contact"><span>Report an issue</span><i>→</i></RouterLink>
         </div>
-
-        <button class="menu-trigger" type="button" :aria-expanded="menuOpen" aria-controls="mobile-navigation" :aria-label="menuOpen ? 'Close menu' : 'Open menu'" @click="menuOpen = !menuOpen">
-          <span></span><span></span>
-        </button>
+        <RouterLink class="citizen-services-link" to="/services"><span>Citizen services</span><strong>Find a service</strong><i>→</i></RouterLink>
       </div>
-    </div>
+    </nav>
 
     <Transition name="menu-fade">
-      <div v-if="menuOpen" id="mobile-navigation" class="mobile-menu">
-        <div class="site-container mobile-menu__inner">
-          <RouterLink class="mobile-service-search" to="/services"><PhMagnifyingGlass :size="20" weight="bold" /> Find a service or information</RouterLink>
-          <nav class="mobile-navigation" aria-label="Mobile navigation">
-            <div v-for="(item, index) in navigation" :key="item.label" class="mobile-navigation__item">
+      <div v-if="menuOpen" id="mobile-navigation" class="official-mobile-menu">
+        <div class="site-container official-mobile-menu__inner">
+          <form class="official-mobile-search" role="search" @submit.prevent="submitSiteSearch">
+            <PhMagnifyingGlass :size="20" /><input v-model="searchQuery" type="search" placeholder="Search services and information" aria-label="Search website" /><button type="submit">Search</button>
+          </form>
+          <nav aria-label="Mobile navigation">
+            <div v-for="(item, index) in navigation" :key="item.label" class="official-mobile-nav-item">
               <span>{{ String(index + 1).padStart(2, '0') }}</span>
-              <RouterLink v-if="!item.children" class="mobile-nav-link" :to="item.to">{{ item.label }}</RouterLink>
+              <RouterLink v-if="!item.children" :to="item.to">{{ item.label }}</RouterLink>
               <template v-else>
-                <button class="mobile-nav-link" type="button" @click="toggleMobileGroup(item.label)">{{ item.label }}<PhCaretDown :size="17" weight="bold" :class="{ 'rotate-180': openMobileGroup === item.label }" /></button>
-                <div v-if="openMobileGroup === item.label" class="mobile-children">
-                  <RouterLink v-for="child in item.children" :key="child.label" class="mobile-child-link" :to="child.to">{{ child.label }}</RouterLink>
+                <button type="button" @click="toggleMobileGroup(item.label)">{{ item.label }}<PhCaretDown :size="17" weight="bold" :class="{ 'rotate-180': openMobileGroup === item.label }" /></button>
+                <div v-if="openMobileGroup === item.label" class="official-mobile-children">
+                  <RouterLink v-for="child in item.children" :key="child.label" :to="child.to">{{ child.label }}</RouterLink>
                 </div>
               </template>
             </div>
           </nav>
-          <RouterLink class="mobile-report" to="/contact">Report an issue or send feedback <span>→</span></RouterLink>
+          <RouterLink class="official-mobile-feedback" to="/contact">Report an issue or send feedback <span>→</span></RouterLink>
         </div>
       </div>
     </Transition>
