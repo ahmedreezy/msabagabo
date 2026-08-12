@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   PhArrowRight,
   PhArrowUpRight,
@@ -63,6 +63,9 @@ const publicLinks = [
 
 const currentSlide = ref(0)
 const isPlaying = ref(true)
+const servicesRail = ref(null)
+const canScrollServicesBack = ref(false)
+const canScrollServicesForward = ref(true)
 let slideTimer
 
 const clearSlideTimer = () => {
@@ -92,14 +95,45 @@ const handleCarouselKeydown = (event) => {
   if (event.key === 'ArrowRight') showSlide(currentSlide.value + 1)
 }
 
+const updateServiceControls = () => {
+  const rail = servicesRail.value
+  if (!rail) return
+  canScrollServicesBack.value = rail.scrollLeft > 8
+  canScrollServicesForward.value = rail.scrollLeft < rail.scrollWidth - rail.clientWidth - 8
+}
+
+const scrollServices = (direction) => {
+  const rail = servicesRail.value
+  if (!rail) return
+  const tile = rail.querySelector('.government-service')
+  const gap = Number.parseFloat(window.getComputedStyle(rail).columnGap) || 16
+  rail.scrollBy({ left: direction * ((tile?.getBoundingClientRect().width || rail.clientWidth * 0.8) + gap), behavior: 'smooth' })
+}
+
+const handleServiceKeys = (event) => {
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    scrollServices(-1)
+  }
+  if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    scrollServices(1)
+  }
+}
+
 watch(isPlaying, startSlideTimer)
 
 onMounted(() => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) isPlaying.value = false
   startSlideTimer()
+  nextTick(updateServiceControls)
+  window.addEventListener('resize', updateServiceControls)
 })
 
-onBeforeUnmount(clearSlideTimer)
+onBeforeUnmount(() => {
+  clearSlideTimer()
+  window.removeEventListener('resize', updateServiceControls)
+})
 </script>
 
 <template>
@@ -148,10 +182,16 @@ onBeforeUnmount(clearSlideTimer)
       <div class="site-container">
         <div class="government-services__heading">
           <div><p>Citizen services</p><h2 id="services-heading">Access government services</h2></div>
-          <span>Start with the service you need.</span>
+          <div class="government-services__heading-side">
+            <span>Start with the service you need.</span>
+            <div class="service-rail-controls" aria-label="Citizen service navigation">
+              <button type="button" aria-label="Previous services" :disabled="!canScrollServicesBack" @click="scrollServices(-1)"><PhCaretLeft :size="20" weight="bold" /></button>
+              <button type="button" aria-label="Next services" :disabled="!canScrollServicesForward" @click="scrollServices(1)"><PhCaretRight :size="20" weight="bold" /></button>
+            </div>
+          </div>
         </div>
 
-        <div class="government-services__grid">
+        <div ref="servicesRail" class="government-services__grid" tabindex="0" aria-label="Citizen services. Use left and right arrow keys to browse." @scroll.passive="updateServiceControls" @keydown="handleServiceKeys">
           <a v-for="(action, index) in citizenActions" :key="action.title" class="government-service" :class="actionClasses[index]" :href="action.href" target="_blank" rel="noreferrer">
             <span class="government-service__icon"><component :is="actionIcons[action.icon]" :size="64" weight="regular" /></span>
             <span class="government-service__content"><strong>{{ action.title }}</strong><small>{{ action.description }}</small><em>{{ action.domain }}</em></span>

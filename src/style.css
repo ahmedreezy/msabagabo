@@ -1667,3 +1667,51 @@
   .carousel-indicators { display: none; }
   .works-carousel__copy h1 { font-size: 2.4rem; }
 }
+
+/* Swipeable citizen service rail */
+@layer components {
+  .government-services__heading-side { display: flex; align-items: center; gap: 1.5rem; }
+  .government-services__heading-side > span { max-width: 20rem; color: rgb(17 24 21 / 0.62); font-size: 0.9rem; }
+  .service-rail-controls { display: flex; flex-shrink: 0; gap: 0.4rem; }
+  .service-rail-controls button { display: grid; width: 2.9rem; height: 2.9rem; place-items: center; border: 1px solid rgb(7 59 44 / 0.28); background: white; color: #073b2c; transition: background-color 300ms var(--ease-premium), color 300ms var(--ease-premium), opacity 300ms var(--ease-premium); }
+  .service-rail-controls button:hover:not(:disabled) { background: #073b2c; color: white; }
+  .service-rail-controls button:disabled { cursor: not-allowed; opacity: 0.3; }
+  .government-services__grid {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-behavior: smooth;
+    scroll-padding-inline: 0;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(7 59 44 / 0.35) transparent;
+  }
+  .government-services__grid::-webkit-scrollbar { height: 0.35rem; }
+  .government-services__grid::-webkit-scrollbar-track { background: transparent; }
+  .government-services__grid::-webkit-scrollbar-thumb { background: rgb(7 59 44 / 0.28); }
+  .government-service {
+    min-height: 18rem;
+    flex: 0 0 calc((100% - 2rem) / 3);
+    scroll-snap-align: start;
+    border-right: 1px solid rgb(7 59 44 / 0.18) !important;
+    border-bottom: 0 !important;
+  }
+  .government-service:first-child { border-left: 1px solid rgb(7 59 44 / 0.18); }
+}
+
+@media (max-width: 1023px) {
+  .government-service { flex-basis: calc((100% - 1rem) / 2); }
+}
+
+@media (max-width: 767px) {
+  .government-services__heading-side { width: 100%; justify-content: space-between; }
+  .government-service { min-height: 15rem; flex-basis: min(82vw, 24rem); padding: 1.4rem; }
+  .government-services__grid { margin-right: -1rem; padding-right: 1rem; scroll-padding-right: 1rem; }
+}
+
+@media (max-width: 479px) {
+  .government-services__heading-side > span { display: none; }
+  .government-services__heading-side { justify-content: flex-end; }
+  .government-service { flex-basis: 88vw; }
+}
