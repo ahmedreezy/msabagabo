@@ -1,18 +1,16 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import {
-  PhArrowRight,
-  PhBuildings,
-  PhCheck,
-  PhMagnifyingGlass,
-} from '@phosphor-icons/vue'
+import { PhArrowRight, PhCheck, PhMagnifyingGlass } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
 import { departments } from '../data/siteData'
 
 const route = useRoute()
 const search = ref(route.query.q || '')
-const selectedSlug = ref(departments[0]?.slug || '')
+
+const totalServices = computed(() =>
+  departments.reduce((total, department) => total + department.services.length, 0),
+)
 
 const filteredDepartments = computed(() => {
   const query = search.value.trim().toLowerCase()
@@ -35,16 +33,6 @@ const filteredDepartments = computed(() => {
     return matches
   }, [])
 })
-
-const activeDepartment = computed(() =>
-  filteredDepartments.value.find((department) => department.slug === selectedSlug.value)
-  || filteredDepartments.value[0]
-  || null,
-)
-
-const selectDepartment = (slug) => {
-  selectedSlug.value = slug
-}
 </script>
 
 <template>
@@ -52,136 +40,89 @@ const selectDepartment = (slug) => {
     <PageIntro
       eyebrow="Public services"
       title="Services by department"
-      description="Find the municipal office responsible for the service you need."
+      description="Find the municipal department responsible for the service you need."
     />
 
-    <section class="bg-white pb-24 pt-12 sm:pb-28 sm:pt-16 lg:pt-20">
+    <section class="bg-canvas pb-24 pt-10 sm:pb-28 sm:pt-14 lg:pt-16">
       <div class="site-container">
-        <div class="grid gap-6 border-b border-ink/10 pb-8 lg:grid-cols-[1fr_minmax(22rem,0.7fr)] lg:items-end">
-          <div>
-            <p class="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-civic-700">Municipal service directory</p>
-            <h2 class="mt-3 max-w-2xl text-2xl font-extrabold leading-tight tracking-[-0.035em] text-ink sm:text-3xl">
-              Start with the responsible department
-            </h2>
+        <div class="grid overflow-hidden bg-white shadow-[0_20px_70px_rgba(7,59,44,0.07)] md:grid-cols-[auto_auto_1fr]">
+          <div class="flex items-center gap-3 border-b border-ink/8 px-5 py-5 md:border-b-0 md:border-r md:px-7">
+            <strong class="text-2xl font-extrabold tracking-[-0.04em] text-civic-800">{{ departments.length }}</strong>
+            <span class="text-xs font-bold leading-4 text-ink/48">Municipal<br />departments</span>
           </div>
-
-          <div class="relative">
+          <div class="flex items-center gap-3 border-b border-ink/8 px-5 py-5 md:border-b-0 md:border-r md:px-7">
+            <strong class="text-2xl font-extrabold tracking-[-0.04em] text-civic-800">{{ totalServices }}</strong>
+            <span class="text-xs font-bold leading-4 text-ink/48">Listed<br />services</span>
+          </div>
+          <div class="relative min-h-16">
             <label class="sr-only" for="service-search">Search departments or services</label>
             <PhMagnifyingGlass
-              class="absolute left-5 top-1/2 -translate-y-1/2 text-civic-700"
-              :size="20"
+              class="absolute left-5 top-1/2 -translate-y-1/2 text-civic-700 md:left-7"
+              :size="21"
               weight="bold"
             />
             <input
               id="service-search"
               v-model="search"
-              class="w-full bg-canvas py-4 pl-13 pr-5 text-sm font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.08)] outline-none transition focus:shadow-[inset_0_0_0_2px_rgba(25,101,73,0.7)] placeholder:text-ink/38"
+              class="h-full min-h-16 w-full border-0 bg-white py-5 pl-13 pr-5 text-sm font-semibold text-ink outline-none transition placeholder:text-ink/38 focus:bg-sage-50 md:pl-16"
               type="search"
               placeholder="Search a department or service"
             />
           </div>
         </div>
 
-        <div v-if="activeDepartment" class="mt-8">
-          <div class="mb-5 lg:hidden">
-            <label class="mb-2 block text-xs font-bold text-ink/60" for="department-select">Select department</label>
-            <select
-              id="department-select"
-              class="w-full border-0 bg-canvas px-4 py-4 text-sm font-bold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.1)] outline-none focus:shadow-[inset_0_0_0_2px_rgba(25,101,73,0.7)]"
-              :value="activeDepartment.slug"
-              @change="selectDepartment($event.target.value)"
-            >
-              <option v-for="department in filteredDepartments" :key="department.slug" :value="department.slug">
-                {{ department.name }} ({{ department.services.length }})
-              </option>
-            </select>
-          </div>
+        <div v-if="filteredDepartments.length" class="mt-10 bg-white px-5 sm:px-8 lg:px-12">
+          <article
+            v-for="(department, index) in filteredDepartments"
+            :key="department.slug"
+            class="grid gap-8 border-b border-ink/10 py-10 last:border-b-0 sm:py-12 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-16 lg:py-14"
+          >
+            <div class="relative lg:pl-14">
+              <span class="mb-5 block font-mono text-xs font-bold tabular-nums text-civic-700 lg:absolute lg:left-0 lg:top-1">
+                {{ String(index + 1).padStart(2, '0') }}
+              </span>
+              <h2 class="max-w-md text-2xl font-extrabold leading-[1.08] tracking-[-0.04em] text-ink sm:text-[1.75rem]">
+                {{ department.name }}
+              </h2>
+              <p class="mt-4 max-w-md text-sm leading-6 text-ink/58">{{ department.summary }}</p>
 
-          <div class="grid items-start lg:grid-cols-[minmax(17rem,0.34fr)_minmax(0,1fr)]">
-            <aside class="hidden bg-canvas p-3 lg:block" aria-label="Service departments">
-              <p class="px-4 pb-4 pt-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-ink/42">
-                {{ filteredDepartments.length }} departments
-              </p>
-              <button
-                v-for="(department, index) in filteredDepartments"
-                :key="department.slug"
-                class="group grid w-full grid-cols-[2rem_1fr_auto] items-center gap-2 border-t border-ink/8 px-4 py-4 text-left transition duration-300 hover:bg-white"
-                :class="activeDepartment.slug === department.slug ? 'bg-civic-800 text-white hover:bg-civic-800' : 'text-ink'"
-                type="button"
-                @click="selectDepartment(department.slug)"
-              >
-                <span
-                  class="font-mono text-[0.65rem] font-bold tabular-nums"
-                  :class="activeDepartment.slug === department.slug ? 'text-white/48' : 'text-ink/35'"
-                >
-                  {{ String(index + 1).padStart(2, '0') }}
-                </span>
-                <span class="text-sm font-bold leading-5">{{ department.name }}</span>
-                <PhArrowRight
-                  class="transition-transform duration-300 group-hover:translate-x-0.5"
-                  :class="activeDepartment.slug === department.slug ? 'text-orange-300' : 'text-ink/28'"
-                  :size="15"
-                  weight="bold"
-                />
-              </button>
-            </aside>
-
-            <article class="relative overflow-hidden bg-civic-50 px-6 py-8 sm:px-9 sm:py-10 lg:min-h-[38rem] lg:px-12 lg:py-12 xl:px-16">
-              <div class="absolute right-0 top-0 size-36 translate-x-1/3 -translate-y-1/3 rounded-full border-[2rem] border-civic-700/[0.04]" aria-hidden="true"></div>
-
-              <div class="relative">
-                <div class="flex items-start justify-between gap-6">
-                  <div class="max-w-3xl">
-                    <p class="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-civic-700">
-                      {{ activeDepartment.services.length }} services offered
-                    </p>
-                    <h3 class="mt-3 text-[clamp(1.8rem,4vw,3rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-ink">
-                      {{ activeDepartment.name }}
-                    </h3>
-                    <p class="mt-5 max-w-2xl text-sm font-medium leading-7 text-ink/62 sm:text-base">
-                      {{ activeDepartment.summary }}
-                    </p>
-                  </div>
-                  <span class="hidden size-14 shrink-0 items-center justify-center bg-white text-civic-800 shadow-[0_12px_35px_rgba(7,59,44,0.08)] sm:flex">
-                    <PhBuildings :size="27" weight="duotone" />
-                  </span>
-                </div>
-
-                <div class="mt-9 border-t border-civic-900/10 pt-8 sm:mt-10">
-                  <h4 class="text-sm font-extrabold text-ink">Services handled by this department</h4>
-                  <ul class="mt-5 grid gap-x-10 gap-y-3 sm:grid-cols-2">
-                    <li
-                      v-for="service in activeDepartment.visibleServices"
-                      :key="service"
-                      class="flex min-h-11 items-start gap-3 border-b border-civic-900/8 pb-3 text-sm font-semibold leading-6 text-ink/72"
-                    >
-                      <span class="mt-1 flex size-4 shrink-0 items-center justify-center rounded-full bg-civic-700 text-white">
-                        <PhCheck :size="10" weight="bold" />
-                      </span>
-                      <span>{{ service }}</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div class="mt-9 grid gap-6 border-t border-civic-900/10 pt-7 sm:mt-10 sm:grid-cols-[1fr_auto] sm:items-end">
-                  <div class="max-w-2xl">
-                    <p class="text-[0.65rem] font-bold uppercase tracking-[0.15em] text-ink/42">Department mandate</p>
-                    <p class="mt-2 text-sm leading-6 text-ink/60">{{ activeDepartment.mandate }}</p>
-                  </div>
-                  <RouterLink
-                    class="inline-flex min-h-12 items-center justify-center gap-3 bg-civic-800 px-5 text-sm font-bold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-civic-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-civic-700"
-                    :to="`/departments/${activeDepartment.slug}`"
-                  >
-                    Department details
-                    <PhArrowRight :size="16" weight="bold" />
-                  </RouterLink>
-                </div>
+              <div class="mt-7 border-l-2 border-civic-700/25 pl-4">
+                <p class="text-xs font-bold text-ink/45">Mandate</p>
+                <p class="mt-2 max-w-md text-xs leading-5 text-ink/52">{{ department.mandate }}</p>
               </div>
-            </article>
-          </div>
+            </div>
+
+            <div class="lg:border-l lg:border-ink/10 lg:pl-12">
+              <div class="flex items-center justify-between gap-4">
+                <h3 class="text-sm font-extrabold text-ink">Services offered</h3>
+                <span class="text-xs font-bold tabular-nums text-ink/40">
+                  {{ department.visibleServices.length }} {{ department.visibleServices.length === 1 ? 'service' : 'services' }}
+                </span>
+              </div>
+
+              <ul class="mt-5 grid gap-x-9 gap-y-3 sm:grid-cols-2">
+                <li
+                  v-for="service in department.visibleServices"
+                  :key="service"
+                  class="flex min-h-12 items-start gap-3 bg-canvas px-4 py-3 text-sm font-semibold leading-6 text-ink/70"
+                >
+                  <PhCheck class="mt-1 shrink-0 text-civic-700" :size="15" weight="bold" />
+                  <span>{{ service }}</span>
+                </li>
+              </ul>
+
+              <RouterLink
+                class="mt-7 inline-flex min-h-11 items-center gap-3 border-b-2 border-civic-700 pb-1 text-sm font-extrabold text-civic-800 transition duration-300 hover:gap-4 hover:text-civic-700 active:translate-y-px"
+                :to="`/departments/${department.slug}`"
+              >
+                View department details
+                <PhArrowRight :size="16" weight="bold" />
+              </RouterLink>
+            </div>
+          </article>
         </div>
 
-        <div v-else class="mt-10 max-w-xl bg-orange-50 p-7">
+        <div v-else class="mt-10 max-w-xl bg-white p-7 shadow-[0_20px_70px_rgba(7,59,44,0.07)]">
           <h2 class="font-extrabold">No matching department or service</h2>
           <p class="mt-2 text-sm leading-6 text-ink/58">Try a shorter search term or contact the council for guidance.</p>
           <RouterLink class="text-link mt-5" to="/contact">
