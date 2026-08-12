@@ -106,14 +106,12 @@ onBeforeUnmount(() => {
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <header ref="headerElement" class="site-header official-header">
-    <div class="national-stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-
     <div class="government-masthead">
       <div class="site-container government-masthead__inner">
         <RouterLink class="government-brand" to="/" aria-label="Makindye Ssabagabo Municipal Council home">
           <img src="/images/municipal-logo.png" alt="Makindye Ssabagabo Municipal Council logo" />
           <span>
-            <small class="government-brand__official"><img src="/images/uganda-flag.png" alt="" /> Official Government of Uganda website</small>
+            <small class="government-brand__official"><span class="government-brand__flag"><img src="/images/uganda-flag.png" alt="Flag of Uganda" /></span> Official Government of Uganda website</small>
             <strong>Makindye Ssabagabo Municipal Council</strong>
             <em>Wakiso District Local Government</em>
           </span>

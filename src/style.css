@@ -1609,6 +1609,8 @@
   .government-brand > img { width: 4.25rem; height: 4.25rem; }
   .government-brand__official { display: flex !important; align-items: center; gap: 0.45rem; color: #63736a !important; letter-spacing: 0.09em !important; }
   .government-brand__official img { width: 1.4rem; height: 0.9rem; object-fit: cover; }
+  .government-brand__flag { display: grid; width: 1.8rem; height: 1.25rem; place-items: center; border: 1px solid rgb(7 59 44 / 0.12); background: white; padding: 0.15rem; box-shadow: 0 0.25rem 0.7rem rgb(7 59 44 / 0.08); }
+  .government-brand__flag img { width: 100%; height: 100%; object-fit: cover; }
   .government-brand strong { margin-top: 0.3rem; font-size: clamp(1rem, 1.35vw, 1.3rem); white-space: nowrap; }
   .government-brand em { display: block; margin-top: 0.18rem; color: #7b887f; font-size: 0.58rem; font-style: normal; font-weight: 700; }
   .government-masthead__utilities { gap: 1.25rem; }
