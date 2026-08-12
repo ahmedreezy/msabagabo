@@ -4,8 +4,7 @@ import { useRoute } from 'vue-router'
 import {
   PhArrowRight,
   PhBuildings,
-  PhCaretDown,
-  PhCheckCircle,
+  PhCheck,
   PhMagnifyingGlass,
 } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
@@ -13,14 +12,15 @@ import { departments } from '../data/siteData'
 
 const route = useRoute()
 const search = ref(route.query.q || '')
-const expandedDepartments = ref([departments[0]?.slug].filter(Boolean))
+const selectedSlug = ref(departments[0]?.slug || '')
 
 const filteredDepartments = computed(() => {
   const query = search.value.trim().toLowerCase()
 
   return departments.reduce((matches, department) => {
-    const departmentText = `${department.name} ${department.shortName} ${department.summary} ${department.mandate}`.toLowerCase()
-    const departmentMatches = departmentText.includes(query)
+    const departmentMatches = `${department.name} ${department.summary} ${department.mandate}`
+      .toLowerCase()
+      .includes(query)
     const matchingServices = query
       ? department.services.filter((service) => service.toLowerCase().includes(query))
       : department.services
@@ -36,12 +36,14 @@ const filteredDepartments = computed(() => {
   }, [])
 })
 
-const isExpanded = (slug) => expandedDepartments.value.includes(slug)
+const activeDepartment = computed(() =>
+  filteredDepartments.value.find((department) => department.slug === selectedSlug.value)
+  || filteredDepartments.value[0]
+  || null,
+)
 
-const toggleDepartment = (slug) => {
-  expandedDepartments.value = isExpanded(slug)
-    ? expandedDepartments.value.filter((item) => item !== slug)
-    : [...expandedDepartments.value, slug]
+const selectDepartment = (slug) => {
+  selectedSlug.value = slug
 }
 </script>
 
@@ -50,106 +52,133 @@ const toggleDepartment = (slug) => {
     <PageIntro
       eyebrow="Public services"
       title="Services by department"
-      description="Choose the responsible municipal department to view its services and mandate."
+      description="Find the municipal office responsible for the service you need."
     />
 
-    <section class="bg-white py-16 sm:py-20 lg:py-24">
+    <section class="bg-white pb-24 pt-12 sm:pb-28 sm:pt-16 lg:pt-20">
       <div class="site-container">
-        <div class="flex flex-col gap-6 border-b border-ink/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
+        <div class="grid gap-6 border-b border-ink/10 pb-8 lg:grid-cols-[1fr_minmax(22rem,0.7fr)] lg:items-end">
           <div>
-            <p class="text-[0.7rem] font-bold uppercase tracking-[0.16em] text-civic-700">Department directory</p>
-            <h2 class="mt-2 text-2xl font-extrabold tracking-[-0.025em] text-ink sm:text-3xl">
-              {{ departments.length }} service departments
+            <p class="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-civic-700">Municipal service directory</p>
+            <h2 class="mt-3 max-w-2xl text-2xl font-extrabold leading-tight tracking-[-0.035em] text-ink sm:text-3xl">
+              Start with the responsible department
             </h2>
           </div>
 
-          <div class="w-full lg:max-w-md">
+          <div class="relative">
             <label class="sr-only" for="service-search">Search departments or services</label>
-            <div class="relative">
-              <PhMagnifyingGlass
-                class="absolute left-5 top-1/2 -translate-y-1/2 text-civic-700"
-                :size="20"
-                weight="bold"
-              />
-              <input
-                id="service-search"
-                v-model="search"
-                class="w-full bg-canvas py-4 pl-13 pr-5 text-sm font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.08)] outline-none transition focus:shadow-[inset_0_0_0_2px_rgba(25,101,73,0.7)] placeholder:text-ink/38"
-                type="search"
-                placeholder="Search departments or services"
-              />
-            </div>
+            <PhMagnifyingGlass
+              class="absolute left-5 top-1/2 -translate-y-1/2 text-civic-700"
+              :size="20"
+              weight="bold"
+            />
+            <input
+              id="service-search"
+              v-model="search"
+              class="w-full bg-canvas py-4 pl-13 pr-5 text-sm font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.08)] outline-none transition focus:shadow-[inset_0_0_0_2px_rgba(25,101,73,0.7)] placeholder:text-ink/38"
+              type="search"
+              placeholder="Search a department or service"
+            />
           </div>
         </div>
 
-        <div v-if="filteredDepartments.length" class="mt-8 divide-y divide-ink/10 border-y border-ink/10">
-          <article v-for="(department, index) in filteredDepartments" :key="department.slug">
-            <h3>
-              <button
-                class="group grid w-full grid-cols-[auto_1fr_auto] items-center gap-4 py-6 text-left sm:gap-6 sm:py-7"
-                type="button"
-                :aria-expanded="isExpanded(department.slug)"
-                :aria-controls="`services-${department.slug}`"
-                @click="toggleDepartment(department.slug)"
-              >
-                <span class="flex size-11 shrink-0 items-center justify-center bg-sage-50 text-civic-800 transition-colors group-hover:bg-civic-700 group-hover:text-white sm:size-12">
-                  <PhBuildings :size="22" weight="duotone" />
-                </span>
-
-                <span class="min-w-0">
-                  <span class="block text-[0.65rem] font-bold uppercase tracking-[0.14em] text-ink/42">
-                    Department {{ String(index + 1).padStart(2, '0') }} · {{ department.services.length }} services
-                  </span>
-                  <span class="mt-1 block text-lg font-extrabold tracking-[-0.015em] text-ink sm:text-xl">
-                    {{ department.name }}
-                  </span>
-                  <span class="mt-1 hidden max-w-3xl text-sm font-medium leading-6 text-ink/55 md:block">
-                    {{ department.summary }}
-                  </span>
-                </span>
-
-                <span class="flex size-9 items-center justify-center rounded-full border border-ink/12 text-ink/55 transition duration-300 group-hover:border-civic-700 group-hover:text-civic-700">
-                  <PhCaretDown
-                    class="transition-transform duration-300"
-                    :class="isExpanded(department.slug) ? 'rotate-180' : ''"
-                    :size="17"
-                    weight="bold"
-                  />
-                </span>
-              </button>
-            </h3>
-
-            <div
-              v-show="isExpanded(department.slug)"
-              :id="`services-${department.slug}`"
-              class="pb-8 pl-0 sm:pl-18 lg:pb-10"
+        <div v-if="activeDepartment" class="mt-8">
+          <div class="mb-5 lg:hidden">
+            <label class="mb-2 block text-xs font-bold text-ink/60" for="department-select">Select department</label>
+            <select
+              id="department-select"
+              class="w-full border-0 bg-canvas px-4 py-4 text-sm font-bold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.1)] outline-none focus:shadow-[inset_0_0_0_2px_rgba(25,101,73,0.7)]"
+              :value="activeDepartment.slug"
+              @change="selectDepartment($event.target.value)"
             >
-              <div class="grid gap-8 bg-canvas p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.55fr)] lg:gap-12">
-                <div>
-                  <p class="text-[0.68rem] font-bold uppercase tracking-[0.15em] text-civic-700">Services offered</p>
-                  <ul class="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+              <option v-for="department in filteredDepartments" :key="department.slug" :value="department.slug">
+                {{ department.name }} ({{ department.services.length }})
+              </option>
+            </select>
+          </div>
+
+          <div class="grid items-start lg:grid-cols-[minmax(17rem,0.34fr)_minmax(0,1fr)]">
+            <aside class="hidden bg-canvas p-3 lg:block" aria-label="Service departments">
+              <p class="px-4 pb-4 pt-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-ink/42">
+                {{ filteredDepartments.length }} departments
+              </p>
+              <button
+                v-for="(department, index) in filteredDepartments"
+                :key="department.slug"
+                class="group grid w-full grid-cols-[2rem_1fr_auto] items-center gap-2 border-t border-ink/8 px-4 py-4 text-left transition duration-300 hover:bg-white"
+                :class="activeDepartment.slug === department.slug ? 'bg-civic-800 text-white hover:bg-civic-800' : 'text-ink'"
+                type="button"
+                @click="selectDepartment(department.slug)"
+              >
+                <span
+                  class="font-mono text-[0.65rem] font-bold tabular-nums"
+                  :class="activeDepartment.slug === department.slug ? 'text-white/48' : 'text-ink/35'"
+                >
+                  {{ String(index + 1).padStart(2, '0') }}
+                </span>
+                <span class="text-sm font-bold leading-5">{{ department.name }}</span>
+                <PhArrowRight
+                  class="transition-transform duration-300 group-hover:translate-x-0.5"
+                  :class="activeDepartment.slug === department.slug ? 'text-orange-300' : 'text-ink/28'"
+                  :size="15"
+                  weight="bold"
+                />
+              </button>
+            </aside>
+
+            <article class="relative overflow-hidden bg-civic-50 px-6 py-8 sm:px-9 sm:py-10 lg:min-h-[38rem] lg:px-12 lg:py-12 xl:px-16">
+              <div class="absolute right-0 top-0 size-36 translate-x-1/3 -translate-y-1/3 rounded-full border-[2rem] border-civic-700/[0.04]" aria-hidden="true"></div>
+
+              <div class="relative">
+                <div class="flex items-start justify-between gap-6">
+                  <div class="max-w-3xl">
+                    <p class="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-civic-700">
+                      {{ activeDepartment.services.length }} services offered
+                    </p>
+                    <h3 class="mt-3 text-[clamp(1.8rem,4vw,3rem)] font-extrabold leading-[1.04] tracking-[-0.045em] text-ink">
+                      {{ activeDepartment.name }}
+                    </h3>
+                    <p class="mt-5 max-w-2xl text-sm font-medium leading-7 text-ink/62 sm:text-base">
+                      {{ activeDepartment.summary }}
+                    </p>
+                  </div>
+                  <span class="hidden size-14 shrink-0 items-center justify-center bg-white text-civic-800 shadow-[0_12px_35px_rgba(7,59,44,0.08)] sm:flex">
+                    <PhBuildings :size="27" weight="duotone" />
+                  </span>
+                </div>
+
+                <div class="mt-9 border-t border-civic-900/10 pt-8 sm:mt-10">
+                  <h4 class="text-sm font-extrabold text-ink">Services handled by this department</h4>
+                  <ul class="mt-5 grid gap-x-10 gap-y-3 sm:grid-cols-2">
                     <li
-                      v-for="service in department.visibleServices"
+                      v-for="service in activeDepartment.visibleServices"
                       :key="service"
-                      class="flex items-start gap-3 text-sm font-semibold leading-6 text-ink/75"
+                      class="flex min-h-11 items-start gap-3 border-b border-civic-900/8 pb-3 text-sm font-semibold leading-6 text-ink/72"
                     >
-                      <PhCheckCircle class="mt-0.5 shrink-0 text-civic-700" :size="18" weight="fill" />
+                      <span class="mt-1 flex size-4 shrink-0 items-center justify-center rounded-full bg-civic-700 text-white">
+                        <PhCheck :size="10" weight="bold" />
+                      </span>
                       <span>{{ service }}</span>
                     </li>
                   </ul>
                 </div>
 
-                <div class="border-t border-ink/10 pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-                  <p class="text-[0.68rem] font-bold uppercase tracking-[0.15em] text-ink/45">Department mandate</p>
-                  <p class="mt-3 text-sm font-medium leading-6 text-ink/64">{{ department.mandate }}</p>
-                  <RouterLink class="text-link mt-6" :to="`/departments/${department.slug}`">
-                    View mandate, units & team
+                <div class="mt-9 grid gap-6 border-t border-civic-900/10 pt-7 sm:mt-10 sm:grid-cols-[1fr_auto] sm:items-end">
+                  <div class="max-w-2xl">
+                    <p class="text-[0.65rem] font-bold uppercase tracking-[0.15em] text-ink/42">Department mandate</p>
+                    <p class="mt-2 text-sm leading-6 text-ink/60">{{ activeDepartment.mandate }}</p>
+                  </div>
+                  <RouterLink
+                    class="inline-flex min-h-12 items-center justify-center gap-3 bg-civic-800 px-5 text-sm font-bold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-civic-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-civic-700"
+                    :to="`/departments/${activeDepartment.slug}`"
+                  >
+                    Department details
                     <PhArrowRight :size="16" weight="bold" />
                   </RouterLink>
                 </div>
               </div>
-            </div>
-          </article>
+            </article>
+          </div>
         </div>
 
         <div v-else class="mt-10 max-w-xl bg-orange-50 p-7">
