@@ -993,7 +993,6 @@
   .civic-cta__button span { background: rgb(17 24 21 / 0.12); }
 
   .page-intro { background: #f5f1e8; }
-  .page-intro::before { content: ""; position: absolute; inset: 0 0 auto; height: 0.3rem; background: linear-gradient(90deg, #111815 0 33.33%, #e9a11b 33.33% 66.66%, #c9272c 66.66%); }
 }
 
 @media (max-width: 1023px) {
