@@ -56,7 +56,7 @@ const submitSearch = () => router.push({ path: '/services', query: query.value ?
         <div class="service-mosaic">
           <a v-for="(action, index) in citizenActions" :key="action.title" class="service-tile group" :class="actionClasses[index]" :href="action.href" target="_blank" rel="noreferrer">
             <span class="service-tile__number">{{ String(index + 1).padStart(2, '0') }}</span>
-            <component class="service-tile__icon" :is="actionIcons[action.icon]" :size="31" weight="regular" />
+            <span class="service-tile__graphic"><component class="service-tile__icon" :is="actionIcons[action.icon]" :size="58" weight="regular" /></span>
             <span class="service-tile__body"><strong>{{ action.title }}</strong><small>{{ action.description }}</small></span>
             <span class="service-tile__arrow"><PhArrowUpRight :size="18" weight="bold" /></span>
           </a>
