@@ -86,23 +86,20 @@ onBeforeUnmount(() => {
   <header class="site-header official-header">
     <div class="national-stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
 
-    <div class="official-gov-bar">
-      <div class="site-container official-gov-bar__inner">
-        <span class="official-gov-bar__owner"><img src="/images/uganda-flag.png" alt="Flag of Uganda" /> An official Government of Uganda website</span>
-        <a href="https://www.gou.go.ug/" target="_blank" rel="noreferrer">Government of Uganda portal <span aria-hidden="true">↗</span></a>
-      </div>
-    </div>
-
     <div class="government-masthead">
       <div class="site-container government-masthead__inner">
         <RouterLink class="government-brand" to="/" aria-label="Makindye Ssabagabo Municipal Council home">
           <img src="/images/municipal-logo.png" alt="Makindye Ssabagabo Municipal Council logo" />
-          <span><small>Wakiso District Local Government</small><strong>Makindye Ssabagabo<br />Municipal Council</strong></span>
+          <span>
+            <small class="government-brand__official"><img src="/images/uganda-flag.png" alt="" /> Official Government of Uganda website</small>
+            <strong>Makindye Ssabagabo Municipal Council</strong>
+            <em>Wakiso District Local Government</em>
+          </span>
         </RouterLink>
 
         <div class="government-masthead__utilities">
-          <a href="tel:0800256260"><span class="masthead-utility-icon"><PhPhone :size="19" /></span><span><small>Toll free</small><strong>0800 256 260</strong></span></a>
-          <a href="mailto:info@msabagabo.go.ug"><span class="masthead-utility-icon"><PhEnvelopeSimple :size="19" /></span><span><small>Email</small><strong>info@msabagabo.go.ug</strong></span></a>
+          <a class="masthead-contact" href="tel:0800256260"><PhPhone :size="17" /><span><small>Toll free</small><strong>0800 256 260</strong></span></a>
+          <a class="masthead-contact" href="mailto:info@msabagabo.go.ug"><PhEnvelopeSimple :size="17" /><span><small>Email</small><strong>info@msabagabo.go.ug</strong></span></a>
           <form class="masthead-search" role="search" @submit.prevent="submitSiteSearch">
             <label class="sr-only" for="site-search">Search this website</label>
             <PhMagnifyingGlass :size="19" />
@@ -131,7 +128,7 @@ onBeforeUnmount(() => {
             </Transition>
           </div>
         </div>
-        <RouterLink class="citizen-services-link" to="/services"><span>Citizen services</span><strong>Find a service</strong><i>→</i></RouterLink>
+        <RouterLink class="citizen-services-link" to="/services"><strong>Find a service</strong><i>→</i></RouterLink>
       </div>
     </nav>
 

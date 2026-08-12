@@ -110,12 +110,12 @@ onBeforeUnmount(clearSlideTimer)
           <img :src="slide.image" :alt="currentSlide === index ? slide.alt : ''" />
         </figure>
       </div>
+      <div class="works-carousel__scrim" aria-hidden="true"></div>
 
       <div class="site-container works-carousel__inner">
         <div class="works-carousel__copy" aria-live="polite" aria-atomic="true">
           <p>{{ slides[currentSlide].eyebrow }}</p>
           <h1>{{ slides[currentSlide].title }}</h1>
-          <span class="identity-rule" aria-hidden="true"><i></i><i></i><i></i></span>
           <p class="works-carousel__description">{{ slides[currentSlide].description }}</p>
           <div class="works-carousel__actions">
             <RouterLink class="civic-button civic-button--primary" to="/projects">Explore our projects <PhArrowRight :size="18" weight="bold" /></RouterLink>
@@ -123,10 +123,8 @@ onBeforeUnmount(clearSlideTimer)
           </div>
         </div>
 
-        <button class="carousel-arrow carousel-arrow--previous" type="button" aria-label="Previous project" @click="showSlide(currentSlide - 1)"><PhCaretLeft :size="25" weight="bold" /></button>
-        <button class="carousel-arrow carousel-arrow--next" type="button" aria-label="Next project" @click="showSlide(currentSlide + 1)"><PhCaretRight :size="25" weight="bold" /></button>
-
         <div class="carousel-status">
+          <button class="carousel-arrow" type="button" aria-label="Previous project" @click="showSlide(currentSlide - 1)"><PhCaretLeft :size="20" weight="bold" /></button>
           <span>{{ String(currentSlide + 1).padStart(2, '0') }} / {{ String(slides.length).padStart(2, '0') }}</span>
           <div class="carousel-indicators" aria-label="Choose a project slide">
             <button v-for="(_, index) in slides" :key="index" type="button" :class="{ 'is-active': currentSlide === index }" :aria-label="`Show project ${index + 1}`" :aria-current="currentSlide === index ? 'true' : undefined" @click="showSlide(index)"></button>
@@ -135,6 +133,7 @@ onBeforeUnmount(clearSlideTimer)
             <PhPause v-if="isPlaying" :size="18" weight="fill" />
             <PhPlay v-else :size="18" weight="fill" />
           </button>
+          <button class="carousel-arrow" type="button" aria-label="Next project" @click="showSlide(currentSlide + 1)"><PhCaretRight :size="20" weight="bold" /></button>
         </div>
       </div>
     </section>
