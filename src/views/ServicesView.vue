@@ -51,35 +51,38 @@ const filteredDepartments = computed(() => {
 
     <section class="bg-canvas pb-24 pt-10 sm:pb-28 sm:pt-14 lg:pt-16">
       <div class="site-container">
-        <div class="grid grid-cols-2 gap-3 lg:grid-cols-[minmax(11rem,0.34fr)_minmax(11rem,0.34fr)_minmax(25rem,1fr)] lg:gap-4">
-          <div class="flex min-h-28 items-center gap-4 bg-white px-5 py-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:px-6">
-            <span class="hidden size-11 shrink-0 items-center justify-center bg-sage-50 text-civic-700 sm:flex">
-              <PhBuildings :size="22" weight="duotone" />
-            </span>
-            <div>
-              <strong class="block text-3xl font-extrabold leading-none tracking-[-0.05em] text-civic-800">{{ departments.length }}</strong>
-              <span class="mt-2 block text-xs font-bold leading-4 text-ink/66">Municipal departments</span>
+        <div class="grid grid-cols-2 gap-3 lg:grid-cols-[0.7fr_0.7fr_1.6fr] lg:gap-4">
+          <div class="flex min-h-32 flex-col justify-between bg-white p-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:p-6">
+            <div class="flex items-center gap-3">
+              <span class="flex size-9 shrink-0 items-center justify-center bg-sage-50 text-civic-700">
+                <PhBuildings :size="19" weight="duotone" />
+              </span>
+              <span class="text-xs font-extrabold leading-4 text-ink/70">Municipal departments</span>
             </div>
+            <strong class="mt-5 block text-4xl font-extrabold leading-none tracking-[-0.055em] text-civic-800">{{ departments.length }}</strong>
           </div>
 
-          <div class="flex min-h-28 items-center gap-4 bg-white px-5 py-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:px-6">
-            <span class="hidden size-11 shrink-0 items-center justify-center bg-sage-50 text-civic-700 sm:flex">
-              <PhListChecks :size="22" weight="duotone" />
-            </span>
-            <div>
-              <strong class="block text-3xl font-extrabold leading-none tracking-[-0.05em] text-civic-800">{{ totalServices }}</strong>
-              <span class="mt-2 block text-xs font-bold leading-4 text-ink/66">Listed services</span>
+          <div class="flex min-h-32 flex-col justify-between bg-white p-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:p-6">
+            <div class="flex items-center gap-3">
+              <span class="flex size-9 shrink-0 items-center justify-center bg-sage-50 text-civic-700">
+                <PhListChecks :size="19" weight="duotone" />
+              </span>
+              <span class="text-xs font-extrabold leading-4 text-ink/70">Listed services</span>
             </div>
+            <strong class="mt-5 block text-4xl font-extrabold leading-none tracking-[-0.055em] text-civic-800">{{ totalServices }}</strong>
           </div>
 
-          <div class="col-span-2 flex min-h-28 flex-col justify-center bg-white px-5 py-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:px-6 lg:col-span-1">
-            <label class="mb-2 block text-xs font-extrabold text-ink/66" for="service-search">
+          <div class="col-span-2 flex min-h-32 flex-col justify-between bg-white p-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:p-6 lg:col-span-1">
+            <label class="flex items-center gap-3 text-xs font-extrabold leading-4 text-ink/70" for="service-search">
+              <span class="flex size-9 shrink-0 items-center justify-center bg-sage-50 text-civic-700">
+                <PhMagnifyingGlass :size="19" weight="duotone" />
+              </span>
               Search the service directory
             </label>
             <div class="relative">
               <PhMagnifyingGlass
-                class="absolute left-4 top-1/2 -translate-y-1/2 text-civic-700"
-                :size="19"
+                class="absolute left-4 top-1/2 -translate-y-1/2 text-ink/50"
+                :size="18"
                 weight="bold"
               />
               <input
@@ -99,13 +102,15 @@ const filteredDepartments = computed(() => {
             :key="department.slug"
             class="grid gap-9 bg-white px-5 py-10 shadow-[0_14px_48px_rgba(7,59,44,0.045)] sm:px-8 sm:py-12 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-16 lg:px-12 lg:py-14"
           >
-            <div class="relative lg:pl-14">
-              <span class="mb-5 block font-mono text-xs font-bold tabular-nums text-civic-700 lg:absolute lg:left-0 lg:top-1">
-                {{ String(index + 1).padStart(2, '0') }}
-              </span>
-              <h2 class="max-w-md text-2xl font-extrabold leading-[1.08] tracking-[-0.04em] text-ink sm:text-[1.75rem]">
-                {{ department.name }}
-              </h2>
+            <div>
+              <div class="flex items-baseline gap-4">
+                <span class="shrink-0 font-mono text-xs font-bold tabular-nums text-civic-700">
+                  {{ String(index + 1).padStart(2, '0') }}
+                </span>
+                <h2 class="max-w-md text-2xl font-extrabold leading-[1.08] tracking-[-0.04em] text-ink sm:text-[1.75rem]">
+                  {{ department.name }}
+                </h2>
+              </div>
               <p class="mt-5 max-w-md text-sm font-medium leading-7 text-ink/72">{{ department.summary }}</p>
 
               <div class="mt-8 border-l-2 border-civic-700/35 pl-4">
