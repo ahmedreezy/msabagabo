@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   PhArrowRight,
   PhArrowUpRight,
@@ -8,17 +8,26 @@ import {
   PhBuildings,
   PhCaretLeft,
   PhCaretRight,
+  PhChalkboardTeacher,
   PhChatCircleText,
+  PhFirstAidKit,
+  PhGlobe,
+  PhGraduationCap,
+  PhHouseLine,
   PhIdentificationCard,
+  PhMapPin,
+  PhMapTrifold,
   PhMegaphone,
   PhPause,
   PhPlay,
   PhBookOpenUser,
-  PhBriefcase,
   PhReceipt,
+  PhRoadHorizon,
+  PhSealCheck,
   PhUsers,
+  PhUsersThree,
 } from '@phosphor-icons/vue'
-import { citizenActions, projects, updates } from '../data/siteData'
+import { projects, updates } from '../data/siteData'
 
 const slides = [
   {
@@ -44,29 +53,102 @@ const slides = [
   },
 ]
 
-const actionIcons = {
-  buildings: PhBuildings,
-  users: PhUsers,
-  blueprint: PhBlueprint,
-  identification: PhIdentificationCard,
-  passport: PhBookOpenUser,
-  receipt: PhReceipt,
-}
+const leadership = [
+  {
+    office: 'Office of the Mayor',
+    role: 'Political leadership',
+    description: 'Leads the elected Municipal Council.',
+    index: '01',
+  },
+  {
+    office: 'Office of the Speaker',
+    role: 'Council business',
+    description: 'Presides over council sittings.',
+    index: '02',
+  },
+  {
+    office: 'Office of the Town Clerk',
+    role: 'Technical administration',
+    description: 'Directs administration and service delivery.',
+    index: '03',
+  },
+  {
+    office: 'Heads of Departments',
+    role: 'Sector delivery',
+    description: 'Coordinate the council’s technical sectors.',
+    index: '04',
+  },
+]
 
-const actionClasses = ['gov-service-land', 'gov-service-hr', 'gov-service-bims', 'gov-service-id', 'gov-service-passport', 'gov-service-taxes']
-const publicLinks = [
-  { title: 'Publications', description: 'Reports, plans and public documents.', to: '/news#publications', icon: PhBookOpenText },
-  { title: 'Tenders & opportunities', description: 'Current procurement and work opportunities.', to: '/opportunities', icon: PhBriefcase },
-  { title: 'Council notices', description: 'Official notices and announcements.', to: '/news', icon: PhMegaphone },
-  { title: 'Contact & feedback', description: 'Ask a question or share feedback.', to: '/contact', icon: PhChatCircleText },
+const statistics = [
+  { value: '439,605', label: 'Residents', detail: '2024 national census', icon: PhUsersThree },
+  { value: '3', label: 'Divisions', detail: 'Bunamwaya, Masajja & Ndejje', icon: PhMapTrifold },
+  { value: '8', label: 'Wards', detail: 'Lower administrative units', icon: PhMapPin },
+  { value: '55', label: 'Cells / villages', detail: 'Community-level administration', icon: PhHouseLine },
+  { value: '16', label: 'UPE schools', detail: 'Government-aided primary schools', icon: PhChalkboardTeacher },
+  { value: '6', label: 'Health facilities', detail: 'Government-aided facilities', icon: PhFirstAidKit },
+]
+
+const achievements = [
+  {
+    title: 'Stronger road maintenance capacity',
+    description: 'A municipal road grader was acquired using locally generated property-tax revenue.',
+    icon: PhRoadHorizon,
+  },
+  {
+    title: 'Expanded learning infrastructure',
+    description: 'Classroom blocks, sanitation facilities, rainwater tanks and desks have been delivered to municipal schools.',
+    icon: PhGraduationCap,
+  },
+  {
+    title: 'Supported universal education',
+    description: 'Sixteen primary schools and two secondary schools receive government capitation support.',
+    icon: PhBookOpenText,
+  },
+  {
+    title: 'Improved organised transport',
+    description: 'Lubugumu and Busingiri–Nyanama taxi parks were opened to support safer urban mobility.',
+    icon: PhSealCheck,
+  },
+]
+
+const notices = [
+  {
+    type: 'Public consultation',
+    title: 'Submit views on the Waste Management Bill',
+    date: 'Open notice',
+    to: '/news',
+  },
+  {
+    type: 'Procurement',
+    title: 'Current tenders and bidding opportunities',
+    date: 'Supplier information',
+    to: '/opportunities',
+  },
+  {
+    type: 'Citizen information',
+    title: 'Municipal Clients’ Charter 2023/24–2025/26',
+    date: 'Service standards',
+    to: '/news#publications',
+  },
+]
+
+const resources = [
+  { name: 'NIRA', description: 'National identification services', href: 'https://www.nira.go.ug/', icon: PhIdentificationCard },
+  { name: 'URA', description: 'Tax registration and payments', href: 'https://ura.go.ug/', icon: PhReceipt },
+  { name: 'Passport Services', description: 'Apply for or track a passport', href: 'https://www.passports.go.ug/', icon: PhBookOpenUser },
+  { name: 'BIMS', description: 'Building application services', href: 'https://bims.go.ug/', icon: PhBlueprint },
+  { name: 'Ministry of Local Government', description: 'National local government information', href: 'https://molg.go.ug/', icon: PhBuildings },
+  { name: 'Wakiso District', description: 'District services and information', href: 'https://www.wakiso.go.ug/', icon: PhMapPin },
+  { name: 'NSSF Uganda', description: 'Social security member services', href: 'https://www.nssfug.org/', icon: PhUsers },
+  { name: 'Government of Uganda', description: 'National government portal', href: 'https://www.gou.go.ug/', icon: PhGlobe },
 ]
 
 const currentSlide = ref(0)
 const isPlaying = ref(true)
-const servicesRail = ref(null)
-const canScrollServicesBack = ref(false)
-const canScrollServicesForward = ref(true)
+const pageRoot = ref(null)
 let slideTimer
+let revealObserver
 
 const clearSlideTimer = () => {
   if (slideTimer) window.clearInterval(slideTimer)
@@ -95,49 +177,35 @@ const handleCarouselKeydown = (event) => {
   if (event.key === 'ArrowRight') showSlide(currentSlide.value + 1)
 }
 
-const updateServiceControls = () => {
-  const rail = servicesRail.value
-  if (!rail) return
-  canScrollServicesBack.value = rail.scrollLeft > 8
-  canScrollServicesForward.value = rail.scrollLeft < rail.scrollWidth - rail.clientWidth - 8
-}
-
-const scrollServices = (direction) => {
-  const rail = servicesRail.value
-  if (!rail) return
-  const tile = rail.querySelector('.government-service')
-  const gap = Number.parseFloat(window.getComputedStyle(rail).columnGap) || 16
-  rail.scrollBy({ left: direction * ((tile?.getBoundingClientRect().width || rail.clientWidth * 0.8) + gap), behavior: 'smooth' })
-}
-
-const handleServiceKeys = (event) => {
-  if (event.key === 'ArrowLeft') {
-    event.preventDefault()
-    scrollServices(-1)
-  }
-  if (event.key === 'ArrowRight') {
-    event.preventDefault()
-    scrollServices(1)
-  }
-}
-
 watch(isPlaying, startSlideTimer)
 
 onMounted(() => {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) isPlaying.value = false
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reducedMotion) isPlaying.value = false
   startSlideTimer()
-  nextTick(updateServiceControls)
-  window.addEventListener('resize', updateServiceControls)
+
+  if (!reducedMotion) {
+    revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        entry.target.classList.add('is-visible')
+        revealObserver.unobserve(entry.target)
+      })
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' })
+    pageRoot.value?.querySelectorAll('.home-reveal').forEach((element) => revealObserver.observe(element))
+  } else {
+    pageRoot.value?.querySelectorAll('.home-reveal').forEach((element) => element.classList.add('is-visible'))
+  }
 })
 
 onBeforeUnmount(() => {
   clearSlideTimer()
-  window.removeEventListener('resize', updateServiceControls)
+  revealObserver?.disconnect()
 })
 </script>
 
 <template>
-  <div class="civic-home">
+  <div ref="pageRoot" class="civic-home enhanced-home">
     <section class="works-carousel" aria-roledescription="carousel" aria-label="Municipal works" tabindex="0" @keydown="handleCarouselKeydown">
       <div class="works-carousel__slides">
         <figure v-for="(slide, index) in slides" :key="slide.title" class="works-slide" :class="{ 'is-active': currentSlide === index }" :aria-hidden="currentSlide !== index">
@@ -152,8 +220,8 @@ onBeforeUnmount(() => {
           <h1>{{ slides[currentSlide].title }}</h1>
           <p class="works-carousel__description">{{ slides[currentSlide].description }}</p>
           <div class="works-carousel__actions">
-            <RouterLink class="civic-button civic-button--primary" to="/projects">Explore our projects <PhArrowRight :size="18" weight="bold" /></RouterLink>
-            <RouterLink class="civic-button civic-button--secondary" to="/contact">Report an issue</RouterLink>
+            <RouterLink class="civic-button civic-button--primary" to="/projects">Explore our projects <span><PhArrowRight :size="17" weight="bold" /></span></RouterLink>
+            <RouterLink class="civic-button civic-button--secondary" to="/contact">Report an issue <span><PhArrowUpRight :size="17" weight="bold" /></span></RouterLink>
           </div>
         </div>
 
@@ -172,86 +240,146 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <RouterLink class="public-notice-bar" to="/news">
-      <span class="public-notice-bar__label"><PhMegaphone :size="22" /> Public notice</span>
-      <strong>Municipal complaints and grievance policy</strong>
-      <span class="public-notice-bar__action">Read notice <PhArrowRight :size="18" weight="bold" /></span>
-    </RouterLink>
-
-    <section class="government-services" aria-labelledby="services-heading">
+    <section class="municipal-profile" aria-labelledby="municipality-heading">
       <div class="site-container">
-        <div class="government-services__heading">
-          <div><p>Citizen services</p><h2 id="services-heading">Access government services</h2></div>
-          <div class="government-services__heading-side">
-            <span>Start with the service you need.</span>
-            <div class="service-rail-controls" aria-label="Citizen service navigation">
-              <button type="button" aria-label="Previous services" :disabled="!canScrollServicesBack" @click="scrollServices(-1)"><PhCaretLeft :size="20" weight="bold" /></button>
-              <button type="button" aria-label="Next services" :disabled="!canScrollServicesForward" @click="scrollServices(1)"><PhCaretRight :size="20" weight="bold" /></button>
-            </div>
+        <div class="municipal-profile__intro home-reveal">
+          <div class="municipal-profile__heading">
+            <p class="home-eyebrow"><span>01</span> About us</p>
+            <h2 id="municipality-heading">Serving one of Uganda’s fastest-growing urban communities.</h2>
+          </div>
+          <div class="municipal-profile__summary">
+            <p class="municipal-profile__lead">Makindye Ssabagabo Municipal Council is an urban local government in Wakiso District, within the Greater Kampala Metropolitan Area.</p>
+            <p>The Council plans, regulates and delivers decentralised services across Bunamwaya, Masajja and Ndejje divisions. Its mandate covers roads and drainage, public health, education, physical planning, trade, environmental management, community development and accountable use of public resources.</p>
+            <RouterLink class="home-text-link" to="/about">Discover our mandate <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
           </div>
         </div>
 
-        <div ref="servicesRail" class="government-services__grid" tabindex="0" aria-label="Citizen services. Use left and right arrow keys to browse." @scroll.passive="updateServiceControls" @keydown="handleServiceKeys">
-          <a v-for="(action, index) in citizenActions" :key="action.title" class="government-service" :class="actionClasses[index]" :href="action.href" target="_blank" rel="noreferrer">
-            <span class="government-service__icon"><component :is="actionIcons[action.icon]" :size="64" weight="regular" /></span>
-            <span class="government-service__content"><strong>{{ action.title }}</strong><small>{{ action.description }}</small><em>{{ action.domain }}</em></span>
-            <span class="government-service__arrow"><PhArrowUpRight :size="20" weight="bold" /></span>
+        <dl class="municipal-profile__quickfacts home-reveal">
+          <div><dt>Mandate</dt><dd>Plan, regulate and deliver sustainable urban services.</dd></div>
+          <div><dt>Location</dt><dd>Greater Kampala, Wakiso District, toward Lake Victoria.</dd></div>
+          <div><dt>Lower units</dt><dd>3 divisions · 8 wards · 55 cells / villages.</dd></div>
+          <div><dt>Public purpose</dt><dd>A well-planned, clean and prosperous municipality.</dd></div>
+        </dl>
+
+        <div class="leadership-compact-heading home-reveal">
+          <div><p class="home-eyebrow"><span>Leadership</span> Accountable service</p><h3>Meet the MSMC leadership team</h3></div>
+          <p>Political direction and technical administration working together for dependable public services.</p>
+        </div>
+
+        <div class="leadership-showcase home-reveal" id="leadership">
+          <div class="leadership-grid">
+            <article v-for="leader in leadership" :key="leader.office" class="leadership-card">
+              <figure><img src="/images/municipality-aerial.jpg" :alt="`${leader.office} representative in the MSMC leadership team`" /><span>{{ leader.index }}</span></figure>
+              <div><p>{{ leader.role }}</p><h4>{{ leader.office }}</h4><span>{{ leader.description }}</span></div>
+            </article>
+          </div>
+          <RouterLink class="home-text-link leadership-showcase__link" to="/about#leadership">View leadership structure <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
+        </div>
+      </div>
+    </section>
+
+    <section class="municipal-statistics" aria-labelledby="statistics-heading">
+      <div class="site-container">
+        <div class="municipal-statistics__heading home-reveal">
+          <div><p class="home-eyebrow home-eyebrow--light"><span>02</span> Municipality at a glance</p><h2 id="statistics-heading">Key municipal statistics</h2></div>
+          <p>A concise view of our population, administration and core public facilities.</p>
+        </div>
+        <div class="municipal-statistics__grid home-reveal">
+          <article v-for="(stat, index) in statistics" :key="stat.label" class="municipal-stat">
+            <div class="municipal-stat__index">{{ String(index + 1).padStart(2, '0') }}</div>
+            <component :is="stat.icon" :size="23" weight="regular" />
+            <strong>{{ stat.value }}<small v-if="stat.suffix"> {{ stat.suffix }}</small></strong>
+            <h3>{{ stat.label }}</h3>
+            <p>{{ stat.detail }}</p>
+          </article>
+        </div>
+        <p class="municipal-statistics__source">Population: Uganda National Population and Housing Census 2024. Administrative and service indicators: municipal planning records.</p>
+      </div>
+    </section>
+
+    <section class="projects-achievements" aria-labelledby="projects-heading">
+      <div class="site-container">
+        <div class="projects-achievements__header home-reveal">
+          <div><p class="home-eyebrow"><span>03</span> Delivery in action</p><h2 id="projects-heading">Ongoing activities &amp; achievements</h2></div>
+          <RouterLink class="home-pill-link" to="/projects">View all projects <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
+        </div>
+
+        <div class="delivery-compact-grid home-reveal">
+          <div class="project-editorial-grid">
+            <article v-for="(project, index) in projects" :key="project.title" class="project-editorial-card" :class="{ 'project-editorial-card--featured': index === 0 }">
+              <img :src="project.image" :alt="project.title" />
+              <div class="project-editorial-card__scrim"></div>
+              <div class="project-editorial-card__content">
+                <div><span>{{ project.sector }}</span><em>{{ project.status }}</em></div>
+                <h3>{{ project.title }}</h3>
+                <RouterLink to="/projects" :aria-label="`Read about ${project.title}`"><PhArrowUpRight :size="20" weight="bold" /></RouterLink>
+              </div>
+            </article>
+          </div>
+
+          <aside class="achievement-ledger">
+            <div class="achievement-ledger__intro"><p class="home-eyebrow"><span>Progress</span> Key achievements</p><h2>Visible results.</h2></div>
+            <div class="achievement-ledger__list">
+              <article v-for="(achievement, index) in achievements" :key="achievement.title">
+                <span>{{ String(index + 1).padStart(2, '0') }}</span>
+                <component :is="achievement.icon" :size="22" weight="regular" />
+                <div><h3>{{ achievement.title }}</h3><p>{{ achievement.description }}</p></div>
+              </article>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="council-newsroom" aria-labelledby="news-heading">
+      <div class="site-container">
+        <div class="council-newsroom__heading home-reveal">
+          <p class="home-eyebrow"><span>04</span> Council newsroom</p>
+          <h2 id="news-heading">Announcements, news &amp; advertisements</h2>
+          <p>Official updates from the Municipal Council, presented clearly and in one place.</p>
+        </div>
+
+        <div class="council-newsroom__layout">
+          <div class="news-editorial home-reveal">
+            <article class="news-editorial__feature">
+              <img :src="updates[0].image" :alt="updates[0].title" />
+              <div><p>{{ updates[0].type }} <span>/</span> {{ updates[0].date }}</p><h3>{{ updates[0].title }}</h3><div>{{ updates[0].excerpt }}</div><RouterLink class="home-text-link" to="/news">Read the update <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink></div>
+            </article>
+            <RouterLink v-for="update in updates.slice(1)" :key="update.title" class="news-editorial__row" to="/news">
+              <img :src="update.image" :alt="update.title" />
+              <div><p>{{ update.type }} · {{ update.date }}</p><h3>{{ update.title }}</h3></div>
+              <span><PhArrowRight :size="17" weight="bold" /></span>
+            </RouterLink>
+          </div>
+
+          <aside class="notice-desk home-reveal" aria-labelledby="notice-heading">
+            <div class="notice-desk__heading"><span><PhMegaphone :size="22" /></span><div><p>Official desk</p><h3 id="notice-heading">Notices &amp; advertisements</h3></div></div>
+            <RouterLink v-for="notice in notices" :key="notice.title" class="notice-desk__item" :to="notice.to">
+              <p>{{ notice.type }}</p><h4>{{ notice.title }}</h4><span>{{ notice.date }} <PhArrowRight :size="15" weight="bold" /></span>
+            </RouterLink>
+            <RouterLink class="notice-desk__button" to="/opportunities">Browse all opportunities <span><PhArrowUpRight :size="16" weight="bold" /></span></RouterLink>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="government-resources" aria-labelledby="resources-heading">
+      <div class="site-container">
+        <div class="government-resources__heading home-reveal">
+          <div><p class="home-eyebrow home-eyebrow--light"><span>05</span> Useful resources</p><h2 id="resources-heading">Government services</h2></div>
+          <p>Trusted links to national institutions and essential public-service platforms.</p>
+        </div>
+        <div class="government-resources__grid home-reveal">
+          <a v-for="resource in resources" :key="resource.name" :href="resource.href" target="_blank" rel="noreferrer">
+            <span class="government-resources__icon"><component :is="resource.icon" :size="25" weight="regular" /></span>
+            <span><strong>{{ resource.name }}</strong><small>{{ resource.description }}</small></span>
+            <PhArrowUpRight :size="18" weight="bold" />
           </a>
         </div>
-
-        <div class="government-services__help">
-          <span>Need help finding the right service?</span>
-          <RouterLink to="/contact">Contact the council <PhArrowRight :size="17" weight="bold" /></RouterLink>
-          <RouterLink class="government-services__all" to="/services">View all service information</RouterLink>
+        <div class="government-resources__contact home-reveal">
+          <div><PhChatCircleText :size="24" weight="regular" /><span><strong>Can’t find what you need?</strong><small>Our help desk can direct you to the right department.</small></span></div>
+          <RouterLink class="home-pill-link home-pill-link--light" to="/contact">Contact the council <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
         </div>
-      </div>
-    </section>
-
-    <section class="municipality-story" aria-labelledby="municipality-heading">
-      <div class="site-container municipality-story__layout">
-        <figure class="municipality-story__media">
-          <img src="/images/municipality-aerial.jpg" alt="Aerial view of an urban centre in Makindye Ssabagabo Municipality" />
-          <figcaption>Masajja <i></i> Ndejje <i></i> Bunamwaya</figcaption>
-        </figure>
-        <div class="municipality-story__content">
-          <span class="section-rule" aria-hidden="true"></span>
-          <p class="municipality-story__eyebrow">Our municipality</p>
-          <h2 id="municipality-heading">A growing urban centre in Greater Kampala</h2>
-          <p>Makindye Ssabagabo brings together established communities, new neighbourhoods, commerce and public infrastructure across three divisions.</p>
-          <dl class="municipality-facts">
-            <div><dt>3</dt><dd>Municipal divisions</dd></div>
-            <div><dt>84.7 km²</dt><dd>Municipal area</dd></div>
-            <div><dt>9</dt><dd>Departments</dd></div>
-          </dl>
-          <div class="municipality-story__links">
-            <RouterLink to="/about">Learn about the municipality <PhArrowRight :size="17" weight="bold" /></RouterLink>
-            <RouterLink to="/departments">Explore departments <PhArrowRight :size="17" weight="bold" /></RouterLink>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="council-information">
-      <div class="site-container council-information__layout">
-        <div class="council-updates">
-          <div class="council-updates__heading"><p>News & notices</p><h2>Latest from the council</h2><span>Current notices, decisions and municipal progress.</span></div>
-          <article class="featured-update">
-            <img :src="projects[0].image" :alt="projects[0].title" />
-            <div><p>{{ updates[0].type }} <i></i> {{ updates[0].date }}</p><h3>{{ updates[0].title }}</h3><span>{{ updates[0].excerpt }}</span><RouterLink to="/news">View all updates <PhArrowRight :size="17" weight="bold" /></RouterLink></div>
-          </article>
-          <RouterLink v-for="update in updates.slice(1)" :key="update.title" class="compact-update" to="/news">
-            <time>{{ update.date }}</time><span>{{ update.type }}</span><strong>{{ update.title }}</strong><PhArrowRight :size="19" weight="bold" />
-          </RouterLink>
-        </div>
-
-        <aside class="public-information" aria-labelledby="public-info-heading">
-          <p>Resources</p><h2 id="public-info-heading">Public information</h2>
-          <RouterLink v-for="item in publicLinks" :key="item.title" class="public-information__link" :to="item.to">
-            <span><component :is="item.icon" :size="30" weight="regular" /></span>
-            <span><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
-            <PhArrowRight :size="21" weight="bold" />
-          </RouterLink>
-        </aside>
       </div>
     </section>
   </div>
