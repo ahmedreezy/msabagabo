@@ -1,13 +1,11 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import {
   PhArrowRight,
   PhArrowUpRight,
   PhBlueprint,
   PhBookOpenText,
   PhBuildings,
-  PhCaretLeft,
-  PhCaretRight,
   PhChalkboardTeacher,
   PhChatCircleText,
   PhFirstAidKit,
@@ -18,8 +16,6 @@ import {
   PhMapPin,
   PhMapTrifold,
   PhMegaphone,
-  PhPause,
-  PhPlay,
   PhBookOpenUser,
   PhReceipt,
   PhRoadHorizon,
@@ -58,26 +54,33 @@ const leadership = [
     office: 'Office of the Mayor',
     role: 'Political leadership',
     description: 'Leads the elected Municipal Council.',
-    index: '01',
+    mark: 'M',
   },
   {
     office: 'Office of the Speaker',
     role: 'Council business',
     description: 'Presides over council sittings.',
-    index: '02',
+    mark: 'S',
   },
   {
     office: 'Office of the Town Clerk',
     role: 'Technical administration',
     description: 'Directs administration and service delivery.',
-    index: '03',
+    mark: 'TC',
   },
   {
     office: 'Heads of Departments',
     role: 'Sector delivery',
     description: 'Coordinate the council’s technical sectors.',
-    index: '04',
+    mark: 'HD',
   },
+]
+
+const quickFacts = [
+  { term: 'Mandate', detail: 'Plan, regulate and deliver sustainable urban services.' },
+  { term: 'Location', detail: 'Greater Kampala, Wakiso District, toward Lake Victoria.' },
+  { term: 'Lower units', detail: '3 divisions · 8 wards · 55 cells / villages.' },
+  { term: 'Public purpose', detail: 'A well-planned, clean and prosperous municipality.' },
 ]
 
 const statistics = [
@@ -147,8 +150,17 @@ const resources = [
 const currentSlide = ref(0)
 const isPlaying = ref(true)
 const pageRoot = ref(null)
+const statisticsGrid = ref(null)
+const animatedStatistics = ref(statistics.map(() => '0'))
+const quickFactsRail = ref(null)
+const leadershipRail = ref(null)
+const projectsRail = ref(null)
+const resourcesRail = ref(null)
+const railState = reactive({ quickFacts: 0, leadership: 0, projects: 0, resources: 0 })
 let slideTimer
 let revealObserver
+let statisticsObserver
+let countAnimationFrame
 
 const clearSlideTimer = () => {
   if (slideTimer) window.clearInterval(slideTimer)
@@ -163,26 +175,60 @@ const startSlideTimer = () => {
   }, 8000)
 }
 
-const showSlide = (index) => {
-  currentSlide.value = (index + slides.length) % slides.length
-  startSlideTimer()
+const animateStatistics = () => {
+  if (countAnimationFrame) window.cancelAnimationFrame(countAnimationFrame)
+  animatedStatistics.value = statistics.map(() => '0')
+
+  const duration = 2000
+  const startedAt = performance.now()
+  const targets = statistics.map((stat) => Number(stat.value.replace(/,/g, '')))
+
+  const tick = (now) => {
+    const progress = Math.min((now - startedAt) / duration, 1)
+    const eased = 1 - Math.pow(1 - progress, 4)
+    animatedStatistics.value = targets.map((target) => Math.round(target * eased).toLocaleString('en-UG'))
+    if (progress < 1) countAnimationFrame = window.requestAnimationFrame(tick)
+  }
+
+  countAnimationFrame = window.requestAnimationFrame(tick)
 }
 
-const togglePlayback = () => {
-  isPlaying.value = !isPlaying.value
+const updateRailPosition = (event, key) => {
+  const rail = event.currentTarget
+  const items = Array.from(rail.children)
+  if (!items.length) return
+
+  railState[key] = items.reduce((closest, item, index) => {
+    const distance = Math.abs((item.offsetLeft - rail.offsetLeft) - rail.scrollLeft)
+    return distance < closest.distance ? { index, distance } : closest
+  }, { index: 0, distance: Number.POSITIVE_INFINITY }).index
 }
 
-const handleCarouselKeydown = (event) => {
-  if (event.key === 'ArrowLeft') showSlide(currentSlide.value - 1)
-  if (event.key === 'ArrowRight') showSlide(currentSlide.value + 1)
+const scrollRailTo = (rail, index) => {
+  const item = rail?.children?.[index]
+  if (!item) return
+  rail.scrollTo({ left: item.offsetLeft - rail.offsetLeft, behavior: 'smooth' })
 }
-
-watch(isPlaying, startSlideTimer)
 
 onMounted(() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if (reducedMotion) isPlaying.value = false
   startSlideTimer()
+
+  if (reducedMotion) {
+    animatedStatistics.value = statistics.map((stat) => stat.value)
+  } else {
+    if ('IntersectionObserver' in window) {
+      statisticsObserver = new IntersectionObserver(([entry]) => {
+        if (!entry?.isIntersecting) return
+        animateStatistics()
+        statisticsObserver.disconnect()
+      }, { threshold: 0.01, rootMargin: '0px 0px -4% 0px' })
+      if (statisticsGrid.value) statisticsObserver.observe(statisticsGrid.value)
+    } else {
+      animateStatistics()
+    }
+  }
 
   if (!reducedMotion) {
     revealObserver = new IntersectionObserver((entries) => {
@@ -201,12 +247,14 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearSlideTimer()
   revealObserver?.disconnect()
+  statisticsObserver?.disconnect()
+  if (countAnimationFrame) window.cancelAnimationFrame(countAnimationFrame)
 })
 </script>
 
 <template>
   <div ref="pageRoot" class="civic-home enhanced-home">
-    <section class="works-carousel" aria-roledescription="carousel" aria-label="Municipal works" tabindex="0" @keydown="handleCarouselKeydown">
+    <section class="works-carousel" data-nav-section="/" aria-roledescription="carousel" aria-label="Municipal works">
       <div class="works-carousel__slides">
         <figure v-for="(slide, index) in slides" :key="slide.title" class="works-slide" :class="{ 'is-active': currentSlide === index }" :aria-hidden="currentSlide !== index">
           <img :src="slide.image" :alt="currentSlide === index ? slide.alt : ''" />
@@ -225,22 +273,10 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div class="carousel-status">
-          <button class="carousel-arrow" type="button" aria-label="Previous project" @click="showSlide(currentSlide - 1)"><PhCaretLeft :size="20" weight="bold" /></button>
-          <span>{{ String(currentSlide + 1).padStart(2, '0') }} / {{ String(slides.length).padStart(2, '0') }}</span>
-          <div class="carousel-indicators" aria-label="Choose a project slide">
-            <button v-for="(_, index) in slides" :key="index" type="button" :class="{ 'is-active': currentSlide === index }" :aria-label="`Show project ${index + 1}`" :aria-current="currentSlide === index ? 'true' : undefined" @click="showSlide(index)"></button>
-          </div>
-          <button class="carousel-playback" type="button" :aria-label="isPlaying ? 'Pause slideshow' : 'Play slideshow'" @click="togglePlayback">
-            <PhPause v-if="isPlaying" :size="18" weight="fill" />
-            <PhPlay v-else :size="18" weight="fill" />
-          </button>
-          <button class="carousel-arrow" type="button" aria-label="Next project" @click="showSlide(currentSlide + 1)"><PhCaretRight :size="20" weight="bold" /></button>
-        </div>
       </div>
     </section>
 
-    <section class="municipal-profile" aria-labelledby="municipality-heading">
+    <section class="municipal-profile" data-nav-section="/about" aria-labelledby="municipality-heading">
       <div class="site-container">
         <div class="municipal-profile__intro home-reveal">
           <div class="municipal-profile__heading">
@@ -254,12 +290,12 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <dl class="municipal-profile__quickfacts home-reveal">
-          <div><dt>Mandate</dt><dd>Plan, regulate and deliver sustainable urban services.</dd></div>
-          <div><dt>Location</dt><dd>Greater Kampala, Wakiso District, toward Lake Victoria.</dd></div>
-          <div><dt>Lower units</dt><dd>3 divisions · 8 wards · 55 cells / villages.</dd></div>
-          <div><dt>Public purpose</dt><dd>A well-planned, clean and prosperous municipality.</dd></div>
+        <dl ref="quickFactsRail" class="municipal-profile__quickfacts home-reveal" @scroll.passive="updateRailPosition($event, 'quickFacts')">
+          <div v-for="(fact, index) in quickFacts" :key="fact.term" :class="{ 'is-rail-active': railState.quickFacts === index }"><dt>{{ fact.term }}</dt><dd>{{ fact.detail }}</dd></div>
         </dl>
+        <div class="mobile-slide-indicator" aria-label="About section slides">
+          <button v-for="(_, index) in quickFacts" :key="index" type="button" :class="{ 'is-active': railState.quickFacts === index }" :aria-label="`Show about slide ${index + 1}`" :aria-current="railState.quickFacts === index ? 'true' : undefined" @click="scrollRailTo(quickFactsRail, index)"></button>
+        </div>
 
         <div class="leadership-compact-heading home-reveal">
           <div><p class="home-eyebrow"><span>Leadership</span> Accountable service</p><h3>Meet the MSMC leadership team</h3></div>
@@ -267,28 +303,30 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="leadership-showcase home-reveal" id="leadership">
-          <div class="leadership-grid">
-            <article v-for="leader in leadership" :key="leader.office" class="leadership-card">
-              <figure><img src="/images/municipality-aerial.jpg" :alt="`${leader.office} representative in the MSMC leadership team`" /><span>{{ leader.index }}</span></figure>
+          <div ref="leadershipRail" class="leadership-grid" @scroll.passive="updateRailPosition($event, 'leadership')">
+            <article v-for="(leader, index) in leadership" :key="leader.office" class="leadership-card" :class="{ 'is-rail-active': railState.leadership === index }">
+              <div class="leadership-card__portrait" aria-hidden="true"><span>{{ leader.mark }}</span></div>
               <div><p>{{ leader.role }}</p><h4>{{ leader.office }}</h4><span>{{ leader.description }}</span></div>
             </article>
+          </div>
+          <div class="mobile-slide-indicator" aria-label="Leadership slides">
+            <button v-for="(_, index) in leadership" :key="index" type="button" :class="{ 'is-active': railState.leadership === index }" :aria-label="`Show leadership slide ${index + 1}`" :aria-current="railState.leadership === index ? 'true' : undefined" @click="scrollRailTo(leadershipRail, index)"></button>
           </div>
           <RouterLink class="home-text-link leadership-showcase__link" to="/about#leadership">View leadership structure <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
         </div>
       </div>
     </section>
 
-    <section class="municipal-statistics" aria-labelledby="statistics-heading">
+    <section class="municipal-statistics" data-nav-section="/about" aria-labelledby="statistics-heading">
       <div class="site-container">
         <div class="municipal-statistics__heading home-reveal">
-          <div><p class="home-eyebrow home-eyebrow--light"><span>02</span> Municipality at a glance</p><h2 id="statistics-heading">Key municipal statistics</h2></div>
+          <div><p class="home-eyebrow home-eyebrow--light">Municipality at a glance</p><h2 id="statistics-heading">Key municipal statistics</h2></div>
           <p>A concise view of our population, administration and core public facilities.</p>
         </div>
-        <div class="municipal-statistics__grid home-reveal">
+        <div ref="statisticsGrid" class="municipal-statistics__grid home-reveal">
           <article v-for="(stat, index) in statistics" :key="stat.label" class="municipal-stat">
-            <div class="municipal-stat__index">{{ String(index + 1).padStart(2, '0') }}</div>
             <component :is="stat.icon" :size="23" weight="regular" />
-            <strong>{{ stat.value }}<small v-if="stat.suffix"> {{ stat.suffix }}</small></strong>
+            <strong :aria-label="stat.value">{{ animatedStatistics[index] }}<small v-if="stat.suffix"> {{ stat.suffix }}</small></strong>
             <h3>{{ stat.label }}</h3>
             <p>{{ stat.detail }}</p>
           </article>
@@ -297,7 +335,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="projects-achievements" aria-labelledby="projects-heading">
+    <section class="projects-achievements" data-nav-section="/projects" aria-labelledby="projects-heading">
       <div class="site-container">
         <div class="projects-achievements__header home-reveal">
           <div><p class="home-eyebrow"><span>03</span> Delivery in action</p><h2 id="projects-heading">Ongoing activities &amp; achievements</h2></div>
@@ -305,8 +343,8 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="delivery-compact-grid home-reveal">
-          <div class="project-editorial-grid">
-            <article v-for="(project, index) in projects" :key="project.title" class="project-editorial-card" :class="{ 'project-editorial-card--featured': index === 0 }">
+          <div ref="projectsRail" class="project-editorial-grid" @scroll.passive="updateRailPosition($event, 'projects')">
+            <article v-for="(project, index) in projects" :key="project.title" class="project-editorial-card" :class="{ 'project-editorial-card--featured': index === 0, 'is-rail-active': railState.projects === index }">
               <img :src="project.image" :alt="project.title" />
               <div class="project-editorial-card__scrim"></div>
               <div class="project-editorial-card__content">
@@ -315,6 +353,9 @@ onBeforeUnmount(() => {
                 <RouterLink to="/projects" :aria-label="`Read about ${project.title}`"><PhArrowUpRight :size="20" weight="bold" /></RouterLink>
               </div>
             </article>
+          </div>
+          <div class="mobile-slide-indicator" aria-label="Project slides">
+            <button v-for="(_, index) in projects" :key="index" type="button" :class="{ 'is-active': railState.projects === index }" :aria-label="`Show project slide ${index + 1}`" :aria-current="railState.projects === index ? 'true' : undefined" @click="scrollRailTo(projectsRail, index)"></button>
           </div>
 
           <aside class="achievement-ledger">
@@ -331,7 +372,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="council-newsroom" aria-labelledby="news-heading">
+    <section class="council-newsroom" data-nav-section="/news" aria-labelledby="news-heading">
       <div class="site-container">
         <div class="council-newsroom__heading home-reveal">
           <p class="home-eyebrow"><span>04</span> Council newsroom</p>
@@ -363,18 +404,21 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="government-resources" aria-labelledby="resources-heading">
+    <section class="government-resources" data-nav-section="/services" aria-labelledby="resources-heading">
       <div class="site-container">
         <div class="government-resources__heading home-reveal">
           <div><p class="home-eyebrow home-eyebrow--light"><span>05</span> Useful resources</p><h2 id="resources-heading">Government services</h2></div>
           <p>Trusted links to national institutions and essential public-service platforms.</p>
         </div>
-        <div class="government-resources__grid home-reveal">
-          <a v-for="resource in resources" :key="resource.name" :href="resource.href" target="_blank" rel="noreferrer">
+        <div ref="resourcesRail" class="government-resources__grid home-reveal" @scroll.passive="updateRailPosition($event, 'resources')">
+          <a v-for="(resource, index) in resources" :key="resource.name" :class="{ 'is-rail-active': railState.resources === index }" :href="resource.href" target="_blank" rel="noreferrer">
             <span class="government-resources__icon"><component :is="resource.icon" :size="25" weight="regular" /></span>
             <span><strong>{{ resource.name }}</strong><small>{{ resource.description }}</small></span>
             <PhArrowUpRight :size="18" weight="bold" />
           </a>
+        </div>
+        <div class="mobile-slide-indicator" aria-label="Government resource slides">
+          <button v-for="(_, index) in resources" :key="index" type="button" :class="{ 'is-active': railState.resources === index }" :aria-label="`Show resource slide ${index + 1}`" :aria-current="railState.resources === index ? 'true' : undefined" @click="scrollRailTo(resourcesRail, index)"></button>
         </div>
         <div class="government-resources__contact home-reveal">
           <div><PhChatCircleText :size="24" weight="regular" /><span><strong>Can’t find what you need?</strong><small>Our help desk can direct you to the right department.</small></span></div>

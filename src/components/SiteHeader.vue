@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PhArrowRight, PhCaretDown, PhEnvelopeSimple, PhMagnifyingGlass, PhPhone } from '@phosphor-icons/vue'
 
@@ -10,7 +10,11 @@ const activeDesktopMenu = ref(null)
 const openMobileGroup = ref(null)
 const searchQuery = ref('')
 const headerElement = ref(null)
+const isScrolled = ref(false)
+const activeHomeSection = ref('/')
 let closeTimer
+let scrollFrame
+let homeSections = []
 
 const navigation = [
   { label: 'Home', to: '/' },
@@ -84,20 +88,63 @@ const handleOutsidePointer = (event) => {
   if (headerElement.value && !headerElement.value.contains(event.target)) closeMenus()
 }
 
+const handleScroll = () => {
+  if (scrollFrame) return
+  scrollFrame = window.requestAnimationFrame(() => {
+    isScrolled.value = window.scrollY > 24
+    updateActiveHomeSection()
+    scrollFrame = undefined
+  })
+}
+
+const collectHomeSections = () => {
+  homeSections = route.path === '/' ? Array.from(document.querySelectorAll('[data-nav-section]')) : []
+  updateActiveHomeSection()
+}
+
+const updateActiveHomeSection = () => {
+  if (route.path !== '/' || !homeSections.length) return
+
+  const headerHeight = headerElement.value?.offsetHeight ?? 0
+  const readingLine = Math.max(headerHeight + 24, window.innerHeight * 0.32)
+  const currentSection = homeSections.find((section) => {
+    const bounds = section.getBoundingClientRect()
+    return bounds.top <= readingLine && bounds.bottom > readingLine
+  })
+
+  if (currentSection?.dataset.navSection) activeHomeSection.value = currentSection.dataset.navSection
+}
+
+const isNavItemActive = (item) => {
+  if (route.path === '/') return activeHomeSection.value === item.to
+  return item.children ? route.path.startsWith(item.to) : route.path === item.to
+}
+
 const submitSiteSearch = () => {
   router.push({ path: '/services', query: searchQuery.value ? { q: searchQuery.value } : {} })
 }
 
-watch(() => route.fullPath, closeMenus)
+watch(() => route.fullPath, async () => {
+  closeMenus()
+  await nextTick()
+  collectHomeSections()
+})
 watch(menuOpen, (open) => { document.body.style.overflow = open ? 'hidden' : '' })
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', handleScroll, { passive: true })
   document.addEventListener('pointerdown', handleOutsidePointer)
+  nextTick(collectHomeSections)
+  handleScroll()
 })
 onBeforeUnmount(() => {
   window.clearTimeout(closeTimer)
+  if (scrollFrame) window.cancelAnimationFrame(scrollFrame)
   document.body.style.overflow = ''
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', handleScroll)
   document.removeEventListener('pointerdown', handleOutsidePointer)
 })
 </script>
@@ -105,7 +152,7 @@ onBeforeUnmount(() => {
 <template>
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  <header ref="headerElement" class="site-header official-header">
+  <header ref="headerElement" class="site-header official-header" :class="{ 'is-scrolled': isScrolled }">
     <div class="national-stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
 
     <div class="government-masthead">
@@ -138,8 +185,8 @@ onBeforeUnmount(() => {
       <div class="site-container government-navigation__inner">
         <div class="government-navigation__links">
           <div v-for="item in navigation" :key="item.label" class="government-navigation__item" @mouseenter="item.children && openDesktopMenu(item.label)" @mouseleave="item.children && scheduleDesktopClose()" @focusin="item.children && openDesktopMenu(item.label)" @focusout="item.children && scheduleDesktopClose()">
-            <RouterLink v-if="!item.children" class="government-navigation__link" :class="{ 'is-active': route.path === item.to }" :to="item.to">{{ item.label }}</RouterLink>
-            <div v-else class="government-navigation__group" :class="{ 'is-active': route.path.startsWith(item.to) }">
+            <RouterLink v-if="!item.children" class="government-navigation__link" :class="{ 'is-active': isNavItemActive(item) }" :aria-current="isNavItemActive(item) ? 'page' : undefined" :to="item.to">{{ item.label }}</RouterLink>
+            <div v-else class="government-navigation__group" :class="{ 'is-active': isNavItemActive(item) }">
               <RouterLink class="government-navigation__group-link" :to="item.to">{{ item.label }}</RouterLink>
               <button class="government-navigation__toggle" type="button" :aria-expanded="activeDesktopMenu === item.label" :aria-label="`Show ${item.label} menu`" @click.stop="toggleDesktopMenu(item.label)"><PhCaretDown :size="12" weight="bold" :class="{ 'rotate-180': activeDesktopMenu === item.label }" /></button>
             </div>
@@ -162,9 +209,9 @@ onBeforeUnmount(() => {
             <PhMagnifyingGlass :size="20" /><input v-model="searchQuery" type="search" placeholder="Search services and information" aria-label="Search website" /><button type="submit">Search</button>
           </form>
           <nav aria-label="Mobile navigation">
-            <div v-for="(item, index) in navigation" :key="item.label" class="official-mobile-nav-item">
+            <div v-for="(item, index) in navigation" :key="item.label" class="official-mobile-nav-item" :class="{ 'is-active': isNavItemActive(item) }">
               <span>{{ String(index + 1).padStart(2, '0') }}</span>
-              <RouterLink v-if="!item.children" :to="item.to">{{ item.label }}</RouterLink>
+              <RouterLink v-if="!item.children" :aria-current="isNavItemActive(item) ? 'page' : undefined" :to="item.to">{{ item.label }}</RouterLink>
               <template v-else>
                 <div class="official-mobile-group">
                   <RouterLink :to="item.to">{{ item.label }}</RouterLink>
