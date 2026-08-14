@@ -11,11 +11,11 @@ const projects = computed(() => cmsContent.projects)
   <div>
     <PageIntro eyebrow="Development and infrastructure" title="Projects" description="Follow municipal investments in roads, education and public infrastructure." />
     <section class="bg-white py-16 sm:py-20 lg:py-24">
-      <div class="site-container grid gap-6 lg:grid-cols-3">
-        <article v-for="project in projects" :key="project.title" class="overflow-hidden bg-canvas shadow-soft">
+      <div class="site-container cms-responsive-grid grid gap-6 lg:grid-cols-3">
+        <article v-for="project in projects" :key="project.title" class="cms-project-card overflow-hidden bg-canvas shadow-soft">
           <img class="aspect-[4/3] w-full object-cover" :src="project.image" :alt="project.title" />
-          <div class="p-6">
-            <div class="flex items-center justify-between gap-4">
+          <div class="cms-project-card__body p-6">
+            <div class="cms-card-meta flex items-center justify-between gap-4">
               <p class="text-[0.68rem] font-bold uppercase tracking-[0.12em] text-civic-700">{{ project.sector }}</p>
               <span class="bg-sage-100 px-2.5 py-1 text-[0.65rem] font-bold text-civic-800">{{ project.status }}</span>
             </div>

@@ -23,7 +23,7 @@ import {
   PhUsers,
   PhUsersThree,
 } from '@phosphor-icons/vue'
-import { cmsContent } from '../stores/cmsContent'
+import { cmsContent, formatCmsDate } from '../stores/cmsContent'
 
 const slides = [
   {
@@ -181,16 +181,22 @@ const startSlideTimer = () => {
 
 const animateStatistics = () => {
   if (countAnimationFrame) window.cancelAnimationFrame(countAnimationFrame)
-  animatedStatistics.value = statistics.value.map(() => '0')
+  const numericValue = (value) => {
+    const normalized = String(value ?? '').trim().replace(/,/g, '')
+    return /^-?\d+(?:\.\d+)?$/.test(normalized) ? Number(normalized) : null
+  }
+  const targets = statistics.value.map((stat) => numericValue(stat.value))
+  animatedStatistics.value = statistics.value.map((stat, index) => targets[index] == null ? stat.value : '0')
 
   const duration = 2000
   const startedAt = performance.now()
-  const targets = statistics.value.map((stat) => Number(String(stat.value).replace(/,/g, '')))
 
   const tick = (now) => {
     const progress = Math.min((now - startedAt) / duration, 1)
     const eased = 1 - Math.pow(1 - progress, 4)
-    animatedStatistics.value = targets.map((target) => Math.round(target * eased).toLocaleString('en-UG'))
+    animatedStatistics.value = targets.map((target, index) => target == null
+      ? statistics.value[index].value
+      : Math.round(target * eased).toLocaleString('en-UG'))
     if (progress < 1) countAnimationFrame = window.requestAnimationFrame(tick)
   }
 
@@ -388,7 +394,7 @@ onBeforeUnmount(() => {
           <div class="news-editorial home-reveal">
             <article class="news-editorial__feature">
               <img :src="updates[0].image" :alt="updates[0].title" />
-              <div><p>{{ updates[0].type }} <span>/</span> {{ updates[0].date }}</p><h3>{{ updates[0].title }}</h3><div>{{ updates[0].excerpt }}</div><RouterLink class="home-text-link" to="/news">Read the update <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink></div>
+              <div><p>{{ updates[0].type }} <span>/</span> {{ formatCmsDate(updates[0].date) }}</p><h3>{{ updates[0].title }}</h3><div>{{ updates[0].excerpt }}</div><RouterLink class="home-text-link" to="/news">Read the update <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink></div>
             </article>
             <RouterLink v-for="update in updates.slice(1)" :key="update.title" class="news-editorial__row" to="/news">
               <img :src="update.image" :alt="update.title" />

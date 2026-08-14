@@ -87,11 +87,11 @@ export const cmsEntries = {
     if (error) throw error
   },
 
-  async upload(file) {
+  async upload(file, options = {}) {
     const extension = file.name.split('.').pop()?.toLowerCase() || 'bin'
     const path = `${new Date().getFullYear()}/${crypto.randomUUID()}.${extension}`
     const { error } = await requireClient().storage.from('cms-media').upload(path, file, { cacheControl: '3600' })
     if (error) throw error
-    return requireClient().storage.from('cms-media').getPublicUrl(path).data.publicUrl
+    return requireClient().storage.from('cms-media').getPublicUrl(path, options.download ? { download: options.download } : undefined).data.publicUrl
   },
 }

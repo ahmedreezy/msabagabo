@@ -96,10 +96,19 @@ const submit = async () => {
 .admin-login__setup p { margin-top: .25rem; font-size: .7rem; line-height: 1.5; }
 .admin-login__back { display: inline-block; margin-top: 1.6rem; border-bottom: 1px solid rgb(7 59 44 / .35); color: #41544b; font-size: .7rem; font-weight: 750; }
 @media (max-width: 800px) {
-  .admin-login { grid-template-columns: 1fr; }
+  .admin-login { width: 100%; min-width: 0; overflow-x: clip; grid-template-columns: minmax(0, 1fr); }
   .admin-login__identity { min-height: 18rem; padding: 1.5rem; }
-  .admin-login__identity h1 { max-width: 28rem; font-size: clamp(2.2rem, 10vw, 3.4rem); }
+  .admin-login__identity h1 { max-width: 28rem; overflow-wrap: anywhere; font-size: clamp(2.2rem, 10vw, 3.4rem); }
   .admin-login__support { display: none; }
   .admin-login__panel { place-items: start center; padding: 2.5rem 1.25rem 4rem; }
+  .admin-login__form-wrap,.admin-login form,.admin-login label { min-width: 0; }
+  .admin-login input { min-width: 0; max-width: 100%; font-size: 1rem; }
+  .admin-login__setup,.admin-login__error { min-width: 0; overflow-wrap: anywhere; }
+}
+@media (max-width: 420px) {
+  .admin-login__identity { min-height: 15rem; padding: 1.1rem; }
+  .admin-login__brand img { width: 3rem; height: 3rem; }
+  .admin-login__identity h1 { font-size: clamp(2rem, 10vw, 2.65rem); }
+  .admin-login__panel { padding: 2rem 1rem 3rem; }
 }
 </style>

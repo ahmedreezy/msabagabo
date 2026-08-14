@@ -10,12 +10,22 @@ import { cmsEntries } from '../services/cms'
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 
+const dateValue = (value) => {
+  const timestamp = Date.parse(value || '')
+  return Number.isNaN(timestamp) ? 0 : timestamp
+}
+
+const sortCollection = (collection, items) => {
+  if (collection === 'updates') return [...items].sort((a, b) => dateValue(b.date) - dateValue(a.date))
+  return items
+}
+
 export const cmsContent = reactive({
   departments: clone(fallbackDepartments),
   projects: clone(fallbackProjects),
   publications: clone(fallbackPublications),
   stats: clone(fallbackStats),
-  updates: clone(fallbackUpdates),
+  updates: sortCollection('updates', clone(fallbackUpdates)),
   loaded: false,
 })
 
@@ -39,13 +49,20 @@ export const loadPublishedContent = async () => {
     }, {})
 
     Object.entries(grouped).forEach(([collection, items]) => {
-      if (collection in cmsContent) cmsContent[collection] = items
+      if (collection in cmsContent) cmsContent[collection] = sortCollection(collection, items)
     })
   } catch (error) {
     console.warn('Published CMS content could not be loaded; local content remains active.', error)
   } finally {
     cmsContent.loaded = true
   }
+}
+
+export const formatCmsDate = (value) => {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return new Intl.DateTimeFormat('en-UG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date)
 }
 
 export const createSeedEntries = () => Object.entries(cmsFallbacks).flatMap(([collection, items]) =>

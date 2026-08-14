@@ -101,7 +101,7 @@ const filteredDepartments = computed(() => {
           <article
             v-for="(department, index) in filteredDepartments"
             :key="department.slug"
-            class="grid gap-9 bg-white px-5 py-10 shadow-[0_14px_48px_rgba(7,59,44,0.045)] sm:px-8 sm:py-12 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-16 lg:px-12 lg:py-14"
+            class="cms-service-department grid gap-9 bg-white px-5 py-10 shadow-[0_14px_48px_rgba(7,59,44,0.045)] sm:px-8 sm:py-12 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-16 lg:px-12 lg:py-14"
           >
             <div>
               <div class="flex items-baseline gap-4">
