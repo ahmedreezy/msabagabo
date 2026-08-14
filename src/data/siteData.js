@@ -207,3 +207,11 @@ export const stats = [
   { value: '6', label: 'Government-aided health facilities' },
 ]
 
+export const homepageStats = [
+  { value: '439,605', label: 'Residents', detail: '2024 national census', icon: 'users' },
+  { value: '3', label: 'Divisions', detail: 'Bunamwaya, Masajja & Ndejje', icon: 'map' },
+  { value: '8', label: 'Wards', detail: 'Lower administrative units', icon: 'pin' },
+  { value: '55', label: 'Cells / villages', detail: 'Community-level administration', icon: 'home' },
+  { value: '16', label: 'UPE schools', detail: 'Government-aided primary schools', icon: 'education' },
+  { value: '6', label: 'Health facilities', detail: 'Government-aided facilities', icon: 'health' },
+]

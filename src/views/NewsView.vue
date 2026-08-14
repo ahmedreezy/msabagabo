@@ -1,7 +1,11 @@
 <script setup>
+import { computed } from 'vue'
 import { PhArrowRight, PhDownloadSimple, PhFilePdf } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
-import { publications, updates } from '../data/siteData'
+import { cmsContent } from '../stores/cmsContent'
+
+const publications = computed(() => cmsContent.publications)
+const updates = computed(() => cmsContent.updates)
 </script>
 
 <template>
@@ -32,7 +36,7 @@ import { publications, updates } from '../data/siteData'
           <p class="section-description">Official plans, reports, budgets and service standards.</p>
         </div>
         <div class="grid gap-3">
-          <a v-for="publication in publications" :key="publication.title" class="group flex items-center gap-4 bg-white p-5 transition duration-500 ease-premium hover:-translate-y-0.5 hover:shadow-soft" href="#">
+          <a v-for="publication in publications" :key="publication.title" class="group flex items-center gap-4 bg-white p-5 transition duration-500 ease-premium hover:-translate-y-0.5 hover:shadow-soft" :href="publication.url || '#'">
             <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-700"><PhFilePdf :size="22" /></span>
             <div class="min-w-0 flex-1">
               <p class="font-extrabold text-ink">{{ publication.title }}</p>
@@ -45,4 +49,3 @@ import { publications, updates } from '../data/siteData'
     </section>
   </div>
 </template>
-

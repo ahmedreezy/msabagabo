@@ -1,7 +1,10 @@
 <script setup>
+import { computed } from 'vue'
 import { PhArrowRight } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
-import { departments } from '../data/siteData'
+import { cmsContent } from '../stores/cmsContent'
+
+const departments = computed(() => cmsContent.departments)
 </script>
 
 <template>
@@ -31,4 +34,3 @@ import { departments } from '../data/siteData'
     </section>
   </div>
 </template>
-

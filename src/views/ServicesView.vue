@@ -9,19 +9,20 @@ import {
   PhMagnifyingGlass,
 } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
-import { departments } from '../data/siteData'
+import { cmsContent } from '../stores/cmsContent'
 
 const route = useRoute()
 const search = ref(route.query.q || '')
+const departments = computed(() => cmsContent.departments)
 
 const totalServices = computed(() =>
-  departments.reduce((total, department) => total + department.services.length, 0),
+  departments.value.reduce((total, department) => total + department.services.length, 0),
 )
 
 const filteredDepartments = computed(() => {
   const query = search.value.trim().toLowerCase()
 
-  return departments.reduce((matches, department) => {
+  return departments.value.reduce((matches, department) => {
     const departmentMatches = `${department.name} ${department.summary} ${department.mandate}`
       .toLowerCase()
       .includes(query)

@@ -3,10 +3,10 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { PhArrowRight, PhCheck, PhEnvelopeSimple, PhGavel, PhUsersThree } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
-import { departments } from '../data/siteData'
+import { cmsContent } from '../stores/cmsContent'
 
 const route = useRoute()
-const department = computed(() => departments.find((item) => item.slug === route.params.slug) || departments[0])
+const department = computed(() => cmsContent.departments.find((item) => item.slug === route.params.slug) || cmsContent.departments[0])
 </script>
 
 <template>
@@ -96,4 +96,3 @@ const department = computed(() => departments.find((item) => item.slug === route
     </section>
   </div>
 </template>
-

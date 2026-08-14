@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import { isSupabaseConfigured } from '../lib/supabase'
+import { cmsAuth } from '../services/cms'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -50,6 +52,18 @@ const router = createRouter({
       component: () => import('../views/ContactView.vue'),
     },
     {
+      path: '/admin/login',
+      name: 'admin-login',
+      component: () => import('../views/admin/AdminLoginView.vue'),
+      meta: { admin: true, guestOnly: true },
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/admin/AdminDashboardView.vue'),
+      meta: { admin: true, requiresAuth: true },
+    },
+    {
       path: '/privacy',
       name: 'privacy',
       component: () => import('../views/GovernmentInfoView.vue'),
@@ -83,6 +97,20 @@ const router = createRouter({
     if (to.hash) return { el: to.hash, top: 24, behavior: 'smooth' }
     return { top: 0 }
   },
+})
+
+router.beforeEach(async (to) => {
+  if (!to.meta.admin) return true
+  if (!isSupabaseConfigured) return to.name === 'admin-login' ? true : { name: 'admin-login' }
+
+  try {
+    const session = await cmsAuth.getSession()
+    if (to.meta.requiresAuth && !session) return { name: 'admin-login' }
+    if (to.meta.guestOnly && session) return { name: 'admin' }
+    return true
+  } catch {
+    return to.meta.requiresAuth ? { name: 'admin-login' } : true
+  }
 })
 
 export default router

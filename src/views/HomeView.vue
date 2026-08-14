@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import {
   PhArrowRight,
   PhArrowUpRight,
@@ -23,7 +23,7 @@ import {
   PhUsers,
   PhUsersThree,
 } from '@phosphor-icons/vue'
-import { projects, updates } from '../data/siteData'
+import { cmsContent } from '../stores/cmsContent'
 
 const slides = [
   {
@@ -83,14 +83,18 @@ const quickFacts = [
   { term: 'Public purpose', detail: 'A well-planned, clean and prosperous municipality.' },
 ]
 
-const statistics = [
-  { value: '439,605', label: 'Residents', detail: '2024 national census', icon: PhUsersThree },
-  { value: '3', label: 'Divisions', detail: 'Bunamwaya, Masajja & Ndejje', icon: PhMapTrifold },
-  { value: '8', label: 'Wards', detail: 'Lower administrative units', icon: PhMapPin },
-  { value: '55', label: 'Cells / villages', detail: 'Community-level administration', icon: PhHouseLine },
-  { value: '16', label: 'UPE schools', detail: 'Government-aided primary schools', icon: PhChalkboardTeacher },
-  { value: '6', label: 'Health facilities', detail: 'Government-aided facilities', icon: PhFirstAidKit },
-]
+const statisticIcons = {
+  users: PhUsersThree,
+  map: PhMapTrifold,
+  pin: PhMapPin,
+  home: PhHouseLine,
+  education: PhChalkboardTeacher,
+  health: PhFirstAidKit,
+}
+
+const projects = computed(() => cmsContent.projects)
+const updates = computed(() => cmsContent.updates)
+const statistics = computed(() => cmsContent.stats.map((stat) => ({ ...stat, icon: statisticIcons[stat.icon] || PhUsersThree })))
 
 const achievements = [
   {
@@ -151,7 +155,7 @@ const currentSlide = ref(0)
 const isPlaying = ref(true)
 const pageRoot = ref(null)
 const statisticsGrid = ref(null)
-const animatedStatistics = ref(statistics.map(() => '0'))
+const animatedStatistics = ref(statistics.value.map(() => '0'))
 const quickFactsRail = ref(null)
 const leadershipRail = ref(null)
 const projectsRail = ref(null)
@@ -177,11 +181,11 @@ const startSlideTimer = () => {
 
 const animateStatistics = () => {
   if (countAnimationFrame) window.cancelAnimationFrame(countAnimationFrame)
-  animatedStatistics.value = statistics.map(() => '0')
+  animatedStatistics.value = statistics.value.map(() => '0')
 
   const duration = 2000
   const startedAt = performance.now()
-  const targets = statistics.map((stat) => Number(stat.value.replace(/,/g, '')))
+  const targets = statistics.value.map((stat) => Number(String(stat.value).replace(/,/g, '')))
 
   const tick = (now) => {
     const progress = Math.min((now - startedAt) / duration, 1)
@@ -216,7 +220,7 @@ onMounted(() => {
   startSlideTimer()
 
   if (reducedMotion) {
-    animatedStatistics.value = statistics.map((stat) => stat.value)
+    animatedStatistics.value = statistics.value.map((stat) => stat.value)
   } else {
     if ('IntersectionObserver' in window) {
       statisticsObserver = new IntersectionObserver(([entry]) => {
