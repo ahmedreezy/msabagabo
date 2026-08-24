@@ -4,6 +4,21 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 
 Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
 
+## Production deployment
+
+Netlify is configured by `netlify.toml` to run `npm run build`, publish the generated `dist` directory, and serve `index.html` for Vue Router URLs.
+
+The GitHub Actions workflow in `.github/workflows/production.yml` verifies pull requests into `main`. A push to `main` (including a merged pull request) also deploys the verified revision to the existing Netlify production site.
+
+Add these repository secrets in **GitHub > Settings > Secrets and variables > Actions**:
+
+- `NETLIFY_AUTH_TOKEN`: a Netlify personal access token used only by GitHub Actions.
+- `NETLIFY_SITE_ID`: the Netlify **Project ID** under **Project configuration > General > Project information**.
+
+The production deploy runs through Netlify Build, so the `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` values should remain configured under the Netlify project's environment variables. Do not store those values in the workflow file.
+
+If Netlify's built-in Git deployment is still enabled for the same repository and production branch, disable one of the two production deploy mechanisms to avoid duplicate deploys. The GitHub Actions workflow is the explicit pipeline defined in this repository.
+
 ## Municipal CMS
 
 The protected CMS is available at `/admin`. It uses Supabase Authentication, Postgres, Row Level Security and Storage.
