@@ -8,16 +8,9 @@ Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://
 
 Netlify is configured by `netlify.toml` to run `npm run build`, publish the generated `dist` directory, and serve `index.html` for Vue Router URLs.
 
-The GitHub Actions workflow in `.github/workflows/production.yml` verifies pull requests into `main`. A push to `main` (including a merged pull request) also deploys the verified revision to the existing Netlify production site.
+The GitHub Actions workflow in `.github/workflows/production.yml` verifies pull requests into `main` and every merged revision. Netlify's connected Git integration then builds and publishes pushes to `main`; this avoids storing Netlify account tokens in GitHub or running duplicate production deploys.
 
-Add these repository secrets in **GitHub > Settings > Secrets and variables > Actions**:
-
-- `NETLIFY_AUTH_TOKEN`: a Netlify personal access token used only by GitHub Actions.
-- `NETLIFY_SITE_ID`: the Netlify **Project ID** under **Project configuration > General > Project information**.
-
-The production deploy runs through Netlify Build, so the `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` values should remain configured under the Netlify project's environment variables. Do not store those values in the workflow file.
-
-If Netlify's built-in Git deployment is still enabled for the same repository and production branch, disable one of the two production deploy mechanisms to avoid duplicate deploys. The GitHub Actions workflow is the explicit pipeline defined in this repository.
+Keep `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` configured under the Netlify project's environment variables. Do not store those values in the workflow file.
 
 ## Municipal CMS
 
