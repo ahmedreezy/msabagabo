@@ -3,25 +3,26 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import {
   PhArrowRight,
   PhArrowUpRight,
-  PhBlueprint,
   PhBookOpenText,
-  PhBuildings,
   PhChalkboardTeacher,
   PhChatCircleText,
+  PhCloud,
+  PhCloudFog,
+  PhCloudLightning,
+  PhCloudRain,
+  PhCloudSun,
   PhFirstAidKit,
-  PhGlobe,
   PhGraduationCap,
   PhHouseLine,
-  PhIdentificationCard,
+  PhLeaf,
   PhMapPin,
   PhMapTrifold,
   PhMegaphone,
-  PhBookOpenUser,
-  PhReceipt,
   PhRoadHorizon,
   PhSealCheck,
-  PhUsers,
+  PhSun,
   PhUsersThree,
+  PhWind,
 } from '@phosphor-icons/vue'
 import { cmsContent, formatCmsDate } from '../stores/cmsContent'
 
@@ -141,15 +142,46 @@ const notices = [
 ]
 
 const resources = [
-  { name: 'NIRA', description: 'National identification services', href: 'https://www.nira.go.ug/', icon: PhIdentificationCard },
-  { name: 'URA', description: 'Tax registration and payments', href: 'https://ura.go.ug/', icon: PhReceipt },
-  { name: 'Passport Services', description: 'Apply for or track a passport', href: 'https://www.passports.go.ug/', icon: PhBookOpenUser },
-  { name: 'BIMS', description: 'Building application services', href: 'https://bims.go.ug/', icon: PhBlueprint },
-  { name: 'Ministry of Local Government', description: 'National local government information', href: 'https://molg.go.ug/', icon: PhBuildings },
-  { name: 'Wakiso District', description: 'District services and information', href: 'https://www.wakiso.go.ug/', icon: PhMapPin },
-  { name: 'NSSF Uganda', description: 'Social security member services', href: 'https://www.nssfug.org/', icon: PhUsers },
-  { name: 'Government of Uganda', description: 'National government portal', href: 'https://www.gou.go.ug/', icon: PhGlobe },
+  { name: 'NIRA', description: 'National identification services', href: 'https://www.nira.go.ug/', logo: '/images/government-logos/nira.png', logoClass: 'government-resources__logo--wide', logoAlt: 'National Identification and Registration Authority logo' },
+  { name: 'URA', description: 'Tax registration and payments', href: 'https://ura.go.ug/', logo: '/images/government-logos/ura.png', logoClass: 'government-resources__logo--ura', logoAlt: 'Uganda Revenue Authority logo' },
+  { name: 'Passport Services', description: 'Apply for or track a passport', href: 'https://www.passports.go.ug/', logo: '/images/government-logos/passport-dcic.png', logoClass: 'government-resources__logo--seal', logoAlt: 'Directorate of Citizenship and Immigration Control logo' },
+  { name: 'BIMS', description: 'Building application services', href: 'https://bims.go.ug/', logo: '/images/government-logos/bims-nbrb.png', logoClass: 'government-resources__logo--wide', logoAlt: 'National Building Review Board logo' },
+  { name: 'Ministry of Local Government', description: 'National local government information', href: 'https://molg.go.ug/', logo: '/images/government-logos/uganda-coat-of-arms.png', logoClass: 'government-resources__logo--coat', logoAlt: 'Coat of arms of Uganda' },
+  { name: 'Wakiso District', description: 'District services and information', href: 'https://www.wakiso.go.ug/', logo: '/images/government-logos/wakiso.png', logoClass: 'government-resources__logo--wide', logoAlt: 'Wakiso District Local Government logo' },
+  { name: 'NSSF Uganda', description: 'Social security member services', href: 'https://www.nssfug.org/', logo: '/images/government-logos/nssf.png', logoClass: 'government-resources__logo--nssf', logoAlt: 'National Social Security Fund Uganda logo' },
+  { name: 'Government of Uganda', description: 'National government portal', href: 'https://www.gou.go.ug/', logo: '/images/government-logos/uganda-coat-of-arms.png', logoClass: 'government-resources__logo--coat', logoAlt: 'Coat of arms of Uganda' },
 ]
+
+const weatherConditions = {
+  Clear: { icon: PhSun, className: 'is-clear' },
+  'Partly cloudy': { icon: PhCloudSun, className: 'is-partly-cloudy' },
+  Cloudy: { icon: PhCloud, className: 'is-cloudy' },
+  'Light rain': { icon: PhCloudRain, className: 'is-light-rain' },
+  'Heavy rain': { icon: PhCloudRain, className: 'is-heavy-rain' },
+  Thunderstorm: { icon: PhCloudLightning, className: 'is-thunderstorm' },
+  Windy: { icon: PhWind, className: 'is-windy' },
+  Foggy: { icon: PhCloudFog, className: 'is-foggy' },
+}
+
+const environmentBulletin = computed(() => cmsContent.environment?.[0] || null)
+const weatherVisual = computed(() => weatherConditions[environmentBulletin.value?.weatherCondition] || weatherConditions.Cloudy)
+const airQuality = computed(() => {
+  const value = Number(environmentBulletin.value?.aqi)
+  if (!Number.isFinite(value)) return { label: 'Not available', className: 'is-unavailable', level: 0 }
+  if (value <= 50) return { label: 'Good', className: 'is-good', level: 1 }
+  if (value <= 100) return { label: 'Moderate', className: 'is-moderate', level: 2 }
+  if (value <= 150) return { label: 'Unhealthy for sensitive groups', className: 'is-sensitive', level: 3 }
+  if (value <= 200) return { label: 'Unhealthy', className: 'is-unhealthy', level: 4 }
+  if (value <= 300) return { label: 'Very unhealthy', className: 'is-very-unhealthy', level: 5 }
+  return { label: 'Hazardous', className: 'is-hazardous', level: 6 }
+})
+
+const kampalaDateKey = (value = new Date()) => new Intl.DateTimeFormat('en-CA', {
+  year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'Africa/Nairobi',
+}).format(value)
+const bulletinIsToday = computed(() => environmentBulletin.value?.date === kampalaDateKey())
+const environmentDateLabel = computed(() => environmentBulletin.value?.date ? formatCmsDate(environmentBulletin.value.date) : '')
+const displayReading = (value) => value === 0 || value ? value : '—'
 
 const currentSlide = ref(0)
 const isPlaying = ref(true)
@@ -283,6 +315,60 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <section v-if="environmentBulletin" class="daily-environment" aria-labelledby="daily-environment-heading">
+      <div class="site-container">
+        <header class="daily-environment__heading home-reveal">
+          <div><p class="home-eyebrow"><span>Daily</span> Public environment</p><h2 id="daily-environment-heading">Today in {{ environmentBulletin.location || 'Makindye Ssabagabo' }}</h2></div>
+          <p :class="{ 'is-stale': !bulletinIsToday }"><span></span>{{ bulletinIsToday ? 'Today’s bulletin' : `Latest available · ${environmentDateLabel}` }}</p>
+        </header>
+
+        <div class="daily-environment__readings home-reveal">
+          <article class="weather-reading" :class="weatherVisual.className">
+            <div class="weather-reading__ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div class="weather-scene" aria-hidden="true">
+              <span class="weather-scene__sun"></span>
+              <span class="weather-scene__cloud weather-scene__cloud--back"><i></i><i></i><i></i></span>
+              <span class="weather-scene__cloud weather-scene__cloud--front"><i></i><i></i><i></i></span>
+              <span class="weather-scene__rain"><i></i><i></i><i></i><i></i></span>
+              <span class="weather-scene__lightning"></span>
+              <span class="weather-scene__wind"><i></i><i></i><i></i></span>
+              <span class="weather-scene__fog"><i></i><i></i><i></i></span>
+            </div>
+            <div class="environment-reading__label"><span>Weather</span><strong>Municipal weather station</strong></div>
+            <div class="weather-reading__primary">
+              <span class="weather-reading__icon"><component :is="weatherVisual.icon" :size="62" weight="duotone" /></span>
+              <div><strong>{{ displayReading(environmentBulletin.temperature) }}<sup>°C</sup></strong><p>{{ environmentBulletin.weatherCondition }}</p></div>
+            </div>
+            <dl class="weather-reading__metrics">
+              <div><dt>High / low</dt><dd>{{ displayReading(environmentBulletin.highTemperature) }}° / {{ displayReading(environmentBulletin.lowTemperature) }}°</dd></div>
+              <div><dt>Rain</dt><dd>{{ displayReading(environmentBulletin.rainChance) }}%</dd></div>
+              <div><dt>Humidity</dt><dd>{{ displayReading(environmentBulletin.humidity) }}%</dd></div>
+              <div><dt>Wind</dt><dd>{{ displayReading(environmentBulletin.windSpeed) }} km/h</dd></div>
+            </dl>
+          </article>
+
+          <article class="air-reading" :class="airQuality.className">
+            <div class="environment-reading__label"><span>Air quality</span><strong>Municipal monitoring system</strong></div>
+            <div class="air-reading__primary">
+              <span class="air-reading__icon"><PhLeaf :size="34" weight="duotone" /></span>
+              <div><p>Air Quality Index</p><strong>{{ displayReading(environmentBulletin.aqi) }}</strong><em>{{ airQuality.label }}</em></div>
+            </div>
+            <div class="air-reading__scale" aria-hidden="true"><i v-for="level in 6" :key="level" :class="{ 'is-reached': level <= airQuality.level }"></i></div>
+            <dl class="air-reading__metrics">
+              <div><dt>PM2.5</dt><dd>{{ displayReading(environmentBulletin.pm25) }} <small>µg/m³</small></dd></div>
+              <div><dt>PM10</dt><dd>{{ displayReading(environmentBulletin.pm10) }} <small>µg/m³</small></dd></div>
+            </dl>
+          </article>
+        </div>
+
+        <div class="daily-environment__guidance home-reveal">
+          <article class="guidance-ribbon guidance-ribbon--weather"><span><PhCloudRain :size="24" weight="duotone" /></span><p><strong>Weather guidance</strong>{{ environmentBulletin.weatherGuidance }}</p></article>
+          <article class="guidance-ribbon guidance-ribbon--air"><span><PhLeaf :size="24" weight="duotone" /></span><p><strong>Air-quality guidance</strong>{{ environmentBulletin.airQualityGuidance }}</p></article>
+          <time :datetime="environmentBulletin.date">Published {{ environmentDateLabel }}</time>
+        </div>
       </div>
     </section>
 
@@ -422,7 +508,7 @@ onBeforeUnmount(() => {
         </div>
         <div ref="resourcesRail" class="government-resources__grid home-reveal" @scroll.passive="updateRailPosition($event, 'resources')">
           <a v-for="(resource, index) in resources" :key="resource.name" :class="{ 'is-rail-active': railState.resources === index }" :href="resource.href" target="_blank" rel="noreferrer">
-            <span class="government-resources__icon"><component :is="resource.icon" :size="25" weight="regular" /></span>
+            <span class="government-resources__icon"><img :class="resource.logoClass" :src="resource.logo" :alt="resource.logoAlt" /></span>
             <span><strong>{{ resource.name }}</strong><small>{{ resource.description }}</small></span>
             <PhArrowUpRight :size="18" weight="bold" />
           </a>
