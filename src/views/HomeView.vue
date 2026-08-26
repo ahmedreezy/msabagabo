@@ -56,6 +56,8 @@ const leadership = [
     role: 'Political leadership',
     description: 'Leads the elected Municipal Council.',
     mark: 'M',
+    image: '/images/mayor.webp',
+    imageAlt: 'Mayor of Makindye Ssabagabo Municipal Council in ceremonial attire',
   },
   {
     office: 'Office of the Speaker',
@@ -401,7 +403,10 @@ onBeforeUnmount(() => {
         <div class="leadership-showcase home-reveal" id="leadership">
           <div ref="leadershipRail" class="leadership-grid" @scroll.passive="updateRailPosition($event, 'leadership')">
             <article v-for="(leader, index) in leadership" :key="leader.office" class="leadership-card" :class="{ 'is-rail-active': railState.leadership === index }">
-              <div class="leadership-card__portrait" aria-hidden="true"><span>{{ leader.mark }}</span></div>
+              <div class="leadership-card__portrait" :class="{ 'leadership-card__portrait--image': leader.image }" :aria-hidden="leader.image ? undefined : 'true'">
+                <img v-if="leader.image" :src="leader.image" :alt="leader.imageAlt" width="1600" height="2400" loading="lazy" decoding="async" />
+                <span v-else>{{ leader.mark }}</span>
+              </div>
               <div><p>{{ leader.role }}</p><h4>{{ leader.office }}</h4><span>{{ leader.description }}</span></div>
             </article>
           </div>
