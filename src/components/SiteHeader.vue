@@ -171,9 +171,8 @@ onBeforeUnmount(() => {
           <a class="masthead-contact" href="mailto:info@msabagabo.go.ug"><PhEnvelopeSimple :size="17" /><span><small>Email</small><strong>info@msabagabo.go.ug</strong></span></a>
           <form class="masthead-search" role="search" @submit.prevent="submitSiteSearch">
             <label class="sr-only" for="site-search">Search this website</label>
-            <PhMagnifyingGlass :size="19" />
-            <input id="site-search" v-model="searchQuery" type="search" placeholder="Search" />
-            <button type="submit" aria-label="Submit search"><PhArrowRight :size="17" weight="bold" /></button>
+            <input id="site-search" v-model="searchQuery" type="search" placeholder="Search this website" />
+            <button type="submit" aria-label="Search this website"><PhMagnifyingGlass :size="18" weight="bold" /></button>
           </form>
         </div>
 

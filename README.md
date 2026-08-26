@@ -4,6 +4,14 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 
 Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
 
+## Production deployment
+
+Netlify is configured by `netlify.toml` to run `npm run build`, publish the generated `dist` directory, and serve `index.html` for Vue Router URLs.
+
+The GitHub Actions workflow in `.github/workflows/production.yml` verifies pull requests into `main` and every merged revision. Netlify's connected Git integration then builds and publishes pushes to `main`; this avoids storing Netlify account tokens in GitHub or running duplicate production deploys.
+
+Keep `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` configured under the Netlify project's environment variables. Do not store those values in the workflow file.
+
 ## Municipal CMS
 
 The protected CMS is available at `/admin`. It uses Supabase Authentication, Postgres, Row Level Security and Storage.

@@ -3,6 +3,7 @@ import {
   departments as fallbackDepartments,
   projects as fallbackProjects,
   publications as fallbackPublications,
+  environmentBulletins as fallbackEnvironment,
   homepageStats as fallbackStats,
   updates as fallbackUpdates,
 } from '../data/siteData'
@@ -16,7 +17,7 @@ const dateValue = (value) => {
 }
 
 const sortCollection = (collection, items) => {
-  if (collection === 'updates') return [...items].sort((a, b) => dateValue(b.date) - dateValue(a.date))
+  if (collection === 'updates' || collection === 'environment') return [...items].sort((a, b) => dateValue(b.date) - dateValue(a.date))
   return items
 }
 
@@ -26,6 +27,7 @@ export const cmsContent = reactive({
   publications: clone(fallbackPublications),
   stats: clone(fallbackStats),
   updates: sortCollection('updates', clone(fallbackUpdates)),
+  environment: sortCollection('environment', clone(fallbackEnvironment)),
   loaded: false,
 })
 
@@ -35,6 +37,7 @@ export const cmsFallbacks = {
   publications: fallbackPublications,
   stats: fallbackStats,
   updates: fallbackUpdates,
+  environment: fallbackEnvironment,
 }
 
 export const loadPublishedContent = async () => {
@@ -44,7 +47,7 @@ export const loadPublishedContent = async () => {
 
     const grouped = entries.reduce((result, entry) => {
       if (!result[entry.collection]) result[entry.collection] = []
-      result[entry.collection].push({ ...entry.payload, _cmsId: entry.id })
+      result[entry.collection].push({ ...entry.payload, _cmsId: entry.id, _publishedAt: entry.published_at })
       return result
     }, {})
 

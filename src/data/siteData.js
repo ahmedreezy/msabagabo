@@ -215,3 +215,22 @@ export const homepageStats = [
   { value: '16', label: 'UPE schools', detail: 'Government-aided primary schools', icon: 'education' },
   { value: '6', label: 'Health facilities', detail: 'Government-aided facilities', icon: 'health' },
 ]
+
+export const environmentBulletins = [
+  {
+    date: '2026-08-25',
+    location: 'Makindye Ssabagabo',
+    weatherCondition: 'Light rain',
+    temperature: 24,
+    highTemperature: 27,
+    lowTemperature: 20,
+    rainChance: 70,
+    humidity: 78,
+    windSpeed: 12,
+    weatherGuidance: 'Rain is expected this afternoon. Carry an umbrella and take care on wet roads.',
+    aqi: 64,
+    pm25: 18,
+    pm10: 31,
+    airQualityGuidance: 'Air quality is moderate. People with respiratory conditions should limit prolonged outdoor activity.',
+  },
+]
