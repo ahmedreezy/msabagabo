@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   PhArrowSquareOut, PhCheck, PhCloudArrowUp, PhFileText, PhFolderOpen, PhNewspaper,
-  PhEye, PhPencilSimple, PhPlus, PhSignOut, PhSpinnerGap, PhSquaresFour, PhTrash, PhWarningCircle,
+  PhCloudSun, PhEye, PhLeaf, PhPencilSimple, PhPlus, PhSignOut, PhSpinnerGap, PhSquaresFour, PhTrash, PhWarningCircle,
 } from '@phosphor-icons/vue'
 import { cmsAuth, cmsEntries } from '../../services/cms'
 import { createSeedEntries, formatCmsDate, loadPublishedContent } from '../../stores/cmsContent'
@@ -11,6 +11,22 @@ import { createSeedEntries, formatCmsDate, loadPublishedContent } from '../../st
 const router = useRouter()
 const pageGroups = [
   { label: 'Homepage', items: [
+    { key: 'environment', label: 'Daily environment', mobileLabel: 'Today', page: 'Homepage', section: 'Today in Makindye Ssabagabo', icon: PhCloudSun, route: '/', chronological: true, fields: [
+      { key: 'date', label: 'Bulletin date', type: 'date', required: true },
+      { key: 'location', label: 'Location', required: true },
+      { key: 'weatherCondition', label: 'Weather condition', type: 'select', required: true, options: ['Clear', 'Partly cloudy', 'Cloudy', 'Light rain', 'Heavy rain', 'Thunderstorm', 'Windy', 'Foggy'] },
+      { key: 'temperature', label: 'Current temperature (°C)', type: 'number', required: true, min: -10, max: 60, step: 1 },
+      { key: 'highTemperature', label: 'Highest temperature (°C)', type: 'number', required: true, min: -10, max: 60, step: 1 },
+      { key: 'lowTemperature', label: 'Lowest temperature (°C)', type: 'number', required: true, min: -10, max: 60, step: 1 },
+      { key: 'rainChance', label: 'Chance of rain (%)', type: 'number', required: true, min: 0, max: 100, step: 1 },
+      { key: 'humidity', label: 'Humidity (%)', type: 'number', required: true, min: 0, max: 100, step: 1 },
+      { key: 'windSpeed', label: 'Wind speed (km/h)', type: 'number', required: true, min: 0, max: 250, step: 1 },
+      { key: 'weatherGuidance', label: 'Weather guidance', type: 'textarea', required: true },
+      { key: 'aqi', label: 'Air Quality Index (AQI)', type: 'number', required: true, min: 0, max: 500, step: 1 },
+      { key: 'pm25', label: 'PM2.5 (µg/m³)', type: 'number', required: true, min: 0, max: 1000, step: 0.1 },
+      { key: 'pm10', label: 'PM10 (µg/m³)', type: 'number', required: true, min: 0, max: 1500, step: 0.1 },
+      { key: 'airQualityGuidance', label: 'Air-quality guidance', type: 'textarea', required: true },
+    ] },
     { key: 'stats', label: 'Statistics', mobileLabel: 'Home', page: 'Homepage', section: 'At a glance', icon: PhSquaresFour, route: '/', fields: [
       { key: 'value', label: 'Value', required: true }, { key: 'label', label: 'Label', required: true },
       { key: 'detail', label: 'Supporting text' },
@@ -78,6 +94,17 @@ const publishedCount = computed(() => entries.value.filter((entry) => entry.stat
 const entryDisplayDate = (entry) => definition.value.chronological
   ? formatCmsDate(entry.payload.date)
   : new Date(entry.updated_at).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' })
+
+const airQualityCategory = (value) => {
+  const aqi = Number(value)
+  if (!Number.isFinite(aqi)) return 'AQI category'
+  if (aqi <= 50) return 'Good'
+  if (aqi <= 100) return 'Moderate'
+  if (aqi <= 150) return 'Unhealthy for sensitive groups'
+  if (aqi <= 200) return 'Unhealthy'
+  if (aqi <= 300) return 'Very unhealthy'
+  return 'Hazardous'
+}
 
 const setFeedback = (type, message) => {
   feedback.type = type
@@ -182,8 +209,12 @@ const saveEntry = async () => {
   saving.value = true
   try {
     const payload = serializePayload()
-    const primaryTitle = payload.title || payload.name || payload.label
+    const primaryTitle = payload.title || payload.name || payload.label || (selectedCollection.value === 'environment' && payload.date ? `Daily environment · ${payload.date}` : '')
     if (!primaryTitle) throw new Error('Add a title or label before saving.')
+    if (selectedCollection.value === 'environment' && editor.value.status === 'published') {
+      const duplicate = entries.value.find((entry) => entry.id !== editor.value.id && entry.status === 'published' && entry.payload.date === payload.date)
+      if (duplicate) throw new Error('A published environment bulletin already exists for this date.')
+    }
     if (selectedCollection.value === 'publications' && !payload.url) throw new Error('Upload the publication document before saving.')
     if (selectedCollection.value === 'departments' && editor.value.status === 'published') {
       if (!payload.team?.length) throw new Error('Add at least one team member before publishing this department.')
@@ -449,7 +480,7 @@ onMounted(async () => {
                   <span><strong>{{ editor.payload[field.key] ? 'Replace document' : 'Choose document' }}</strong><small>PDF, Word, Excel, PowerPoint, CSV or text</small></span>
                 </label>
               </div>
-              <input v-else :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :type="field.type || 'text'" :required="field.required" />
+              <input v-else :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :type="field.type || 'text'" :required="field.required" :min="field.min" :max="field.max" :step="field.step" />
             </div>
             <label v-if="!definition.chronological"><span>Website position</span><input v-model.number="editor.sort_order" type="number" min="0" /><small>Lower numbers appear first.</small></label>
             <label><span>Publishing state</span><select v-model="editor.status"><option value="draft">Draft</option><option value="published" :disabled="!canPublish">Published</option></select><small v-if="!canPublish">A publisher must approve this entry.</small></label>
@@ -503,6 +534,15 @@ onMounted(async () => {
                 <div>{{ previewItem.excerpt || 'The update summary will appear here.' }}</div>
                 <span class="cms-preview-link">Read the update <PhArrowSquareOut :size="16" /></span>
               </div>
+            </article>
+
+            <article v-else-if="selectedCollection === 'environment'" class="cms-preview-environment">
+              <header><span>Daily environment</span><strong>{{ previewItem.location || 'Makindye Ssabagabo' }}</strong><time>{{ formatCmsDate(previewItem.date) || 'Bulletin date' }}</time></header>
+              <div class="cms-preview-environment__grid">
+                <section><PhCloudSun :size="31" /><div><span>Weather</span><strong>{{ previewItem.temperature || '—' }}°</strong><p>{{ previewItem.weatherCondition || 'Weather condition' }}</p></div></section>
+                <section><PhLeaf :size="31" /><div><span>Air quality</span><strong>{{ previewItem.aqi || '—' }}</strong><p>{{ airQualityCategory(previewItem.aqi) }}</p></div></section>
+              </div>
+              <footer><strong>Today’s guidance</strong><p>{{ previewItem.weatherGuidance || 'Weather guidance will appear here.' }}</p><p>{{ previewItem.airQualityGuidance || 'Air-quality guidance will appear here.' }}</p></footer>
             </article>
 
             <article v-else-if="selectedCollection === 'publications'" class="cms-preview-publication">
@@ -648,6 +688,7 @@ onMounted(async () => {
 .cms-preview-placeholder { display: grid; place-items: center; background: #dfe6df; color: #65756d; font-size: .78rem; font-weight: 800; }
 .cms-preview-link { display: inline-flex; align-items: center; gap: .45rem; margin-top: auto; padding-top: 1.4rem; color: #17634c; font-size: .8rem; font-weight: 850; }
 .cms-preview-stat { display: flex; width: min(100%, 20rem); min-height: 19rem; align-items: center; flex-direction: column; background: #073b2c; padding: 2rem 1.25rem; color: white; text-align: center; }.cms-preview-stat > svg { color: #e8c774; }.cms-preview-stat strong { max-width: 100%; margin-top: 1.4rem; overflow-wrap: anywhere; font-size: clamp(2.4rem, 8vw, 4rem); font-weight: 900; line-height: 1; }.cms-preview-stat h3 { margin-top: 1rem; overflow-wrap: anywhere; font-size: .95rem; font-weight: 850; }.cms-preview-stat p { margin-top: .45rem; overflow-wrap: anywhere; color: rgb(255 255 255 / .6); font-size: .76rem; line-height: 1.5; }
+.cms-preview-environment { width: min(100%, 48rem); overflow: hidden; border-radius: .9rem; background: white; box-shadow: 0 1rem 3rem rgb(7 59 44 / .12); }.cms-preview-environment > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.2rem; background: #073b2c; color: white; }.cms-preview-environment > header span { color: #e8c774; font-size: .62rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }.cms-preview-environment > header strong { font-size: .78rem; }.cms-preview-environment > header time { color: rgb(255 255 255 / .55); font-size: .62rem; }.cms-preview-environment__grid { display: grid; grid-template-columns: 1fr 1fr; }.cms-preview-environment__grid > section { display: flex; min-height: 12rem; align-items: center; gap: 1.1rem; padding: 1.5rem; }.cms-preview-environment__grid > section:first-child { background: #3e6872; color: white; }.cms-preview-environment__grid > section:last-child { color: #2f6f50; }.cms-preview-environment__grid span { display: block; font-size: .58rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-environment__grid strong { display: block; margin-top: .45rem; font-size: 3.4rem; font-weight: 900; line-height: .9; }.cms-preview-environment__grid p { margin-top: .6rem; font-size: .72rem; font-weight: 800; }.cms-preview-environment > footer { padding: 1.1rem 1.25rem; background: #f3f1e8; }.cms-preview-environment > footer strong { font-size: .65rem; text-transform: uppercase; }.cms-preview-environment > footer p { margin-top: .4rem; color: #5e7067; font-size: .72rem; line-height: 1.5; }
 .cms-preview-project { display: flex; width: min(100%, 28rem); min-width: 0; overflow: hidden; flex-direction: column; background: #f6f8f6; box-shadow: 0 1rem 3rem rgb(7 59 44 / .12); }.cms-preview-project > img,.cms-preview-project > .cms-preview-placeholder { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }.cms-preview-project__body { display: flex; min-width: 0; flex: 1; flex-direction: column; padding: 1.5rem; }.cms-preview-project__body > div { display: flex; min-width: 0; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: .65rem; }.cms-preview-project__body > div span { color: #17634c; font-size: .68rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-project__body > div em { background: #e2ebe5; padding: .3rem .5rem; color: #104b3a; font-size: .65rem; font-style: normal; font-weight: 800; }.cms-preview-project h3 { margin-top: 1rem; overflow-wrap: anywhere; font-size: 1.5rem; font-weight: 900; line-height: 1.12; }
 .cms-preview-news { display: grid; width: min(100%, 44rem); min-width: 0; overflow: hidden; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: white; box-shadow: 0 1rem 3rem rgb(7 59 44 / .1); }.cms-preview-news > img,.cms-preview-news > .cms-preview-placeholder { width: 100%; height: 100%; min-height: 24rem; object-fit: cover; }.cms-preview-news__body { display: flex; min-width: 0; justify-content: center; flex-direction: column; padding: clamp(1.5rem, 4vw, 2.5rem); }.cms-preview-news__body > p { overflow-wrap: anywhere; color: #8b6719; font-size: .65rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-news__body h3 { margin-top: 1rem; overflow-wrap: anywhere; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 900; line-height: 1.08; }.cms-preview-news__body > div { margin-top: 1rem; overflow-wrap: anywhere; color: #617168; font-size: .85rem; line-height: 1.65; }
 .cms-preview-publication { display: grid; width: min(100%, 42rem); min-width: 0; grid-template-columns: auto minmax(0, 1fr) auto; gap: 1rem; align-items: center; background: white; padding: 1.25rem; box-shadow: 0 1rem 3rem rgb(7 59 44 / .08); }.cms-preview-publication > span { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 50%; background: #fff5e9; color: #a94d0b; }.cms-preview-publication h3,.cms-preview-publication p { overflow-wrap: anywhere; }.cms-preview-publication h3 { font-size: .95rem; font-weight: 900; }.cms-preview-publication p { margin-top: .25rem; color: #738078; font-size: .72rem; font-weight: 700; }.cms-preview-publication > svg { color: #698078; }
