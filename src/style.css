@@ -2851,6 +2851,12 @@
   object-fit: cover;
   object-position: 50% 10%;
 }
+.leadership-card--town-clerk .leadership-card__portrait--image img {
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1.12);
+  transform-origin: 50% 38%;
+}
 .leadership-card__portrait > span {
   position: relative;
   z-index: 1;
@@ -2874,7 +2880,14 @@
   font-size: clamp(1.15rem, 1.7vw, 1.4rem);
   line-height: 1.08;
 }
-.enhanced-home .leadership-card > div:last-child > span { margin-top: 0.75rem; font-size: 0.76rem; }
+.enhanced-home .leadership-card > div:last-child > span { display: block; font-size: 0.76rem; }
+.enhanced-home .leadership-card .leadership-card__office {
+  margin-top: 0.55rem;
+  color: rgb(17 24 21 / 0.66);
+  font-weight: 700;
+  line-height: 1.35;
+}
+.enhanced-home .leadership-card .leadership-card__description { margin-top: 0.7rem; }
 
 .enhanced-home .municipal-statistics {
   background:
