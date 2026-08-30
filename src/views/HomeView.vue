@@ -51,26 +51,34 @@ const slides = [
 
 const leadership = [
   {
+    id: 'mayor',
     office: 'Office of the Mayor',
-    role: 'Political leadership',
+    name: 'Galabuzi John Bosco',
+    role: 'Mayor',
     description: 'Leads the elected Municipal Council.',
     mark: 'M',
     image: '/images/mayor.webp',
-    imageAlt: 'Mayor of Makindye Ssabagabo Municipal Council in ceremonial attire',
+    imageAlt: 'Galabuzi John Bosco, Mayor of Makindye Ssabagabo Municipal Council',
   },
   {
+    id: 'town-clerk',
+    office: 'Office of the Town Clerk',
+    name: 'Otimong Moses',
+    role: 'Town Clerk',
+    description: 'Directs administration and service delivery.',
+    mark: 'TC',
+    image: '/images/town-clerk-landscape.png',
+    imageAlt: 'Otimong Moses, Town Clerk of Makindye Ssabagabo Municipal Council',
+  },
+  {
+    id: 'speaker',
     office: 'Office of the Speaker',
-    role: 'Council business',
+    role: 'Speaker',
     description: 'Presides over council sittings.',
     mark: 'S',
   },
   {
-    office: 'Office of the Town Clerk',
-    role: 'Technical administration',
-    description: 'Directs administration and service delivery.',
-    mark: 'TC',
-  },
-  {
+    id: 'heads-of-departments',
     office: 'Heads of Departments',
     role: 'Sector delivery',
     description: 'Coordinate the council’s technical sectors.',
@@ -316,12 +324,17 @@ onBeforeUnmount(() => {
 
         <div class="leadership-showcase home-reveal" id="leadership">
           <div ref="leadershipRail" class="leadership-grid" @scroll.passive="updateRailPosition($event, 'leadership')">
-            <article v-for="(leader, index) in leadership" :key="leader.office" class="leadership-card" :class="{ 'is-rail-active': railState.leadership === index }">
+            <article v-for="(leader, index) in leadership" :key="leader.id" class="leadership-card" :class="[`leadership-card--${leader.id}`, { 'is-rail-active': railState.leadership === index }]">
               <div class="leadership-card__portrait" :class="{ 'leadership-card__portrait--image': leader.image }" :aria-hidden="leader.image ? undefined : 'true'">
-                <img v-if="leader.image" :src="leader.image" :alt="leader.imageAlt" width="1600" height="2400" loading="lazy" decoding="async" />
+                <img v-if="leader.image" :src="leader.image" :alt="leader.imageAlt" loading="lazy" decoding="async" />
                 <span v-else>{{ leader.mark }}</span>
               </div>
-              <div><p>{{ leader.role }}</p><h4>{{ leader.office }}</h4><span>{{ leader.description }}</span></div>
+              <div>
+                <p>{{ leader.role }}</p>
+                <h4>{{ leader.name || leader.office }}</h4>
+                <span v-if="leader.name" class="leadership-card__office">{{ leader.office }}</span>
+                <span class="leadership-card__description">{{ leader.description }}</span>
+              </div>
             </article>
           </div>
           <div class="mobile-slide-indicator" aria-label="Leadership slides">
