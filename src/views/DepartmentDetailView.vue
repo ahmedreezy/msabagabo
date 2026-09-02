@@ -12,12 +12,12 @@ const department = computed(() => cmsContent.departments.find((item) => item.slu
 <template>
   <div>
     <PageIntro
-      eyebrow="Municipal department"
+      eyebrow="Municipal directorate"
       :title="department.name"
       :description="department.summary"
     >
       <template #breadcrumb>
-        <RouterLink class="hover:text-orange-600" to="/departments">Departments</RouterLink>
+        <RouterLink class="hover:text-orange-600" to="/directorates">Directorates</RouterLink>
         <span class="mx-2 text-ink/25">/</span>
         <span>{{ department.shortName }}</span>
       </template>
@@ -27,13 +27,13 @@ const department = computed(() => cmsContent.departments.find((item) => item.slu
       <div class="site-container grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
         <aside>
           <div class="sticky top-6 bg-civic-900 p-7 text-white sm:p-8">
-            <p class="text-xs font-bold uppercase tracking-[0.14em] text-orange-300">Department contact</p>
+            <p class="text-xs font-bold uppercase tracking-[0.14em] text-orange-300">Directorate contact</p>
             <p class="cms-safe-text mt-5 text-xl font-extrabold">{{ department.lead }}</p>
             <a class="cms-safe-text mt-4 flex items-center gap-2 text-sm text-white/68 hover:text-white" :href="`mailto:${department.contact}`">
               <PhEnvelopeSimple :size="18" /> {{ department.contact }}
             </a>
             <RouterLink class="mt-7 inline-flex items-center gap-2 text-sm font-bold text-orange-300 hover:text-white" to="/contact">
-              Contact the department <PhArrowRight :size="16" weight="bold" />
+              Contact the directorate <PhArrowRight :size="16" weight="bold" />
             </RouterLink>
           </div>
         </aside>
@@ -41,7 +41,7 @@ const department = computed(() => cmsContent.departments.find((item) => item.slu
         <div class="grid gap-14">
           <section>
             <p class="section-kicker">Mandate</p>
-            <h2 class="mt-4 text-3xl font-extrabold tracking-[-0.04em] text-ink">What the department is responsible for</h2>
+            <h2 class="mt-4 text-3xl font-extrabold tracking-[-0.04em] text-ink">What the directorate is responsible for</h2>
             <p class="cms-safe-text mt-5 text-base leading-8 text-ink/65">{{ department.mandate }}</p>
           </section>
 
@@ -58,7 +58,7 @@ const department = computed(() => cmsContent.departments.find((item) => item.slu
           <section>
             <div class="flex items-center gap-3">
               <PhUsersThree class="text-civic-700" :size="27" />
-              <h2 class="text-2xl font-extrabold tracking-[-0.035em]">Units and sub-departments</h2>
+              <h2 class="text-2xl font-extrabold tracking-[-0.035em]">Units and sections</h2>
             </div>
             <div class="mt-7 grid gap-3 sm:grid-cols-2">
               <div v-for="unit in department.units" :key="unit" class="cms-safe-text flex min-w-0 items-center gap-3 bg-canvas p-4 text-sm font-bold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.06)]">
@@ -79,8 +79,8 @@ const department = computed(() => cmsContent.departments.find((item) => item.slu
           </section>
 
           <section>
-            <p class="section-kicker">People serving this department</p>
-            <h2 class="mt-4 text-2xl font-extrabold tracking-[-0.035em]">Department team</h2>
+            <p class="section-kicker">People serving this directorate</p>
+            <h2 class="mt-4 text-2xl font-extrabold tracking-[-0.035em]">Directorate team</h2>
             <div v-if="department.team?.length" class="mt-7 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               <article v-for="member in department.team" :key="`${member.name}-${member.role}`" class="group min-w-0 overflow-hidden bg-canvas">
                 <div class="aspect-[4/5] overflow-hidden bg-sage-100">
@@ -92,7 +92,7 @@ const department = computed(() => cmsContent.departments.find((item) => item.slu
                 </div>
               </article>
             </div>
-            <p v-else class="mt-6 bg-sage-50 p-5 text-sm leading-6 text-ink/60">Team information is being prepared by the department.</p>
+            <p v-else class="mt-6 bg-sage-50 p-5 text-sm leading-6 text-ink/60">Team information is being prepared by the directorate.</p>
           </section>
         </div>
       </div>

@@ -5,6 +5,7 @@ import {
   publications as fallbackPublications,
   environmentBulletins as fallbackEnvironment,
   homepageStats as fallbackStats,
+  leadership as fallbackLeadership,
   updates as fallbackUpdates,
 } from '../data/siteData'
 import { cmsEntries } from '../services/cms'
@@ -26,6 +27,7 @@ export const cmsContent = reactive({
   projects: clone(fallbackProjects),
   publications: clone(fallbackPublications),
   stats: clone(fallbackStats),
+  leadership: clone(fallbackLeadership),
   updates: sortCollection('updates', clone(fallbackUpdates)),
   environment: sortCollection('environment', clone(fallbackEnvironment)),
   loaded: false,
@@ -36,6 +38,7 @@ export const cmsFallbacks = {
   projects: fallbackProjects,
   publications: fallbackPublications,
   stats: fallbackStats,
+  leadership: fallbackLeadership,
   updates: fallbackUpdates,
   environment: fallbackEnvironment,
 }
@@ -72,7 +75,7 @@ export const createSeedEntries = () => Object.entries(cmsFallbacks).flatMap(([co
   items.map((payload, index) => ({
     collection,
     slug: payload.slug || null,
-    title: payload.title || payload.name || payload.label,
+    title: payload.title || payload.name || payload.label || payload.office,
     payload: clone(payload),
     status: 'draft',
     sort_order: index,

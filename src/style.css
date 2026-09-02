@@ -3129,6 +3129,8 @@
 .official-header .government-navigation__item:nth-child(6) { animation-delay: 175ms; }
 .official-header .government-navigation__item:nth-child(7) { animation-delay: 210ms; }
 .official-header .government-navigation__item:nth-child(8) { animation-delay: 245ms; }
+.official-header .government-navigation__item:nth-child(9) { animation-delay: 280ms; }
+.official-header .government-navigation__item:nth-child(10) { animation-delay: 315ms; }
 
 .official-header .government-navigation__link:hover,
 .official-header .government-navigation__group:hover {
@@ -3168,6 +3170,7 @@
   .official-header *::before,
   .official-header *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
 }
@@ -3609,9 +3612,8 @@
   }
 
   .official-header .government-navigation__inner {
-    min-height: 4.35rem;
+    min-height: 4.15rem;
     align-items: center;
-    gap: 1rem;
   }
 
   .official-header .government-navigation__links,
@@ -3619,7 +3621,13 @@
     align-items: center;
   }
 
-  .official-header .government-navigation__links { gap: 0.14rem; }
+  .official-header .government-navigation__links {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.08rem;
+  }
+
+  .official-header .government-navigation__item { min-width: 0; }
 
   .official-header .government-navigation__link,
   .official-header .government-navigation__group {
@@ -3635,17 +3643,17 @@
   }
 
   .official-header .government-navigation__link {
-    padding-inline: clamp(0.72rem, 1vw, 1.05rem);
+    padding-inline: clamp(0.52rem, 0.72vw, 0.78rem);
   }
 
   .official-header .government-navigation__group-link {
     min-height: 2.85rem;
-    padding-left: clamp(0.72rem, 1vw, 1.05rem);
+    padding-left: clamp(0.52rem, 0.72vw, 0.78rem);
   }
 
   .official-header .government-navigation__toggle {
-    min-width: 1.8rem;
-    padding: 0 0.62rem 0 0.25rem;
+    min-width: 1.45rem;
+    padding: 0 0.45rem 0 0.18rem;
   }
 
   .official-header .government-navigation__link::after,
@@ -3730,6 +3738,12 @@
   }
 
   .official-header .official-nav-dropdown > a { border-radius: 0.45rem; }
+
+  .official-header .government-navigation__item:last-child .official-nav-dropdown {
+    right: 0;
+    left: auto;
+    transform-origin: top right;
+  }
 }
 
 .official-header .masthead-search {

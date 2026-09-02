@@ -50,43 +50,6 @@ const slides = [
   },
 ]
 
-const leadership = [
-  {
-    id: 'mayor',
-    office: 'Office of the Mayor',
-    name: 'Galabuzi John Bosco',
-    role: 'Mayor',
-    description: 'Leads the elected Municipal Council.',
-    mark: 'M',
-    image: '/images/mayor.webp',
-    imageAlt: 'Galabuzi John Bosco, Mayor of Makindye Ssabagabo Municipal Council',
-  },
-  {
-    id: 'town-clerk',
-    office: 'Office of the Town Clerk',
-    name: 'Otimong Moses',
-    role: 'Town Clerk',
-    description: 'Directs administration and service delivery.',
-    mark: 'TC',
-    image: '/images/town-clerk-landscape.png',
-    imageAlt: 'Otimong Moses, Town Clerk of Makindye Ssabagabo Municipal Council',
-  },
-  {
-    id: 'speaker',
-    office: 'Office of the Speaker',
-    role: 'Speaker',
-    description: 'Presides over council sittings.',
-    mark: 'S',
-  },
-  {
-    id: 'heads-of-departments',
-    office: 'Heads of Departments',
-    role: 'Sector delivery',
-    description: 'Coordinate the council’s technical sectors.',
-    mark: 'HD',
-  },
-]
-
 const quickFacts = [
   { term: 'Mandate', detail: 'Plan, regulate and deliver sustainable urban services.' },
   { term: 'Location', detail: 'Greater Kampala, Wakiso District, toward Lake Victoria.' },
@@ -105,6 +68,7 @@ const statisticIcons = {
 
 const projects = computed(() => cmsContent.projects)
 const updates = computed(() => cmsContent.updates)
+const leadership = computed(() => cmsContent.leadership)
 const statistics = computed(() => cmsContent.stats.map((stat) => ({ ...stat, icon: statisticIcons[stat.icon] || PhUsersThree })))
 
 const achievements = [
@@ -141,7 +105,7 @@ const notices = [
     type: 'Procurement',
     title: 'Current tenders and bidding opportunities',
     date: 'Supplier information',
-    to: '/opportunities',
+    to: '/tenders',
   },
   {
     type: 'Citizen information',
@@ -410,9 +374,9 @@ onBeforeUnmount(() => {
 
         <div class="leadership-showcase home-reveal" id="leadership">
           <div ref="leadershipRail" class="leadership-grid" @scroll.passive="updateRailPosition($event, 'leadership')">
-            <article v-for="(leader, index) in leadership" :key="leader.id" class="leadership-card" :class="[`leadership-card--${leader.id}`, { 'is-rail-active': railState.leadership === index }]">
+            <article v-for="(leader, index) in leadership" :key="leader._cmsId || leader.slug || leader.id || index" class="leadership-card" :class="[`leadership-card--${leader.id || leader.slug || 'officer'}`, { 'is-rail-active': railState.leadership === index }]">
               <div class="leadership-card__portrait" :class="{ 'leadership-card__portrait--image': leader.image }" :aria-hidden="leader.image ? undefined : 'true'">
-                <img v-if="leader.image" :src="leader.image" :alt="leader.imageAlt" loading="lazy" decoding="async" />
+                <img v-if="leader.image" :src="leader.image" :alt="`${leader.name || leader.office}, ${leader.role}`" loading="lazy" decoding="async" />
                 <span v-else>{{ leader.mark }}</span>
               </div>
               <div>
@@ -486,7 +450,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="council-newsroom" data-nav-section="/news" aria-labelledby="news-heading">
+    <section class="council-newsroom" data-nav-section="/open-government" aria-labelledby="news-heading">
       <div class="site-container">
         <div class="council-newsroom__heading home-reveal">
           <p class="home-eyebrow"><span>04</span> Council newsroom</p>
@@ -512,7 +476,7 @@ onBeforeUnmount(() => {
             <RouterLink v-for="notice in notices" :key="notice.title" class="notice-desk__item" :to="notice.to">
               <p>{{ notice.type }}</p><h4>{{ notice.title }}</h4><span>{{ notice.date }} <PhArrowRight :size="15" weight="bold" /></span>
             </RouterLink>
-            <RouterLink class="notice-desk__button" to="/opportunities">Browse all opportunities <span><PhArrowUpRight :size="16" weight="bold" /></span></RouterLink>
+            <RouterLink class="notice-desk__button" to="/tenders">Browse current tenders <span><PhArrowUpRight :size="16" weight="bold" /></span></RouterLink>
           </aside>
         </div>
       </div>
@@ -535,7 +499,7 @@ onBeforeUnmount(() => {
           <button v-for="(_, index) in resources" :key="index" type="button" :class="{ 'is-active': railState.resources === index }" :aria-label="`Show resource slide ${index + 1}`" :aria-current="railState.resources === index ? 'true' : undefined" @click="scrollRailTo(resourcesRail, index)"></button>
         </div>
         <div class="government-resources__contact home-reveal">
-          <div><PhChatCircleText :size="24" weight="regular" /><span><strong>Can’t find what you need?</strong><small>Our help desk can direct you to the right department.</small></span></div>
+          <div><PhChatCircleText :size="24" weight="regular" /><span><strong>Can’t find what you need?</strong><small>Our help desk can direct you to the right directorate.</small></span></div>
           <RouterLink class="home-pill-link home-pill-link--light" to="/contact">Contact the council <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
         </div>
       </div>

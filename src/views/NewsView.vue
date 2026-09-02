@@ -21,7 +21,8 @@ const updates = computed(() => cmsContent.updates)
               <p class="content-meta">{{ update.type }} <span>/</span> {{ formatCmsDate(update.date) }}</p>
               <h3 class="mt-3 text-xl font-extrabold leading-tight tracking-[-0.03em]">{{ update.title }}</h3>
               <p class="mt-3 text-sm leading-6 text-ink/56">{{ update.excerpt }}</p>
-              <a class="text-link mt-5" href="#">Read update <PhArrowRight :size="16" weight="bold" /></a>
+              <a v-if="update.url" class="text-link mt-5" :href="update.url" target="_blank" rel="noreferrer">Read update <PhArrowRight :size="16" weight="bold" /></a>
+              <RouterLink v-else class="text-link mt-5" to="/contact#feedback">Request more information <PhArrowRight :size="16" weight="bold" /></RouterLink>
             </div>
           </article>
         </div>
@@ -36,14 +37,17 @@ const updates = computed(() => cmsContent.updates)
           <p class="section-description">Official plans, reports, budgets and service standards.</p>
         </div>
         <div class="grid gap-3">
-          <a v-for="publication in publications" :key="publication.title" class="cms-publication-row group flex items-center gap-4 bg-white p-5 transition duration-500 ease-premium hover:-translate-y-0.5 hover:shadow-soft" :href="publication.url || undefined" :download="publication.fileName || undefined" target="_blank" rel="noreferrer">
-            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-700"><PhFilePdf :size="22" /></span>
-            <div class="min-w-0 flex-1">
-              <p class="font-extrabold text-ink">{{ publication.title }}</p>
-              <p class="mt-1 text-xs font-semibold text-ink/45">{{ publication.category }} · {{ publication.format }}</p>
+          <template v-for="publication in publications" :key="publication.title">
+            <a v-if="publication.url" class="cms-publication-row group flex items-center gap-4 bg-white p-5 transition duration-500 ease-premium hover:-translate-y-0.5 hover:shadow-soft" :href="publication.url" :download="publication.fileName || undefined" target="_blank" rel="noreferrer">
+              <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-700"><PhFilePdf :size="22" /></span>
+              <span class="min-w-0 flex-1"><strong class="block font-extrabold text-ink">{{ publication.title }}</strong><small class="mt-1 block font-semibold text-ink/45">{{ publication.category }} · {{ publication.format }}</small></span>
+              <PhDownloadSimple class="shrink-0 text-ink/30 group-hover:text-civic-700" :size="20" weight="bold" />
+            </a>
+            <div v-else class="cms-publication-row flex items-center gap-4 bg-white p-5">
+              <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-orange-50 text-orange-700"><PhFilePdf :size="22" /></span>
+              <span class="min-w-0 flex-1"><strong class="block font-extrabold text-ink">{{ publication.title }}</strong><small class="mt-1 block font-semibold text-ink/45">{{ publication.category }} · {{ publication.format }} · File pending publication</small></span>
             </div>
-            <PhDownloadSimple class="shrink-0 text-ink/30 group-hover:text-civic-700" :size="20" weight="bold" />
-          </a>
+          </template>
         </div>
       </div>
     </section>

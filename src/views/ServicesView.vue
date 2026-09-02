@@ -46,8 +46,8 @@ const filteredDepartments = computed(() => {
   <div>
     <PageIntro
       eyebrow="Public services"
-      title="Services by department"
-      description="Find the municipal department responsible for the service you need."
+      title="Services by directorate"
+      description="Find the municipal directorate responsible for the service you need."
     />
 
     <section class="bg-canvas pb-24 pt-10 sm:pb-28 sm:pt-14 lg:pt-16">
@@ -58,7 +58,7 @@ const filteredDepartments = computed(() => {
               <span class="flex size-9 shrink-0 items-center justify-center bg-sage-50 text-civic-700">
                 <PhBuildings :size="19" weight="duotone" />
               </span>
-              <span class="text-xs font-extrabold leading-4 text-ink/70">Municipal departments</span>
+              <span class="text-xs font-extrabold leading-4 text-ink/70">Municipal directorates</span>
             </div>
             <strong class="mt-5 block text-4xl font-extrabold leading-none tracking-[-0.055em] text-civic-800">{{ departments.length }}</strong>
           </div>
@@ -91,7 +91,7 @@ const filteredDepartments = computed(() => {
                 v-model="search"
                 class="min-h-12 w-full border-0 bg-canvas py-3 pl-12 pr-4 text-sm font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.08)] outline-none transition placeholder:text-ink/50 focus:bg-sage-50 focus:shadow-[inset_0_0_0_2px_rgba(23,99,76,0.7)]"
                 type="search"
-                placeholder="Enter a department or service"
+                placeholder="Enter a directorate or service"
               />
             </div>
           </div>
@@ -141,9 +141,9 @@ const filteredDepartments = computed(() => {
 
               <RouterLink
                 class="mt-7 inline-flex min-h-11 items-center gap-3 border-b-2 border-civic-700 pb-1 text-sm font-extrabold text-civic-800 transition duration-300 hover:gap-4 hover:text-civic-700 active:translate-y-px"
-                :to="`/departments/${department.slug}`"
+                :to="`/directorates/${department.slug}`"
               >
-                View department details
+                View directorate details
                 <PhArrowRight :size="16" weight="bold" />
               </RouterLink>
             </div>
@@ -151,7 +151,7 @@ const filteredDepartments = computed(() => {
         </div>
 
         <div v-else class="mt-10 max-w-xl bg-white p-7 shadow-[0_20px_70px_rgba(7,59,44,0.07)]">
-          <h2 class="font-extrabold">No matching department or service</h2>
+          <h2 class="font-extrabold">No matching directorate or service</h2>
           <p class="mt-2 text-sm leading-6 text-ink/58">Try a shorter search term or contact the council for guidance.</p>
           <RouterLink class="text-link mt-5" to="/contact">
             Contact the council

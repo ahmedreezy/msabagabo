@@ -92,7 +92,7 @@ const functions = [
           <p class="section-kicker">Leadership and accountability</p>
           <h2 class="section-title mt-4">Political direction. Technical delivery.</h2>
           <p class="section-description">The Mayor and Municipal Council provide political leadership. The Town Clerk leads technical administration and implementation.</p>
-          <RouterLink class="text-link mt-7" to="/departments">Meet the departments <PhArrowRight :size="17" weight="bold" /></RouterLink>
+          <RouterLink class="text-link mt-7" to="/directorates">Meet the directorates <PhArrowRight :size="17" weight="bold" /></RouterLink>
         </div>
       </div>
     </section>

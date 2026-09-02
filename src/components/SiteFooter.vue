@@ -12,8 +12,8 @@ import { PhArrowUpRight, PhEnvelopeSimple, PhMapPin, PhPhone } from '@phosphor-i
         </div>
 
         <nav class="official-footer__navigation" aria-label="Footer navigation">
-          <div><h2>Council</h2><RouterLink to="/about">About the municipality</RouterLink><RouterLink to="/departments">Departments</RouterLink><RouterLink to="/projects">Projects</RouterLink><RouterLink to="/opportunities">Opportunities</RouterLink></div>
-          <div><h2>Public information</h2><RouterLink to="/services">Services</RouterLink><RouterLink to="/news">News & notices</RouterLink><RouterLink to="/news#publications">Publications</RouterLink><RouterLink to="/contact">Contact & feedback</RouterLink></div>
+          <div><h2>Council</h2><RouterLink to="/about">About the municipality</RouterLink><RouterLink to="/directorates">Directorates</RouterLink><RouterLink to="/projects">Projects</RouterLink><RouterLink to="/careers">Careers</RouterLink></div>
+          <div><h2>Public information</h2><RouterLink to="/services">Services</RouterLink><RouterLink to="/tenders">Tenders</RouterLink><RouterLink to="/open-government">Open government</RouterLink><RouterLink to="/faqs">FAQs</RouterLink><RouterLink to="/contact">Contact & feedback</RouterLink></div>
         </nav>
 
         <address class="official-footer__contact">

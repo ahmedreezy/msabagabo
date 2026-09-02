@@ -16,7 +16,7 @@ const submit = () => {
     <PageIntro eyebrow="Contact the council" title="How can we help?" description="Send an enquiry, request information or share feedback about a municipal service." />
     <section class="bg-white py-16 sm:py-20 lg:py-24">
       <div class="site-container grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20">
-        <aside class="grid content-start gap-4">
+        <aside id="contact-details" class="scroll-mt-36 grid content-start gap-4">
           <div class="bg-civic-900 p-6 text-white">
             <PhPhone class="text-orange-300" :size="25" />
             <p class="mt-5 text-xs font-bold uppercase tracking-[0.13em] text-white/52">Toll free</p>
@@ -34,7 +34,7 @@ const submit = () => {
           </div>
         </aside>
 
-        <div>
+        <div id="feedback" class="scroll-mt-36">
           <div v-if="submitted" class="bg-sage-50 p-8" role="status">
             <PhCheckCircle class="text-civic-700" :size="36" weight="fill" />
             <h2 class="mt-5 text-2xl font-extrabold tracking-[-0.035em]">Your message is ready for submission</h2>
