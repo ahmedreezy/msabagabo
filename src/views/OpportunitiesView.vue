@@ -3,9 +3,9 @@ import { PhArrowRight, PhBriefcase, PhFileText, PhStudent } from '@phosphor-icon
 import PageIntro from '../components/PageIntro.vue'
 
 const opportunities = [
-  { title: 'Bids & tenders', description: 'Current procurement notices, bid documents and submission information.', icon: PhFileText },
-  { title: 'Jobs', description: 'Municipal vacancies and official application requirements.', icon: PhBriefcase },
-  { title: 'Internships & trainees', description: 'Learning opportunities for university and college students.', icon: PhStudent },
+  { title: 'Bids & tenders', description: 'Current procurement notices, bid documents and submission information.', icon: PhFileText, to: '/tenders' },
+  { title: 'Jobs', description: 'Municipal vacancies and official application requirements.', icon: PhBriefcase, to: '/careers#employment' },
+  { title: 'Internships & trainees', description: 'Learning opportunities for university and college students.', icon: PhStudent, to: '/careers#internships' },
 ]
 </script>
 
@@ -18,7 +18,7 @@ const opportunities = [
           <component :is="item.icon" class="text-orange-600" :size="31" weight="regular" />
           <h2 class="mt-10 text-xl font-extrabold tracking-[-0.03em]">{{ item.title }}</h2>
           <p class="mt-3 flex-1 text-sm leading-6 text-ink/56">{{ item.description }}</p>
-          <a class="text-link mt-7" href="#">View listings <PhArrowRight :size="16" weight="bold" /></a>
+          <RouterLink class="text-link mt-7" :to="item.to">View listings <PhArrowRight :size="16" weight="bold" /></RouterLink>
         </article>
       </div>
     </section>

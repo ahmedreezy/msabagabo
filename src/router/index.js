@@ -17,12 +17,14 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
     },
     {
-      path: '/departments',
+      path: '/directorates',
+      alias: '/departments',
       name: 'departments',
       component: () => import('../views/DepartmentsView.vue'),
     },
     {
-      path: '/departments/:slug',
+      path: '/directorates/:slug',
+      alias: '/departments/:slug',
       name: 'department-detail',
       component: () => import('../views/DepartmentDetailView.vue'),
     },
@@ -45,6 +47,26 @@ const router = createRouter({
       path: '/opportunities',
       name: 'opportunities',
       component: () => import('../views/OpportunitiesView.vue'),
+    },
+    {
+      path: '/tenders',
+      name: 'tenders',
+      component: () => import('../views/TendersView.vue'),
+    },
+    {
+      path: '/careers',
+      name: 'careers',
+      component: () => import('../views/CareersView.vue'),
+    },
+    {
+      path: '/open-government',
+      name: 'open-government',
+      component: () => import('../views/OpenGovernmentView.vue'),
+    },
+    {
+      path: '/faqs',
+      name: 'faqs',
+      component: () => import('../views/FaqsView.vue'),
     },
     {
       path: '/contact',

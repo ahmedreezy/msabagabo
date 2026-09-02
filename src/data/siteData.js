@@ -200,6 +200,49 @@ export const publications = [
   { title: 'Complaints and Grievance Policy', category: 'Governance', format: 'PDF' },
 ]
 
+export const leadership = [
+  {
+    id: 'mayor',
+    slug: 'mayor',
+    office: 'Office of the Mayor',
+    name: 'Galabuzi John Bosco',
+    role: 'Mayor',
+    description: 'Leads the elected Municipal Council.',
+    mark: 'M',
+    image: '/images/mayor.webp',
+  },
+  {
+    id: 'town-clerk',
+    slug: 'town-clerk',
+    office: 'Office of the Town Clerk',
+    name: 'Otimong Moses',
+    role: 'Town Clerk',
+    description: 'Directs administration and service delivery.',
+    mark: 'TC',
+    image: '/images/town-clerk-landscape.png',
+  },
+  {
+    id: 'speaker',
+    slug: 'speaker',
+    office: 'Office of the Speaker',
+    name: '',
+    role: 'Speaker',
+    description: 'Presides over council sittings.',
+    mark: 'S',
+    image: '',
+  },
+  {
+    id: 'heads-of-directorates',
+    slug: 'heads-of-directorates',
+    office: 'Heads of Directorates',
+    name: '',
+    role: 'Sector delivery',
+    description: 'Coordinate the council’s technical sectors.',
+    mark: 'HD',
+    image: '',
+  },
+]
+
 export const stats = [
   { value: '3', label: 'Municipal divisions' },
   { value: '84.7 km²', label: 'Municipal area' },

@@ -19,7 +19,7 @@ let homeSections = []
 const navigation = [
   { label: 'Home', to: '/' },
   {
-    label: 'About',
+    label: 'About Us',
     to: '/about',
     children: [
       { label: 'Our municipality', to: '/about' },
@@ -28,31 +28,40 @@ const navigation = [
     ],
   },
   {
-    label: 'Departments',
-    to: '/departments',
+    label: 'Directorates',
+    to: '/directorates',
+    activePaths: ['/departments'],
     children: [
-      { label: 'All departments', to: '/departments' },
-      { label: 'Administration', to: '/departments/administration' },
-      { label: 'Finance & Planning', to: '/departments/finance-planning' },
-      { label: 'Works & Engineering', to: '/departments/works-engineering' },
-      { label: 'Health', to: '/departments/health' },
-      { label: 'Education & Sports', to: '/departments/education-sports' },
-      { label: 'Natural Resources', to: '/departments/natural-resources' },
+      { label: 'All directorates', to: '/directorates' },
+      { label: 'Administration', to: '/directorates/administration' },
+      { label: 'Finance & Planning', to: '/directorates/finance-planning' },
+      { label: 'Works & Engineering', to: '/directorates/works-engineering' },
+      { label: 'Health', to: '/directorates/health' },
+      { label: 'Education & Sports', to: '/directorates/education-sports' },
+      { label: 'Natural Resources', to: '/directorates/natural-resources' },
     ],
   },
-  { label: 'Services', to: '/services' },
   { label: 'Projects', to: '/projects' },
+  { label: 'Tenders', to: '/tenders' },
+  { label: 'Services', to: '/services' },
   {
-    label: 'News',
-    to: '/news',
+    label: 'Careers',
+    to: '/careers',
     children: [
-      { label: 'News & announcements', to: '/news' },
-      { label: 'Publications', to: '/news#publications' },
-      { label: 'Gallery', to: '/news#gallery' },
+      { label: 'Employment opportunities', to: '/careers#employment' },
+      { label: 'Internships', to: '/careers#internships' },
     ],
   },
-  { label: 'Opportunities', to: '/opportunities' },
-  { label: 'Contact', to: '/contact' },
+  { label: 'Open Gov', to: '/open-government' },
+  { label: 'FAQs', to: '/faqs' },
+  {
+    label: 'Contact Us',
+    to: '/contact',
+    children: [
+      { label: 'Contact details', to: '/contact#contact-details' },
+      { label: 'Citizen feedback', to: '/contact#feedback' },
+    ],
+  },
 ]
 
 const closeMenus = () => {
@@ -117,7 +126,8 @@ const updateActiveHomeSection = () => {
 
 const isNavItemActive = (item) => {
   if (route.path === '/') return activeHomeSection.value === item.to
-  return item.children ? route.path.startsWith(item.to) : route.path === item.to
+  const matchingPaths = [item.to, ...(item.activePaths || [])]
+  return matchingPaths.some((path) => route.path === path || (path !== '/' && route.path.startsWith(`${path}/`)))
 }
 
 const submitSiteSearch = () => {
@@ -197,7 +207,6 @@ onBeforeUnmount(() => {
             </Transition>
           </div>
         </div>
-        <RouterLink class="citizen-services-link" to="/services"><strong>Find a service</strong><PhArrowRight :size="17" weight="bold" /></RouterLink>
       </div>
     </nav>
 

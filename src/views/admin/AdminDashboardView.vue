@@ -3,7 +3,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   PhArrowSquareOut, PhCheck, PhCloudArrowUp, PhFileText, PhFolderOpen, PhNewspaper,
-  PhCloudSun, PhEye, PhLeaf, PhPencilSimple, PhPlus, PhSignOut, PhSpinnerGap, PhSquaresFour, PhTrash, PhWarningCircle,
+  PhCloudSun, PhEye, PhLeaf, PhPencilSimple, PhPlus, PhSignOut, PhSpinnerGap, PhSquaresFour, PhTrash, PhUsersThree, PhWarningCircle,
 } from '@phosphor-icons/vue'
 import { cmsAuth, cmsEntries } from '../../services/cms'
 import { createSeedEntries, formatCmsDate, loadPublishedContent } from '../../stores/cmsContent'
@@ -26,6 +26,15 @@ const pageGroups = [
       { key: 'pm25', label: 'PM2.5 (µg/m³)', type: 'number', required: true, min: 0, max: 1000, step: 0.1 },
       { key: 'pm10', label: 'PM10 (µg/m³)', type: 'number', required: true, min: 0, max: 1500, step: 0.1 },
       { key: 'airQualityGuidance', label: 'Air-quality guidance', type: 'textarea', required: true },
+    ] },
+    { key: 'leadership', label: 'Leadership team', mobileLabel: 'Leaders', page: 'Homepage', section: 'MSMC leadership team', icon: PhUsersThree, route: '/#leadership', fields: [
+      { key: 'slug', label: 'Leadership position', type: 'select', required: true, options: ['mayor', 'town-clerk', 'speaker', 'heads-of-directorates'] },
+      { key: 'name', label: 'Officer full name' },
+      { key: 'role', label: 'Official role', required: true },
+      { key: 'office', label: 'Office or directorate', required: true },
+      { key: 'description', label: 'Responsibility summary', type: 'textarea', required: true },
+      { key: 'image', label: 'Officer photograph', type: 'media' },
+      { key: 'mark', label: 'Fallback initials', required: true },
     ] },
     { key: 'stats', label: 'Statistics', mobileLabel: 'Home', page: 'Homepage', section: 'At a glance', icon: PhSquaresFour, route: '/', fields: [
       { key: 'value', label: 'Value', required: true }, { key: 'label', label: 'Label', required: true },
@@ -209,7 +218,7 @@ const saveEntry = async () => {
   saving.value = true
   try {
     const payload = serializePayload()
-    const primaryTitle = payload.title || payload.name || payload.label || (selectedCollection.value === 'environment' && payload.date ? `Daily environment · ${payload.date}` : '')
+    const primaryTitle = payload.title || payload.name || payload.label || payload.office || (selectedCollection.value === 'environment' && payload.date ? `Daily environment · ${payload.date}` : '')
     if (!primaryTitle) throw new Error('Add a title or label before saving.')
     if (selectedCollection.value === 'environment' && editor.value.status === 'published') {
       const duplicate = entries.value.find((entry) => entry.id !== editor.value.id && entry.status === 'published' && entry.payload.date === payload.date)
@@ -332,9 +341,11 @@ const importStarterContent = async () => {
   seeding.value = true
   try {
     const allEntries = await cmsEntries.list()
-    if (allEntries.length) throw new Error('Starter content can only be imported into an empty CMS.')
-    for (const item of createSeedEntries()) await cmsEntries.save(item, session.value.user.id)
-    setFeedback('success', 'Starter content imported as drafts.')
+    const existingKeys = new Set(allEntries.map((entry) => `${entry.collection}:${entry.slug || entry.title}`))
+    const missingEntries = createSeedEntries().filter((entry) => !existingKeys.has(`${entry.collection}:${entry.slug || entry.title}`))
+    if (!missingEntries.length) throw new Error('All starter content is already available in the CMS.')
+    for (const item of missingEntries) await cmsEntries.save(item, session.value.user.id)
+    setFeedback('success', `${missingEntries.length} starter ${missingEntries.length === 1 ? 'entry' : 'entries'} imported as drafts.`)
     await loadEntries()
   } catch (error) {
     setFeedback('error', error.message || 'Starter content could not be imported.')
@@ -508,7 +519,15 @@ onMounted(async () => {
           </header>
 
           <div class="admin-preview-dialog__canvas">
-            <article v-if="selectedCollection === 'stats'" class="cms-preview-stat">
+            <article v-if="selectedCollection === 'leadership'" class="cms-preview-leadership">
+              <div class="cms-preview-leadership__portrait">
+                <img v-if="previewItem.image" :src="previewItem.image" :alt="previewItem.name || previewItem.office || 'Officer photograph'" />
+                <span v-else>{{ previewItem.mark || '—' }}</span>
+              </div>
+              <div><p>{{ previewItem.role || 'Official role' }}</p><h3>{{ previewItem.name || previewItem.office || 'Officer name' }}</h3><span v-if="previewItem.name">{{ previewItem.office }}</span><div>{{ previewItem.description || 'Responsibility summary' }}</div></div>
+            </article>
+
+            <article v-else-if="selectedCollection === 'stats'" class="cms-preview-stat">
               <PhSquaresFour :size="26" />
               <strong>{{ previewItem.value || '0' }}</strong>
               <h3>{{ previewItem.label || 'Statistic label' }}</h3>
@@ -688,6 +707,7 @@ onMounted(async () => {
 .cms-preview-placeholder { display: grid; place-items: center; background: #dfe6df; color: #65756d; font-size: .78rem; font-weight: 800; }
 .cms-preview-link { display: inline-flex; align-items: center; gap: .45rem; margin-top: auto; padding-top: 1.4rem; color: #17634c; font-size: .8rem; font-weight: 850; }
 .cms-preview-stat { display: flex; width: min(100%, 20rem); min-height: 19rem; align-items: center; flex-direction: column; background: #073b2c; padding: 2rem 1.25rem; color: white; text-align: center; }.cms-preview-stat > svg { color: #e8c774; }.cms-preview-stat strong { max-width: 100%; margin-top: 1.4rem; overflow-wrap: anywhere; font-size: clamp(2.4rem, 8vw, 4rem); font-weight: 900; line-height: 1; }.cms-preview-stat h3 { margin-top: 1rem; overflow-wrap: anywhere; font-size: .95rem; font-weight: 850; }.cms-preview-stat p { margin-top: .45rem; overflow-wrap: anywhere; color: rgb(255 255 255 / .6); font-size: .76rem; line-height: 1.5; }
+.cms-preview-leadership { display: grid; width: min(100%, 25rem); overflow: hidden; background: #f3f1e8; box-shadow: 0 1rem 3rem rgb(7 59 44 / .12); }.cms-preview-leadership__portrait { display: grid; aspect-ratio: 4 / 3; place-items: center; overflow: hidden; background: #a8791e; color: #102d24; }.cms-preview-leadership__portrait img { width: 100%; height: 100%; object-fit: cover; }.cms-preview-leadership__portrait > span { font-size: 3.5rem; font-weight: 900; }.cms-preview-leadership > div:last-child { padding: 1.5rem; }.cms-preview-leadership > div:last-child > p { color: #8b6719; font-size: .68rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }.cms-preview-leadership h3 { margin-top: .75rem; overflow-wrap: anywhere; font-size: 1.6rem; font-weight: 900; line-height: 1.08; }.cms-preview-leadership > div:last-child > span { display: block; margin-top: .55rem; color: #53655c; font-size: .78rem; font-weight: 800; }.cms-preview-leadership > div:last-child > div { margin-top: 1rem; color: #65736c; font-size: .8rem; line-height: 1.6; }
 .cms-preview-environment { width: min(100%, 48rem); overflow: hidden; border-radius: .9rem; background: white; box-shadow: 0 1rem 3rem rgb(7 59 44 / .12); }.cms-preview-environment > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.2rem; background: #073b2c; color: white; }.cms-preview-environment > header span { color: #e8c774; font-size: .62rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }.cms-preview-environment > header strong { font-size: .78rem; }.cms-preview-environment > header time { color: rgb(255 255 255 / .55); font-size: .62rem; }.cms-preview-environment__grid { display: grid; grid-template-columns: 1fr 1fr; }.cms-preview-environment__grid > section { display: flex; min-height: 12rem; align-items: center; gap: 1.1rem; padding: 1.5rem; }.cms-preview-environment__grid > section:first-child { background: #3e6872; color: white; }.cms-preview-environment__grid > section:last-child { color: #2f6f50; }.cms-preview-environment__grid span { display: block; font-size: .58rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-environment__grid strong { display: block; margin-top: .45rem; font-size: 3.4rem; font-weight: 900; line-height: .9; }.cms-preview-environment__grid p { margin-top: .6rem; font-size: .72rem; font-weight: 800; }.cms-preview-environment > footer { padding: 1.1rem 1.25rem; background: #f3f1e8; }.cms-preview-environment > footer strong { font-size: .65rem; text-transform: uppercase; }.cms-preview-environment > footer p { margin-top: .4rem; color: #5e7067; font-size: .72rem; line-height: 1.5; }
 .cms-preview-project { display: flex; width: min(100%, 28rem); min-width: 0; overflow: hidden; flex-direction: column; background: #f6f8f6; box-shadow: 0 1rem 3rem rgb(7 59 44 / .12); }.cms-preview-project > img,.cms-preview-project > .cms-preview-placeholder { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }.cms-preview-project__body { display: flex; min-width: 0; flex: 1; flex-direction: column; padding: 1.5rem; }.cms-preview-project__body > div { display: flex; min-width: 0; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: .65rem; }.cms-preview-project__body > div span { color: #17634c; font-size: .68rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-project__body > div em { background: #e2ebe5; padding: .3rem .5rem; color: #104b3a; font-size: .65rem; font-style: normal; font-weight: 800; }.cms-preview-project h3 { margin-top: 1rem; overflow-wrap: anywhere; font-size: 1.5rem; font-weight: 900; line-height: 1.12; }
 .cms-preview-news { display: grid; width: min(100%, 44rem); min-width: 0; overflow: hidden; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: white; box-shadow: 0 1rem 3rem rgb(7 59 44 / .1); }.cms-preview-news > img,.cms-preview-news > .cms-preview-placeholder { width: 100%; height: 100%; min-height: 24rem; object-fit: cover; }.cms-preview-news__body { display: flex; min-width: 0; justify-content: center; flex-direction: column; padding: clamp(1.5rem, 4vw, 2.5rem); }.cms-preview-news__body > p { overflow-wrap: anywhere; color: #8b6719; font-size: .65rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-news__body h3 { margin-top: 1rem; overflow-wrap: anywhere; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 900; line-height: 1.08; }.cms-preview-news__body > div { margin-top: 1rem; overflow-wrap: anywhere; color: #617168; font-size: .85rem; line-height: 1.65; }
