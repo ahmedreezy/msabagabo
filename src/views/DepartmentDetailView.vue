@@ -1,16 +1,29 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { PhArrowRight, PhCheck, PhEnvelopeSimple, PhGavel, PhUsersThree } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
 import { cmsContent } from '../stores/cmsContent'
+import EducationDepartment from '../components/EducationDepartment.vue'
+import NotFoundView from './NotFoundView.vue'
+import { publicEducationProfile } from '../lib/educationProfile.js'
 
 const route = useRoute()
-const department = computed(() => cmsContent.departments.find((item) => item.slug === route.params.slug) || cmsContent.departments[0])
+const department = computed(() => cmsContent.departments.find((item) => item.slug === route.params.slug))
+const educationDraft = ref(null)
+const educationPreview = computed(() => import.meta.env.DEV && !!educationDraft.value && !publicEducationProfile(department.value || {}))
+const educationDepartment = computed(() => educationPreview.value ? { ...department.value, educationProfile: department.value?.educationProfile || educationDraft.value } : department.value)
+onMounted(async () => {
+  if (import.meta.env.DEV) {
+    const { createEducationDraft } = await import('../data/educationDraft.js')
+    educationDraft.value = createEducationDraft()
+  }
+})
 </script>
 
 <template>
-  <div>
+  <EducationDepartment v-if="department?.slug === 'education-sports'" :department="educationDepartment" :preview="educationPreview" />
+  <div v-else-if="department">
     <PageIntro
       eyebrow="Municipal directorate"
       :title="department.name"
@@ -98,4 +111,6 @@ const department = computed(() => cmsContent.departments.find((item) => item.slu
       </div>
     </section>
   </div>
+  <div v-else-if="!cmsContent.loaded" class="site-container py-20" role="status">Loading department…</div>
+  <NotFoundView v-else />
 </template>

@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import { educationPublicationIssues } from '../lib/educationProfile.js'
 
 const requireClient = () => {
   if (!supabase) throw new Error('Supabase is not configured. Add the required Vite environment variables.')
@@ -56,6 +57,10 @@ export const cmsEntries = {
   },
 
   async save(entry, userId) {
+    if (entry.collection === 'departments' && entry.status === 'published' && entry.payload?.educationProfile) {
+      const issues = educationPublicationIssues(entry.payload)
+      if (issues.length) throw new Error(issues[0])
+    }
     const record = {
       collection: entry.collection,
       slug: entry.slug || null,

@@ -116,6 +116,8 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to) {
+    // The Education page waits for its optional CMS sections before resolving anchors.
+    if (to.name === 'department-detail' && to.params.slug === 'education-sports' && to.hash) return false
     if (to.hash) return { el: to.hash, top: 24, behavior: 'smooth' }
     return { top: 0 }
   },
