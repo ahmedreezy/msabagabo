@@ -8,7 +8,7 @@ const questions = [
   { question: 'Where are tender notices published?', answer: 'Current procurement notices and supplier information are listed on the Tenders page.', link: 'View tenders', to: '/tenders' },
   { question: 'How can I apply for a council job or internship?', answer: 'Open vacancies and placement notices appear on the Careers page with their application requirements.', link: 'View careers', to: '/careers' },
   { question: 'Where can I access budgets, plans and policies?', answer: 'The Open Government page brings together available municipal publications and public documents.', link: 'Open document library', to: '/open-government' },
-  { question: 'How do I report a problem or send feedback?', answer: 'Use the citizen feedback form or contact the council by telephone or email.', link: 'Send feedback', to: '/contact#feedback' },
+  { question: 'How do I report a problem or send feedback?', answer: 'Use the citizen feedback form or contact the council by telephone or email.', link: 'Send feedback', to: '/contact#e8ebf0ck' },
 ]
 </script>
 
@@ -26,7 +26,7 @@ const questions = [
           <p class="section-kicker">Common questions</p>
           <h2 class="section-title mt-4">Start with the right public service</h2>
           <p class="section-description">If your question is not covered, the council help desk can direct it to the responsible office.</p>
-          <RouterLink class="button-primary mt-7" to="/contact#feedback">Contact the help desk</RouterLink>
+          <RouterLink class="button-primary mt-7" to="/contact#e8ebf0ck">Contact the help desk</RouterLink>
         </div>
 
         <div class="grid gap-0">

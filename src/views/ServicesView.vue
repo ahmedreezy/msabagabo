@@ -50,7 +50,7 @@ const filteredDepartments = computed(() => {
       description="Find the municipal directorate responsible for the service you need."
     />
 
-    <section class="bg-canvas pb-24 pt-10 sm:pb-28 sm:pt-14 lg:pt-16">
+    <section id="service-directory" class="scroll-mt-24 bg-canvas pb-24 pt-10 sm:pb-28 sm:pt-14 lg:pt-16">
       <div class="site-container">
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-[0.7fr_0.7fr_1.6fr] lg:gap-4">
           <div class="flex min-h-32 flex-col justify-between bg-white p-5 shadow-[0_14px_45px_rgba(7,59,44,0.055)] sm:p-6">
@@ -89,7 +89,7 @@ const filteredDepartments = computed(() => {
               <input
                 id="service-search"
                 v-model="search"
-                class="min-h-12 w-full border-0 bg-canvas py-3 pl-12 pr-4 text-sm font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.08)] outline-none transition placeholder:text-ink/50 focus:bg-sage-50 focus:shadow-[inset_0_0_0_2px_rgba(23,99,76,0.7)]"
+                class="min-h-12 w-full border-0 bg-canvas py-3 pl-12 pr-4 text-sm font-semibold text-ink shadow-[inset_0_0_0_1px_rgba(23,35,58,0.08)] outline-none transition placeholder:text-ink/50 focus:bg-sage-50 focus:shadow-[inset_0_0_0_2px_rgba(143,63,72,0.7)]"
                 type="search"
                 placeholder="Enter a directorate or service"
               />
@@ -98,20 +98,19 @@ const filteredDepartments = computed(() => {
         </div>
 
         <div v-if="filteredDepartments.length" class="mt-12 space-y-5 sm:mt-14 sm:space-y-6">
-          <article
+          <details
             v-for="(department, index) in filteredDepartments"
             :key="department.slug"
-            class="cms-service-department grid gap-9 bg-white px-5 py-10 shadow-[0_14px_48px_rgba(7,59,44,0.045)] sm:px-8 sm:py-12 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-16 lg:px-12 lg:py-14"
+            :open="Boolean(search.trim()) || index === 0"
+            class="cms-service-department service-disclosure bg-white shadow-[0_14px_48px_rgba(71,54,43,0.06)]"
           >
+            <summary class="flex cursor-pointer list-none items-center gap-4 px-5 py-6 sm:px-8 lg:px-12">
+              <span class="shrink-0 font-mono text-xs font-bold tabular-nums text-orange-700">{{ String(index + 1).padStart(2, '0') }}</span>
+              <h2 class="flex-1 text-xl font-extrabold leading-tight tracking-[-0.035em] text-ink sm:text-2xl">{{ department.name }}</h2>
+              <span class="hidden text-xs font-bold tabular-nums text-ink/55 sm:block">{{ department.visibleServices.length }} services</span>
+            </summary>
+            <div class="grid gap-9 border-t border-ink/10 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-16 lg:px-12 lg:py-12">
             <div>
-              <div class="flex items-baseline gap-4">
-                <span class="shrink-0 font-mono text-xs font-bold tabular-nums text-civic-700">
-                  {{ String(index + 1).padStart(2, '0') }}
-                </span>
-                <h2 class="max-w-md text-2xl font-extrabold leading-[1.08] tracking-[-0.04em] text-ink sm:text-[1.75rem]">
-                  {{ department.name }}
-                </h2>
-              </div>
               <p class="mt-5 max-w-md text-sm font-medium leading-7 text-ink/72">{{ department.summary }}</p>
 
               <div class="mt-8 border-l-2 border-civic-700/35 pl-4">
@@ -147,7 +146,8 @@ const filteredDepartments = computed(() => {
                 <PhArrowRight :size="16" weight="bold" />
               </RouterLink>
             </div>
-          </article>
+            </div>
+          </details>
         </div>
 
         <div v-else class="mt-10 max-w-xl bg-white p-7 shadow-[0_20px_70px_rgba(7,59,44,0.07)]">

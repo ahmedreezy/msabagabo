@@ -38,7 +38,7 @@ const careerSections = [
           <h2 class="mt-4 text-3xl font-extrabold tracking-[-0.04em]">{{ item.title }}</h2>
           <p class="mt-4 max-w-xl text-sm leading-7 text-ink/62">{{ item.description }}</p>
           <div class="mt-8 bg-sage-50 p-5 text-sm font-bold text-civic-900" role="status">{{ item.status }}</div>
-          <RouterLink class="text-link mt-6" to="/contact#feedback">Ask about {{ item.id === 'employment' ? 'recruitment' : 'placements' }} <PhArrowRight :size="16" weight="bold" /></RouterLink>
+          <RouterLink class="text-link mt-6" to="/contact#e8ebf0ck">Ask about {{ item.id === 'employment' ? 'recruitment' : 'placements' }} <PhArrowRight :size="16" weight="bold" /></RouterLink>
         </article>
       </div>
     </section>

@@ -6,6 +6,7 @@ import {
   environmentBulletins as fallbackEnvironment,
   homepageStats as fallbackStats,
   leadership as fallbackLeadership,
+  pagePresentations as fallbackPagePresentations,
   updates as fallbackUpdates,
 } from '../data/siteData'
 import { cmsEntries } from '../services/cms'
@@ -28,6 +29,7 @@ export const cmsContent = reactive({
   publications: clone(fallbackPublications),
   stats: clone(fallbackStats),
   leadership: clone(fallbackLeadership),
+  page_presentations: clone(fallbackPagePresentations),
   updates: sortCollection('updates', clone(fallbackUpdates)),
   environment: sortCollection('environment', clone(fallbackEnvironment)),
   loaded: false,
@@ -39,6 +41,7 @@ export const cmsFallbacks = {
   publications: fallbackPublications,
   stats: fallbackStats,
   leadership: fallbackLeadership,
+  page_presentations: fallbackPagePresentations,
   updates: fallbackUpdates,
   environment: fallbackEnvironment,
 }
@@ -69,6 +72,15 @@ export const formatCmsDate = (value) => {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
   return new Intl.DateTimeFormat('en-UG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date)
+}
+
+export const getPagePresentation = (pageKey, fallbackKey = 'utility-default') => {
+  const entries = cmsContent.page_presentations || []
+  return entries.find((entry) => entry.slug === pageKey)
+    || fallbackPagePresentations.find((entry) => entry.slug === pageKey)
+    || entries.find((entry) => entry.slug === fallbackKey)
+    || fallbackPagePresentations.find((entry) => entry.slug === fallbackKey)
+    || fallbackPagePresentations[0]
 }
 
 export const createSeedEntries = () => Object.entries(cmsFallbacks).flatMap(([collection, items]) =>

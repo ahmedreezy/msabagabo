@@ -14,7 +14,13 @@ const isScrolled = ref(false)
 const activeHomeSection = ref('/')
 let closeTimer
 let scrollFrame
+let headerResizeObserver
 let homeSections = []
+
+const syncHeaderHeight = () => {
+  const height = headerElement.value?.offsetHeight
+  if (height) document.documentElement.style.setProperty('--site-header-height', `${height}px`)
+}
 
 const navigation = [
   { label: 'Home', to: '/' },
@@ -41,25 +47,27 @@ const navigation = [
       { label: 'Natural Resources', to: '/directorates/natural-resources' },
     ],
   },
-  { label: 'Projects', to: '/projects' },
-  { label: 'Tenders', to: '/tenders' },
   { label: 'Services', to: '/services' },
+  { label: 'Projects', to: '/projects' },
   {
-    label: 'Careers',
-    to: '/careers',
+    label: 'Opportunities',
+    to: '/opportunities',
+    activePaths: ['/tenders', '/careers'],
     children: [
+      { label: 'Bids & tenders', to: '/tenders' },
       { label: 'Employment opportunities', to: '/careers#employment' },
-      { label: 'Internships', to: '/careers#internships' },
+      { label: 'Internships & trainees', to: '/careers#internships' },
     ],
   },
   { label: 'Open Gov', to: '/open-government' },
-  { label: 'FAQs', to: '/faqs' },
   {
     label: 'Contact Us',
     to: '/contact',
+    activePaths: ['/faqs'],
     children: [
       { label: 'Contact details', to: '/contact#contact-details' },
-      { label: 'Citizen feedback', to: '/contact#feedback' },
+      { label: 'Citizen feedback', to: '/contact#e8ebf0ck' },
+      { label: 'Frequently asked questions', to: '/faqs' },
     ],
   },
 ]
@@ -145,13 +153,22 @@ onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
   window.addEventListener('resize', handleScroll, { passive: true })
   document.addEventListener('pointerdown', handleOutsidePointer)
-  nextTick(collectHomeSections)
+  nextTick(() => {
+    collectHomeSections()
+    syncHeaderHeight()
+    if ('ResizeObserver' in window && headerElement.value) {
+      headerResizeObserver = new ResizeObserver(syncHeaderHeight)
+      headerResizeObserver.observe(headerElement.value)
+    }
+  })
   handleScroll()
 })
 onBeforeUnmount(() => {
   window.clearTimeout(closeTimer)
   if (scrollFrame) window.cancelAnimationFrame(scrollFrame)
   document.body.style.overflow = ''
+  headerResizeObserver?.disconnect()
+  document.documentElement.style.removeProperty('--site-header-height')
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('resize', handleScroll)
@@ -162,37 +179,28 @@ onBeforeUnmount(() => {
 <template>
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  <header ref="headerElement" class="site-header official-header" :class="{ 'is-scrolled': isScrolled }">
-    <div class="national-stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <header ref="headerElement" class="site-header official-header corporate-header" :class="{ 'is-scrolled': isScrolled }">
+    <div class="corporate-utility-bar">
+      <div class="site-container corporate-utility-bar__inner">
+        <p>Official Government of Uganda website</p>
+        <div>
+          <a href="tel:0800256260"><PhPhone :size="14" /> 0800 256 260</a>
+          <a href="mailto:info@msabagabo.go.ug"><PhEnvelopeSimple :size="14" /> info@msabagabo.go.ug</a>
+        </div>
+      </div>
+    </div>
 
-    <div class="government-masthead">
-      <div class="site-container government-masthead__inner">
+    <div class="corporate-navbar">
+      <div class="site-container corporate-navbar__inner">
         <RouterLink class="government-brand" to="/" aria-label="Makindye Ssabagabo Municipal Council home">
           <img src="/images/municipal-logo.png" alt="Makindye Ssabagabo Municipal Council logo" />
           <span>
-            <small class="government-brand__official">Official Government of Uganda website</small>
             <strong>Makindye Ssabagabo Municipal Council</strong>
             <em>Wakiso District Local Government</em>
           </span>
         </RouterLink>
 
-        <div class="government-masthead__utilities">
-          <a class="masthead-contact" href="tel:0800256260"><PhPhone :size="17" /><span><small>Toll free</small><strong>0800 256 260</strong></span></a>
-          <a class="masthead-contact" href="mailto:info@msabagabo.go.ug"><PhEnvelopeSimple :size="17" /><span><small>Email</small><strong>info@msabagabo.go.ug</strong></span></a>
-          <form class="masthead-search" role="search" @submit.prevent="submitSiteSearch">
-            <label class="sr-only" for="site-search">Search this website</label>
-            <input id="site-search" v-model="searchQuery" type="search" placeholder="Search this website" />
-            <button type="submit" aria-label="Search this website"><PhMagnifyingGlass :size="18" weight="bold" /></button>
-          </form>
-        </div>
-
-        <button class="official-menu-trigger" type="button" :aria-expanded="menuOpen" aria-controls="mobile-navigation" :aria-label="menuOpen ? 'Close menu' : 'Open menu'" @click="menuOpen = !menuOpen"><span></span><span></span><span></span></button>
-      </div>
-    </div>
-
-    <nav class="government-navigation" aria-label="Primary navigation">
-      <div class="site-container government-navigation__inner">
-        <div class="government-navigation__links">
+        <nav class="corporate-navigation" aria-label="Primary navigation">
           <div v-for="item in navigation" :key="item.label" class="government-navigation__item" @mouseenter="item.children && openDesktopMenu(item.label)" @mouseleave="item.children && scheduleDesktopClose()" @focusin="item.children && openDesktopMenu(item.label)" @focusout="item.children && scheduleDesktopClose()">
             <RouterLink v-if="!item.children" class="government-navigation__link" :class="{ 'is-active': isNavItemActive(item) }" :aria-current="isNavItemActive(item) ? 'page' : undefined" :to="item.to">{{ item.label }}</RouterLink>
             <div v-else class="government-navigation__group" :class="{ 'is-active': isNavItemActive(item) }">
@@ -206,9 +214,17 @@ onBeforeUnmount(() => {
               </div>
             </Transition>
           </div>
-        </div>
+        </nav>
+
+        <form class="corporate-search" role="search" @submit.prevent="submitSiteSearch">
+          <label class="sr-only" for="site-search">Search this website</label>
+          <input id="site-search" v-model="searchQuery" type="search" placeholder="Search" />
+          <button type="submit" aria-label="Search this website"><PhMagnifyingGlass :size="18" weight="bold" /></button>
+        </form>
+
+        <button class="official-menu-trigger" type="button" :aria-expanded="menuOpen" aria-controls="mobile-navigation" :aria-label="menuOpen ? 'Close menu' : 'Open menu'" @click="menuOpen = !menuOpen"><span></span><span></span><span></span></button>
       </div>
-    </nav>
+    </div>
 
     <Transition name="menu-fade">
       <div v-if="menuOpen" id="mobile-navigation" class="official-mobile-menu">

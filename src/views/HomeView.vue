@@ -24,31 +24,8 @@ import {
   PhUsersThree,
   PhWind,
 } from '@phosphor-icons/vue'
+import PageHero from '../components/PageHero.vue'
 import { cmsContent, formatCmsDate } from '../stores/cmsContent'
-
-const slides = [
-  {
-    eyebrow: 'Roads & drainage',
-    title: 'Building a better connected municipality',
-    description: 'Road and drainage improvements are opening safer routes for residents, businesses and public services.',
-    image: '/images/road-project.jpg',
-    alt: 'Road rehabilitation and drainage works in Makindye Ssabagabo Municipality',
-  },
-  {
-    eyebrow: 'Education infrastructure',
-    title: 'Better learning spaces for our children',
-    description: 'New classroom facilities are expanding safe, practical learning environments for growing communities.',
-    image: '/images/school-project.jpg',
-    alt: 'Construction work on a municipal classroom block',
-  },
-  {
-    eyebrow: 'Urban development',
-    title: 'Investing in the places people use every day',
-    description: 'Municipal projects are strengthening public infrastructure and supporting orderly urban growth.',
-    image: '/images/municipal-project.jpg',
-    alt: 'Municipal public infrastructure project in Makindye Ssabagabo',
-  },
-]
 
 const quickFacts = [
   { term: 'Mandate', detail: 'Plan, regulate and deliver sustainable urban services.' },
@@ -157,8 +134,6 @@ const bulletinIsToday = computed(() => environmentBulletin.value?.date === kampa
 const environmentDateLabel = computed(() => environmentBulletin.value?.date ? formatCmsDate(environmentBulletin.value.date) : '')
 const displayReading = (value) => value === 0 || value ? value : '—'
 
-const currentSlide = ref(0)
-const isPlaying = ref(true)
 const pageRoot = ref(null)
 const statisticsGrid = ref(null)
 const animatedStatistics = ref(statistics.value.map(() => '0'))
@@ -167,23 +142,9 @@ const leadershipRail = ref(null)
 const projectsRail = ref(null)
 const resourcesRail = ref(null)
 const railState = reactive({ quickFacts: 0, leadership: 0, projects: 0, resources: 0 })
-let slideTimer
 let revealObserver
 let statisticsObserver
 let countAnimationFrame
-
-const clearSlideTimer = () => {
-  if (slideTimer) window.clearInterval(slideTimer)
-  slideTimer = undefined
-}
-
-const startSlideTimer = () => {
-  clearSlideTimer()
-  if (!isPlaying.value) return
-  slideTimer = window.setInterval(() => {
-    currentSlide.value = (currentSlide.value + 1) % slides.length
-  }, 8000)
-}
 
 const animateStatistics = () => {
   if (countAnimationFrame) window.cancelAnimationFrame(countAnimationFrame)
@@ -228,8 +189,6 @@ const scrollRailTo = (rail, index) => {
 
 onMounted(() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (reducedMotion) isPlaying.value = false
-  startSlideTimer()
 
   if (reducedMotion) {
     animatedStatistics.value = statistics.value.map((stat) => stat.value)
@@ -261,7 +220,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  clearSlideTimer()
   revealObserver?.disconnect()
   statisticsObserver?.disconnect()
   if (countAnimationFrame) window.cancelAnimationFrame(countAnimationFrame)
@@ -270,27 +228,14 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="pageRoot" class="civic-home enhanced-home">
-    <section class="works-carousel" data-nav-section="/" aria-roledescription="carousel" aria-label="Municipal works">
-      <div class="works-carousel__slides">
-        <figure v-for="(slide, index) in slides" :key="slide.title" class="works-slide" :class="{ 'is-active': currentSlide === index }" :aria-hidden="currentSlide !== index">
-          <img :src="slide.image" :alt="currentSlide === index ? slide.alt : ''" />
-        </figure>
-      </div>
-      <div class="works-carousel__scrim" aria-hidden="true"></div>
-
-      <div class="site-container works-carousel__inner">
-        <div class="works-carousel__copy" aria-live="polite" aria-atomic="true">
-          <p>{{ slides[currentSlide].eyebrow }}</p>
-          <h1>{{ slides[currentSlide].title }}</h1>
-          <p class="works-carousel__description">{{ slides[currentSlide].description }}</p>
-          <div class="works-carousel__actions">
-            <RouterLink class="civic-button civic-button--primary" to="/projects">Explore our projects <span><PhArrowRight :size="17" weight="bold" /></span></RouterLink>
-            <RouterLink class="civic-button civic-button--secondary" to="/contact">Report an issue <span><PhArrowUpRight :size="17" weight="bold" /></span></RouterLink>
-          </div>
-        </div>
-
-      </div>
-    </section>
+    <PageHero
+      page-key="home"
+      variant="signature"
+      :show-breadcrumb="false"
+      secondary-label="Report an issue"
+      secondary-to="/contact#e8ebf0ck"
+      data-nav-section="/"
+    />
 
     <section v-if="environmentBulletin" class="daily-environment" aria-labelledby="daily-environment-heading">
       <div class="site-container">
