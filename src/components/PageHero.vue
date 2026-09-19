@@ -44,6 +44,26 @@ const isExternal = (to) => /^(https?:|mailto:|tel:)/i.test(to || '')
 
 <template>
   <section class="page-hero" :class="`page-hero--${variant}`" :style="heroStyle">
+    <figure class="page-hero__media">
+      <img
+        class="page-hero__backdrop"
+        :src="content.image"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        decoding="async"
+      />
+      <img
+        class="page-hero__illustration"
+        :src="content.image"
+        :alt="content.imageAlt"
+        loading="eager"
+        :fetchpriority="variant === 'signature' ? 'high' : 'auto'"
+        decoding="async"
+      />
+    </figure>
+    <div class="page-hero__veil" aria-hidden="true"></div>
+    <p v-if="content.isIllustrative" class="page-hero__credit">{{ content.credit }}</p>
     <div class="site-container page-hero__shell">
       <div class="page-hero__content">
         <nav v-if="showBreadcrumb" class="page-hero__breadcrumb" aria-label="Breadcrumb">
@@ -78,17 +98,6 @@ const isExternal = (to) => /^(https?:|mailto:|tel:)/i.test(to || '')
           </div>
         </div>
       </div>
-
-      <figure class="page-hero__media">
-        <img
-          :src="content.image"
-          :alt="content.imageAlt"
-          loading="eager"
-          :fetchpriority="variant === 'signature' ? 'high' : 'auto'"
-          decoding="async"
-        />
-        <figcaption v-if="content.isIllustrative" class="page-hero__credit">{{ content.credit }}</figcaption>
-      </figure>
     </div>
   </section>
 </template>

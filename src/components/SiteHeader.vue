@@ -2,17 +2,27 @@
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PhArrowRight, PhCaretDown, PhEnvelopeSimple, PhMagnifyingGlass, PhPhone } from '@phosphor-icons/vue'
+import {
+  CollapsibleContent,
+  CollapsibleRoot,
+  CollapsibleTrigger,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuRoot,
+  NavigationMenuTrigger,
+} from 'reka-ui'
 
 const route = useRoute()
 const router = useRouter()
 const menuOpen = ref(false)
-const activeDesktopMenu = ref(null)
+const activeDesktopMenu = ref('')
 const openMobileGroup = ref(null)
 const searchQuery = ref('')
 const headerElement = ref(null)
 const isScrolled = ref(false)
 const activeHomeSection = ref('/')
-let closeTimer
 let scrollFrame
 let headerResizeObserver
 let homeSections = []
@@ -74,27 +84,12 @@ const navigation = [
 
 const closeMenus = () => {
   menuOpen.value = false
-  activeDesktopMenu.value = null
+  activeDesktopMenu.value = ''
   openMobileGroup.value = null
 }
 
-const toggleDesktopMenu = (label) => {
-  window.clearTimeout(closeTimer)
-  activeDesktopMenu.value = activeDesktopMenu.value === label ? null : label
-}
-
-const openDesktopMenu = (label) => {
-  window.clearTimeout(closeTimer)
-  activeDesktopMenu.value = label
-}
-
-const scheduleDesktopClose = () => {
-  window.clearTimeout(closeTimer)
-  closeTimer = window.setTimeout(() => { activeDesktopMenu.value = null }, 180)
-}
-
-const toggleMobileGroup = (label) => {
-  openMobileGroup.value = openMobileGroup.value === label ? null : label
+const setMobileGroup = (label, open) => {
+  openMobileGroup.value = open ? label : null
 }
 
 const handleKeydown = (event) => {
@@ -103,6 +98,12 @@ const handleKeydown = (event) => {
 
 const handleOutsidePointer = (event) => {
   if (headerElement.value && !headerElement.value.contains(event.target)) closeMenus()
+}
+
+const handleResize = () => {
+  if (window.innerWidth >= 1200) closeMenus()
+  syncHeaderHeight()
+  handleScroll()
 }
 
 const handleScroll = () => {
@@ -151,7 +152,7 @@ watch(menuOpen, (open) => { document.body.style.overflow = open ? 'hidden' : '' 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   window.addEventListener('scroll', handleScroll, { passive: true })
-  window.addEventListener('resize', handleScroll, { passive: true })
+  window.addEventListener('resize', handleResize, { passive: true })
   document.addEventListener('pointerdown', handleOutsidePointer)
   nextTick(() => {
     collectHomeSections()
@@ -164,14 +165,13 @@ onMounted(() => {
   handleScroll()
 })
 onBeforeUnmount(() => {
-  window.clearTimeout(closeTimer)
   if (scrollFrame) window.cancelAnimationFrame(scrollFrame)
   document.body.style.overflow = ''
   headerResizeObserver?.disconnect()
   document.documentElement.style.removeProperty('--site-header-height')
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('resize', handleScroll)
+  window.removeEventListener('resize', handleResize)
   document.removeEventListener('pointerdown', handleOutsidePointer)
 })
 </script>
@@ -200,26 +200,33 @@ onBeforeUnmount(() => {
           </span>
         </RouterLink>
 
-        <nav class="corporate-navigation" aria-label="Primary navigation">
-          <div v-for="item in navigation" :key="item.label" class="government-navigation__item" @mouseenter="item.children && openDesktopMenu(item.label)" @mouseleave="item.children && scheduleDesktopClose()" @focusin="item.children && openDesktopMenu(item.label)" @focusout="item.children && scheduleDesktopClose()">
-            <RouterLink v-if="!item.children" class="government-navigation__link" :class="{ 'is-active': isNavItemActive(item) }" :aria-current="isNavItemActive(item) ? 'page' : undefined" :to="item.to">{{ item.label }}</RouterLink>
-            <div v-else class="government-navigation__group" :class="{ 'is-active': isNavItemActive(item) }">
-              <RouterLink class="government-navigation__group-link" :to="item.to">{{ item.label }}</RouterLink>
-              <button class="government-navigation__toggle" type="button" :aria-expanded="activeDesktopMenu === item.label" :aria-label="`Show ${item.label} menu`" @click.stop="toggleDesktopMenu(item.label)"><PhCaretDown :size="12" weight="bold" :class="{ 'rotate-180': activeDesktopMenu === item.label }" /></button>
-            </div>
-            <Transition name="dropdown-reveal">
-              <div v-if="item.children && activeDesktopMenu === item.label" class="official-nav-dropdown" @mouseenter="openDesktopMenu(item.label)" @mouseleave="scheduleDesktopClose">
-                <p>{{ item.label }}</p>
-                <RouterLink v-for="child in item.children" :key="child.label" :to="child.to">{{ child.label }} <PhArrowRight :size="14" weight="bold" /></RouterLink>
-              </div>
-            </Transition>
-          </div>
-        </nav>
+        <NavigationMenuRoot v-model="activeDesktopMenu" class="corporate-navigation" aria-label="Primary navigation" :delay-duration="120" :skip-delay-duration="250">
+          <NavigationMenuList class="corporate-navigation__list">
+            <NavigationMenuItem v-for="item in navigation" :key="item.label" :value="item.label" class="government-navigation__item" :class="{ 'is-open': activeDesktopMenu === item.label }">
+              <NavigationMenuLink v-if="!item.children" as-child :active="isNavItemActive(item)">
+                <RouterLink class="government-navigation__link" :class="{ 'is-active': isNavItemActive(item) }" :to="item.to">{{ item.label }}</RouterLink>
+              </NavigationMenuLink>
+              <template v-else>
+                <NavigationMenuTrigger class="government-navigation__group" :class="{ 'is-active': isNavItemActive(item) }">
+                  <span class="government-navigation__group-link">{{ item.label }}</span>
+                  <span class="government-navigation__toggle" aria-hidden="true"><PhCaretDown :size="12" weight="bold" /></span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent class="official-nav-dropdown">
+                  <p>{{ item.label }}</p>
+                  <NavigationMenuLink v-for="child in item.children" :key="child.label" as-child>
+                    <RouterLink :to="child.to">{{ child.label }} <PhArrowRight :size="14" weight="bold" /></RouterLink>
+                  </NavigationMenuLink>
+                </NavigationMenuContent>
+              </template>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenuRoot>
 
         <form class="corporate-search" role="search" @submit.prevent="submitSiteSearch">
           <label class="sr-only" for="site-search">Search this website</label>
-          <input id="site-search" v-model="searchQuery" type="search" placeholder="Search" />
-          <button type="submit" aria-label="Search this website"><PhMagnifyingGlass :size="18" weight="bold" /></button>
+          <PhMagnifyingGlass class="corporate-search__icon" :size="18" aria-hidden="true" />
+          <input id="site-search" v-model="searchQuery" type="search" placeholder="Search council services" />
+          <button type="submit"><span>Search</span><PhArrowRight :size="15" weight="bold" aria-hidden="true" /></button>
         </form>
 
         <button class="official-menu-trigger" type="button" :aria-expanded="menuOpen" aria-controls="mobile-navigation" :aria-label="menuOpen ? 'Close menu' : 'Open menu'" @click="menuOpen = !menuOpen"><span></span><span></span><span></span></button>
@@ -233,19 +240,30 @@ onBeforeUnmount(() => {
             <PhMagnifyingGlass :size="20" /><input v-model="searchQuery" type="search" placeholder="Search services and information" aria-label="Search website" /><button type="submit">Search</button>
           </form>
           <nav aria-label="Mobile navigation">
-            <div v-for="(item, index) in navigation" :key="item.label" class="official-mobile-nav-item" :class="{ 'is-active': isNavItemActive(item) }">
-              <span>{{ String(index + 1).padStart(2, '0') }}</span>
-              <RouterLink v-if="!item.children" :aria-current="isNavItemActive(item) ? 'page' : undefined" :to="item.to">{{ item.label }}</RouterLink>
-              <template v-else>
+            <template v-for="(item, index) in navigation" :key="item.label">
+              <div v-if="!item.children" class="official-mobile-nav-item" :class="{ 'is-active': isNavItemActive(item) }">
+                <span>{{ String(index + 1).padStart(2, '0') }}</span>
+                <RouterLink :aria-current="isNavItemActive(item) ? 'page' : undefined" :to="item.to">{{ item.label }}</RouterLink>
+              </div>
+              <CollapsibleRoot
+                v-else
+                class="official-mobile-nav-item official-mobile-nav-item--group"
+                :class="{ 'is-active': isNavItemActive(item) }"
+                :open="openMobileGroup === item.label"
+                @update:open="setMobileGroup(item.label, $event)"
+              >
+                <span>{{ String(index + 1).padStart(2, '0') }}</span>
                 <div class="official-mobile-group">
                   <RouterLink :to="item.to">{{ item.label }}</RouterLink>
-                  <button type="button" :aria-expanded="openMobileGroup === item.label" :aria-label="`Show ${item.label} links`" @click="toggleMobileGroup(item.label)"><PhCaretDown :size="17" weight="bold" :class="{ 'rotate-180': openMobileGroup === item.label }" /></button>
+                  <CollapsibleTrigger class="official-mobile-group__trigger" :aria-label="`${openMobileGroup === item.label ? 'Hide' : 'Show'} ${item.label} links`">
+                    <PhCaretDown :size="17" weight="bold" />
+                  </CollapsibleTrigger>
                 </div>
-                <div v-if="openMobileGroup === item.label" class="official-mobile-children">
+                <CollapsibleContent class="official-mobile-children">
                   <RouterLink v-for="child in item.children" :key="child.label" :to="child.to">{{ child.label }}</RouterLink>
-                </div>
-              </template>
-            </div>
+                </CollapsibleContent>
+              </CollapsibleRoot>
+            </template>
           </nav>
           <RouterLink class="official-mobile-feedback" to="/contact">Report an issue or send feedback <PhArrowRight :size="18" weight="bold" /></RouterLink>
         </div>
