@@ -58,28 +58,25 @@ onMounted(async () => {
             <p class="cms-safe-text mt-5 text-base leading-8 text-ink/65">{{ department.mandate }}</p>
           </section>
 
-          <section class="bg-orange-50 p-6 sm:p-8">
-            <div class="flex gap-4">
+          <details class="editorial-disclosure bg-orange-50 px-6 sm:px-8">
+            <summary>Legal authority</summary>
+            <div class="flex gap-4 pb-7">
               <PhGavel class="shrink-0 text-orange-700" :size="28" weight="regular" />
               <div>
-                <h2 class="text-xl font-extrabold tracking-[-0.025em]">Legal authority</h2>
                 <p class="cms-safe-text mt-3 text-sm leading-6 text-ink/62">{{ department.authority }}</p>
               </div>
             </div>
-          </section>
+          </details>
 
-          <section>
-            <div class="flex items-center gap-3">
-              <PhUsersThree class="text-civic-700" :size="27" />
-              <h2 class="text-2xl font-extrabold tracking-[-0.035em]">Units and sections</h2>
-            </div>
-            <div class="mt-7 grid gap-3 sm:grid-cols-2">
-              <div v-for="unit in department.units" :key="unit" class="cms-safe-text flex min-w-0 items-center gap-3 bg-canvas p-4 text-sm font-bold text-ink shadow-[inset_0_0_0_1px_rgba(17,26,23,0.06)]">
+          <details class="editorial-disclosure">
+            <summary><span class="flex items-center gap-3"><PhUsersThree class="text-civic-700" :size="27" /> Units and sections</span></summary>
+            <div class="mt-7 grid gap-3 pb-7 sm:grid-cols-2">
+              <div v-for="unit in department.units" :key="unit" class="cms-safe-text flex min-w-0 items-center gap-3 bg-canvas p-4 text-sm font-bold text-ink shadow-[inset_0_0_0_1px_rgba(23,35,58,0.06)]">
                 <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-sage-100 text-civic-800"><PhCheck :size="14" weight="bold" /></span>
                 {{ unit }}
               </div>
             </div>
-          </section>
+          </details>
 
           <section>
             <h2 class="text-2xl font-extrabold tracking-[-0.035em]">Services offered</h2>

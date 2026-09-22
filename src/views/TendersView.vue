@@ -33,7 +33,7 @@ const tenders = computed(() => cmsContent.updates.filter((update) =>
                 <p class="content-meta">{{ tender.type }} <span>/</span> {{ formatCmsDate(tender.date) }}</p>
                 <h3 class="mt-3 text-xl font-extrabold leading-tight tracking-[-0.03em]">{{ tender.title }}</h3>
                 <p class="mt-3 text-sm leading-7 text-ink/62">{{ tender.excerpt }}</p>
-                <RouterLink class="text-link mt-5" to="/contact#feedback">Request tender information <PhArrowRight :size="16" weight="bold" /></RouterLink>
+                <RouterLink class="text-link mt-5" to="/contact#e8ebf0ck">Request tender information <PhArrowRight :size="16" weight="bold" /></RouterLink>
               </div>
             </div>
           </article>
@@ -43,7 +43,7 @@ const tenders = computed(() => cmsContent.updates.filter((update) =>
           <PhFileText class="text-civic-700" :size="32" />
           <h2 class="mt-5 text-2xl font-extrabold tracking-[-0.035em]">No active tenders are currently published</h2>
           <p class="mt-3 max-w-xl text-sm leading-7 text-ink/62">New procurement notices will appear here when they are released by the Municipal Council.</p>
-          <RouterLink class="text-link mt-6" to="/contact#feedback">Contact the procurement desk <PhArrowRight :size="16" weight="bold" /></RouterLink>
+          <RouterLink class="text-link mt-6" to="/contact#e8ebf0ck">Contact the procurement desk <PhArrowRight :size="16" weight="bold" /></RouterLink>
         </div>
       </div>
     </section>

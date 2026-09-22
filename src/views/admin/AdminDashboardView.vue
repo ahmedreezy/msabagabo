@@ -13,6 +13,22 @@ import { educationPublicationIssues, normalizeEducationProfile } from '../../lib
 
 const router = useRouter()
 const pageGroups = [
+  { label: 'Website presentation', items: [
+    { key: 'page_presentations', label: 'Page heroes', mobileLabel: 'Heroes', page: 'Website presentation', section: 'Page heroes and banners', icon: PhEye, route: '/', fields: [
+      { key: 'slug', label: 'Page', type: 'select', required: true, options: ['home', 'about', 'directorates', 'directorate-default', 'services', 'projects', 'news', 'opportunities', 'tenders', 'careers', 'open-government', 'faqs', 'contact', 'legal-default', 'utility-default'] },
+      { key: 'eyebrow', label: 'Eyebrow', required: true },
+      { key: 'title', label: 'Hero title', required: true },
+      { key: 'summary', label: 'Short summary', type: 'textarea', required: true },
+      { key: 'image', label: 'Hero image', type: 'media', required: true },
+      { key: 'imageAlt', label: 'Image description', type: 'textarea', required: true },
+      { key: 'focalX', label: 'Horizontal focal point (%)', type: 'number', required: true, min: 0, max: 100, step: 1 },
+      { key: 'focalY', label: 'Vertical focal point (%)', type: 'number', required: true, min: 0, max: 100, step: 1 },
+      { key: 'ctaLabel', label: 'Action label' },
+      { key: 'ctaTo', label: 'Action destination' },
+      { key: 'isIllustrative', label: 'Mark as an illustrative visual', type: 'boolean' },
+      { key: 'credit', label: 'Media credit or caption' },
+    ] },
+  ] },
   { label: 'Homepage', items: [
     { key: 'environment', label: 'Daily environment', mobileLabel: 'Today', page: 'Homepage', section: 'Today in Makindye Ssabagabo', icon: PhCloudSun, route: '/', chronological: true, fields: [
       { key: 'date', label: 'Bulletin date', type: 'date', required: true },
@@ -155,6 +171,7 @@ const hydratePayload = (payload = {}) => {
       const parsed = new Date(next[field.key])
       next[field.key] = Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString().slice(0, 10)
     }
+    else if (field.type === 'boolean') next[field.key] = Boolean(next[field.key])
     else if (next[field.key] == null) next[field.key] = ''
   })
   return next
@@ -247,6 +264,12 @@ const saveEntry = async () => {
       if (duplicate) throw new Error('A published environment bulletin already exists for this date.')
     }
     if (selectedCollection.value === 'publications' && !payload.url) throw new Error('Upload the publication document before saving.')
+    if (selectedCollection.value === 'page_presentations') {
+      if (!payload.image || !String(payload.imageAlt || '').trim()) throw new Error('Add a hero image and a useful image description before saving.')
+      if (Boolean(payload.ctaLabel) !== Boolean(payload.ctaTo)) throw new Error('Add both the action label and destination, or leave both empty.')
+      const duplicate = entries.value.find((entry) => entry.id !== editor.value.id && entry.payload.slug === payload.slug)
+      if (duplicate) throw new Error('A page hero already exists for this page.')
+    }
     if (selectedCollection.value === 'departments' && editor.value.status === 'published') {
       if (payload.educationProfile) {
         const issues = educationPublicationIssues(payload)
@@ -292,6 +315,17 @@ const uploadMedia = async (event, field) => {
   mediaPreviews[field.key] = URL.createObjectURL(file)
   uploading.value = true
   try {
+    if (selectedCollection.value === 'page_presentations') {
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Hero images must be JPEG, PNG or WebP files.')
+      const dimensions = await new Promise((resolve, reject) => {
+        const source = URL.createObjectURL(file)
+        const image = new Image()
+        image.onload = () => { URL.revokeObjectURL(source); resolve({ width: image.naturalWidth, height: image.naturalHeight }) }
+        image.onerror = () => { URL.revokeObjectURL(source); reject(new Error('The selected image could not be read.')) }
+        image.src = source
+      })
+      if (dimensions.width < 1920 || dimensions.height < 1080) throw new Error('Hero images must be at least 1920 × 1080 pixels.')
+    }
     editor.value.payload[field.key] = await cmsEntries.upload(file)
     URL.revokeObjectURL(mediaPreviews[field.key])
     delete mediaPreviews[field.key]
@@ -470,6 +504,7 @@ onMounted(async () => {
               <textarea v-if="field.type === 'textarea'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" rows="4" :required="field.required"></textarea>
               <textarea v-else-if="field.type === 'list'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" rows="5" :required="field.required" placeholder="One item per line"></textarea>
               <select v-else-if="field.type === 'select'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :required="field.required"><option value="" disabled>Select an option</option><option v-for="option in field.options" :key="option" :value="option">{{ option }}</option></select>
+              <label v-else-if="field.type === 'boolean'" class="admin-checkbox" :for="`cms-field-${field.key}`"><input :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" type="checkbox" /><span>Show an “Illustrative visual” disclosure with this image</span></label>
               <section v-else-if="field.type === 'team'" class="admin-team-editor" aria-label="Department team members">
                 <div class="admin-team-editor__heading">
                   <p>{{ editor.payload.team.length }} {{ editor.payload.team.length === 1 ? 'team member' : 'team members' }}</p>
@@ -506,9 +541,9 @@ onMounted(async () => {
                 </figure>
                 <div class="admin-media-controls">
                   <input :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" type="url" placeholder="Paste an image URL" />
-                  <label><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" @change="uploadMedia($event, field)" /><PhCloudArrowUp :size="18" /> {{ uploading ? 'Uploading…' : mediaPreview(field) ? 'Replace image' : 'Choose image' }}</label>
+                  <label><input type="file" :accept="selectedCollection === 'page_presentations' ? 'image/jpeg,image/png,image/webp' : 'image/jpeg,image/png,image/webp,image/gif'" @change="uploadMedia($event, field)" /><PhCloudArrowUp :size="18" /> {{ uploading ? 'Uploading…' : mediaPreview(field) ? 'Replace image' : 'Choose image' }}</label>
                 </div>
-                <small>Images are cropped to fit the website layout. Use “Preview this section” to check the final placement.</small>
+                <small>{{ selectedCollection === 'page_presentations' ? 'JPEG, PNG or WebP · Minimum 1920 × 1080 pixels. Use the focal-point fields and preview to check desktop and mobile crops.' : 'Images are cropped to fit the website layout. Use “Preview this section” to check the final placement.' }}</small>
               </div>
               <div v-else-if="field.type === 'file'" class="admin-document-field">
                 <div v-if="editor.payload[field.key]" class="admin-document-current">
@@ -551,7 +586,14 @@ onMounted(async () => {
           </header>
 
           <div class="admin-preview-dialog__canvas">
-            <article v-if="selectedCollection === 'leadership'" class="cms-preview-leadership">
+            <article v-if="selectedCollection === 'page_presentations'" class="cms-preview-page-hero" :style="{ '--preview-x': `${previewItem.focalX || 50}%`, '--preview-y': `${previewItem.focalY || 50}%` }">
+              <img v-if="previewItem.image" :src="previewItem.image" :alt="previewItem.imageAlt || 'Hero image preview'" />
+              <div class="cms-preview-page-hero__veil"></div>
+              <div class="cms-preview-page-hero__copy"><p>{{ previewItem.eyebrow || 'Page eyebrow' }}</p><h3>{{ previewItem.title || 'Page title' }}</h3><span>{{ previewItem.summary || 'A short page summary will appear here.' }}</span><b v-if="previewItem.ctaLabel">{{ previewItem.ctaLabel }}</b></div>
+              <small v-if="previewItem.isIllustrative">{{ previewItem.credit || 'Illustrative visual' }}</small>
+            </article>
+
+            <article v-else-if="selectedCollection === 'leadership'" class="cms-preview-leadership">
               <div class="cms-preview-leadership__portrait">
                 <img v-if="previewItem.image" :src="previewItem.image" :alt="previewItem.name || previewItem.office || 'Officer photograph'" />
                 <span v-else>{{ previewItem.mark || '—' }}</span>
@@ -866,6 +908,19 @@ onMounted(async () => {
   .cms-preview-department > header { padding: 1.5rem 1.25rem; }
   .cms-preview-department > section { padding: 1.25rem; }
 }
+
+.admin-checkbox { display: flex; min-height: 3rem; align-items: center; gap: .75rem; background: #f4f1e8; padding: .8rem; cursor: pointer; }
+.admin-checkbox input { width: 1.1rem; height: 1.1rem; flex: none; accent-color: #9f5038; }
+.admin-checkbox span { margin: 0; color: #34473f; font-size: .75rem; font-weight: 750; line-height: 1.45; }
+.cms-preview-page-hero { position: relative; min-height: 25rem; overflow: hidden; background: #1d2723; color: white; }
+.cms-preview-page-hero > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--preview-x) var(--preview-y); }
+.cms-preview-page-hero__veil { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(24 29 27 / .91), rgb(24 29 27 / .52) 52%, rgb(24 29 27 / .08)); }
+.cms-preview-page-hero__copy { position: relative; z-index: 1; display: flex; min-height: 25rem; max-width: 34rem; flex-direction: column; align-items: flex-start; justify-content: center; padding: 2.5rem; }
+.cms-preview-page-hero__copy p { color: #e0ae55; font-size: .64rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+.cms-preview-page-hero__copy h3 { margin-top: .75rem; font-family: Georgia, serif; font-size: clamp(2.1rem, 5vw, 4rem); font-weight: 650; line-height: .98; letter-spacing: -.045em; }
+.cms-preview-page-hero__copy span { max-width: 29rem; margin-top: 1rem; color: rgb(255 255 255 / .78); font-size: .9rem; line-height: 1.6; }
+.cms-preview-page-hero__copy b { margin-top: 1.3rem; background: #bd684d; padding: .7rem 1rem; font-size: .72rem; }
+.cms-preview-page-hero > small { position: absolute; z-index: 2; right: 1rem; bottom: 1rem; background: rgb(24 29 27 / .7); padding: .35rem .5rem; font-size: .55rem; }
 
 @media (max-width: 420px) {
   .admin-toolbar__actions { grid-template-columns: 1fr; }

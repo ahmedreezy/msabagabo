@@ -24,31 +24,8 @@ import {
   PhUsersThree,
   PhWind,
 } from '@phosphor-icons/vue'
+import PageHero from '../components/PageHero.vue'
 import { cmsContent, formatCmsDate } from '../stores/cmsContent'
-
-const slides = [
-  {
-    eyebrow: 'Roads & drainage',
-    title: 'Building a better connected municipality',
-    description: 'Road and drainage improvements are opening safer routes for residents, businesses and public services.',
-    image: '/images/road-project.jpg',
-    alt: 'Road rehabilitation and drainage works in Makindye Ssabagabo Municipality',
-  },
-  {
-    eyebrow: 'Education infrastructure',
-    title: 'Better learning spaces for our children',
-    description: 'New classroom facilities are expanding safe, practical learning environments for growing communities.',
-    image: '/images/school-project.jpg',
-    alt: 'Construction work on a municipal classroom block',
-  },
-  {
-    eyebrow: 'Urban development',
-    title: 'Investing in the places people use every day',
-    description: 'Municipal projects are strengthening public infrastructure and supporting orderly urban growth.',
-    image: '/images/municipal-project.jpg',
-    alt: 'Municipal public infrastructure project in Makindye Ssabagabo',
-  },
-]
 
 const quickFacts = [
   { term: 'Mandate', detail: 'Plan, regulate and deliver sustainable urban services.' },
@@ -157,8 +134,6 @@ const bulletinIsToday = computed(() => environmentBulletin.value?.date === kampa
 const environmentDateLabel = computed(() => environmentBulletin.value?.date ? formatCmsDate(environmentBulletin.value.date) : '')
 const displayReading = (value) => value === 0 || value ? value : '—'
 
-const currentSlide = ref(0)
-const isPlaying = ref(true)
 const pageRoot = ref(null)
 const statisticsGrid = ref(null)
 const animatedStatistics = ref(statistics.value.map(() => '0'))
@@ -167,23 +142,9 @@ const leadershipRail = ref(null)
 const projectsRail = ref(null)
 const resourcesRail = ref(null)
 const railState = reactive({ quickFacts: 0, leadership: 0, projects: 0, resources: 0 })
-let slideTimer
 let revealObserver
 let statisticsObserver
 let countAnimationFrame
-
-const clearSlideTimer = () => {
-  if (slideTimer) window.clearInterval(slideTimer)
-  slideTimer = undefined
-}
-
-const startSlideTimer = () => {
-  clearSlideTimer()
-  if (!isPlaying.value) return
-  slideTimer = window.setInterval(() => {
-    currentSlide.value = (currentSlide.value + 1) % slides.length
-  }, 8000)
-}
 
 const animateStatistics = () => {
   if (countAnimationFrame) window.cancelAnimationFrame(countAnimationFrame)
@@ -228,8 +189,6 @@ const scrollRailTo = (rail, index) => {
 
 onMounted(() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (reducedMotion) isPlaying.value = false
-  startSlideTimer()
 
   if (reducedMotion) {
     animatedStatistics.value = statistics.value.map((stat) => stat.value)
@@ -261,7 +220,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  clearSlideTimer()
   revealObserver?.disconnect()
   statisticsObserver?.disconnect()
   if (countAnimationFrame) window.cancelAnimationFrame(countAnimationFrame)
@@ -270,25 +228,42 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="pageRoot" class="civic-home enhanced-home">
-    <section class="works-carousel" data-nav-section="/" aria-roledescription="carousel" aria-label="Municipal works">
-      <div class="works-carousel__slides">
-        <figure v-for="(slide, index) in slides" :key="slide.title" class="works-slide" :class="{ 'is-active': currentSlide === index }" :aria-hidden="currentSlide !== index">
-          <img :src="slide.image" :alt="currentSlide === index ? slide.alt : ''" />
-        </figure>
-      </div>
-      <div class="works-carousel__scrim" aria-hidden="true"></div>
+    <PageHero
+      page-key="home"
+      variant="signature"
+      :show-breadcrumb="false"
+      secondary-label="Report an issue"
+      secondary-to="/contact#e8ebf0ck"
+      data-nav-section="/"
+    />
 
-      <div class="site-container works-carousel__inner">
-        <div class="works-carousel__copy" aria-live="polite" aria-atomic="true">
-          <p>{{ slides[currentSlide].eyebrow }}</p>
-          <h1>{{ slides[currentSlide].title }}</h1>
-          <p class="works-carousel__description">{{ slides[currentSlide].description }}</p>
-          <div class="works-carousel__actions">
-            <RouterLink class="civic-button civic-button--primary" to="/projects">Explore our projects <span><PhArrowRight :size="17" weight="bold" /></span></RouterLink>
-            <RouterLink class="civic-button civic-button--secondary" to="/contact">Report an issue <span><PhArrowUpRight :size="17" weight="bold" /></span></RouterLink>
-          </div>
+    <section class="home-leadership" data-nav-section="/about" aria-labelledby="leadership-heading">
+      <div class="site-container">
+        <div class="leadership-compact-heading home-reveal">
+          <div><p class="home-eyebrow"><span>01</span> Our team</p><h2 id="leadership-heading">Meet the MSMC leadership team.</h2></div>
+          <p>Political direction and technical administration working together for dependable public services.</p>
         </div>
 
+        <div class="leadership-showcase home-reveal" id="leadership">
+          <div ref="leadershipRail" class="leadership-grid" @scroll.passive="updateRailPosition($event, 'leadership')">
+            <article v-for="(leader, index) in leadership" :key="leader._cmsId || leader.slug || leader.id || index" class="leadership-card" :class="[`leadership-card--${leader.id || leader.slug || 'officer'}`, { 'is-rail-active': railState.leadership === index }]">
+              <div class="leadership-card__portrait" :class="{ 'leadership-card__portrait--image': leader.image }" :aria-hidden="leader.image ? undefined : 'true'">
+                <img v-if="leader.image" :src="leader.image" :alt="`${leader.name || leader.office}, ${leader.role}`" loading="lazy" decoding="async" />
+                <span v-else>{{ leader.mark }}</span>
+              </div>
+              <div>
+                <p>{{ leader.role }}</p>
+                <h3>{{ leader.name || leader.office }}</h3>
+                <span v-if="leader.name" class="leadership-card__office">{{ leader.office }}</span>
+                <span class="leadership-card__description">{{ leader.description }}</span>
+              </div>
+            </article>
+          </div>
+          <div class="mobile-slide-indicator" aria-label="Leadership slides">
+            <button v-for="(_, index) in leadership" :key="index" type="button" :class="{ 'is-active': railState.leadership === index }" :aria-label="`Show leadership slide ${index + 1}`" :aria-current="railState.leadership === index ? 'true' : undefined" @click="scrollRailTo(leadershipRail, index)"></button>
+          </div>
+          <RouterLink class="home-text-link leadership-showcase__link" to="/about#leadership">View leadership structure <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
+        </div>
       </div>
     </section>
 
@@ -350,7 +325,7 @@ onBeforeUnmount(() => {
       <div class="site-container">
         <div class="municipal-profile__intro home-reveal">
           <div class="municipal-profile__heading">
-            <p class="home-eyebrow"><span>01</span> About us</p>
+            <p class="home-eyebrow"><span>02</span> About us</p>
             <h2 id="municipality-heading">Serving one of Uganda’s fastest-growing urban communities.</h2>
           </div>
           <div class="municipal-profile__summary">
@@ -367,31 +342,6 @@ onBeforeUnmount(() => {
           <button v-for="(_, index) in quickFacts" :key="index" type="button" :class="{ 'is-active': railState.quickFacts === index }" :aria-label="`Show about slide ${index + 1}`" :aria-current="railState.quickFacts === index ? 'true' : undefined" @click="scrollRailTo(quickFactsRail, index)"></button>
         </div>
 
-        <div class="leadership-compact-heading home-reveal">
-          <div><p class="home-eyebrow"><span>Leadership</span> Accountable service</p><h3>Meet the MSMC leadership team</h3></div>
-          <p>Political direction and technical administration working together for dependable public services.</p>
-        </div>
-
-        <div class="leadership-showcase home-reveal" id="leadership">
-          <div ref="leadershipRail" class="leadership-grid" @scroll.passive="updateRailPosition($event, 'leadership')">
-            <article v-for="(leader, index) in leadership" :key="leader._cmsId || leader.slug || leader.id || index" class="leadership-card" :class="[`leadership-card--${leader.id || leader.slug || 'officer'}`, { 'is-rail-active': railState.leadership === index }]">
-              <div class="leadership-card__portrait" :class="{ 'leadership-card__portrait--image': leader.image }" :aria-hidden="leader.image ? undefined : 'true'">
-                <img v-if="leader.image" :src="leader.image" :alt="`${leader.name || leader.office}, ${leader.role}`" loading="lazy" decoding="async" />
-                <span v-else>{{ leader.mark }}</span>
-              </div>
-              <div>
-                <p>{{ leader.role }}</p>
-                <h4>{{ leader.name || leader.office }}</h4>
-                <span v-if="leader.name" class="leadership-card__office">{{ leader.office }}</span>
-                <span class="leadership-card__description">{{ leader.description }}</span>
-              </div>
-            </article>
-          </div>
-          <div class="mobile-slide-indicator" aria-label="Leadership slides">
-            <button v-for="(_, index) in leadership" :key="index" type="button" :class="{ 'is-active': railState.leadership === index }" :aria-label="`Show leadership slide ${index + 1}`" :aria-current="railState.leadership === index ? 'true' : undefined" @click="scrollRailTo(leadershipRail, index)"></button>
-          </div>
-          <RouterLink class="home-text-link leadership-showcase__link" to="/about#leadership">View leadership structure <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
-        </div>
       </div>
     </section>
 

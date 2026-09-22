@@ -19,7 +19,7 @@ const departments = computed(() => cmsContent.departments)
         <RouterLink
           v-for="department in departments"
           :key="department.slug"
-          class="cms-department-card group flex min-h-72 flex-col bg-canvas p-6 shadow-[inset_0_0_0_1px_rgba(17,26,23,0.06)] transition duration-500 ease-premium hover:-translate-y-1 hover:bg-white hover:shadow-soft sm:p-8"
+          class="cms-department-card group flex min-h-72 flex-col bg-canvas p-6 shadow-[inset_0_0_0_1px_rgba(23,35,58,0.06)] transition duration-500 ease-premium hover:-translate-y-1 hover:bg-white hover:shadow-soft sm:p-8"
           :to="`/directorates/${department.slug}`"
         >
           <p class="text-xs font-bold uppercase tracking-[0.14em] text-civic-700">Directorate</p>

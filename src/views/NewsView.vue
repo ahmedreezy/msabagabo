@@ -22,7 +22,7 @@ const updates = computed(() => cmsContent.updates)
               <h3 class="mt-3 text-xl font-extrabold leading-tight tracking-[-0.03em]">{{ update.title }}</h3>
               <p class="mt-3 text-sm leading-6 text-ink/56">{{ update.excerpt }}</p>
               <a v-if="update.url" class="text-link mt-5" :href="update.url" target="_blank" rel="noreferrer">Read update <PhArrowRight :size="16" weight="bold" /></a>
-              <RouterLink v-else class="text-link mt-5" to="/contact#feedback">Request more information <PhArrowRight :size="16" weight="bold" /></RouterLink>
+              <RouterLink v-else class="text-link mt-5" to="/contact#e8ebf0ck">Request more information <PhArrowRight :size="16" weight="bold" /></RouterLink>
             </div>
           </article>
         </div>
