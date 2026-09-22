@@ -4216,6 +4216,7 @@ body { background: var(--editorial-ivory); color: var(--editorial-ink); }
   isolation: isolate;
   min-height: clamp(30rem, 55vw, 43rem);
   overflow: hidden;
+  overflow-anchor: none;
   background: #151b26;
   color: white;
 }
@@ -4412,6 +4413,7 @@ details.editorial-disclosure[open] > summary::after { content: "−"; }
   --corporate-accent: #8f3f48;
   --corporate-accent-dark: #71323a;
   --site-header-height: 7.5rem;
+  --hero-header-height: 13rem;
   --editorial-ivory: var(--corporate-canvas);
   --editorial-paper: var(--corporate-white);
   --editorial-sand: #dfe4eb;
@@ -4524,7 +4526,7 @@ body { background: var(--corporate-canvas); }
 .page-hero--signature,
 .page-hero--page,
 .page-hero--compact {
-  min-height: max(35rem, calc(100dvh - var(--site-header-height)));
+  min-height: max(35rem, calc(100dvh - var(--hero-header-height)));
   background: var(--corporate-navy);
   color: white;
 }
@@ -4627,6 +4629,7 @@ body { background: var(--corporate-canvas); }
 .air-reading.is-sensitive { --aqi-color: #925248; }
 
 @media (max-width: 1199px) {
+  :root { --hero-header-height: 5.25rem; }
   .corporate-utility-bar { display: none; }
   .corporate-navbar__inner { min-height: 5.25rem; }
   .corporate-header .government-brand { width: auto; max-width: calc(100% - 4.5rem); }
@@ -4646,7 +4649,7 @@ body { background: var(--corporate-canvas); }
   .page-hero,
   .page-hero--signature,
   .page-hero--page,
-  .page-hero--compact { min-height: max(38rem, calc(100svh - var(--site-header-height))); }
+  .page-hero--compact { min-height: max(38rem, calc(100svh - var(--hero-header-height))); }
   .page-hero__shell { padding-block: 4rem; align-items: center; }
   .page-hero__veil { background: linear-gradient(90deg, rgb(12 22 40 / .88), rgb(12 22 40 / .55)), linear-gradient(0deg, rgb(12 22 40 / .5), transparent); }
   .page-hero__breadcrumb { margin-bottom: 1.5rem; }
@@ -5174,11 +5177,15 @@ body { background: var(--corporate-canvas); }
   .corporate-header .government-brand strong { font-size: .86rem; }
 }
 
-/* Sticky compact header: preserve every navigation control while reducing height on scroll. */
+/* Fixed compact header: reserve a stable document-space header height while it reduces on scroll. */
 .site-header.corporate-header {
+  position: fixed;
+  inset: 0 0 auto;
+  width: 100%;
   will-change: box-shadow;
   transition: box-shadow 320ms ease, background-color 320ms ease;
 }
+.site-header-spacer { height: var(--hero-header-height); }
 .corporate-navbar {
   transition: background-color 320ms ease, border-color 320ms ease, backdrop-filter 320ms ease;
 }
@@ -5309,33 +5316,27 @@ body { background: var(--corporate-canvas); }
   .corporate-header .official-menu-trigger { transition: none; }
 }
 
-/* Preserve complete 16:9 editorial illustrations on internal-page heroes. */
+/* Keep hero imagery stable while the sticky header changes state. */
 .page-hero .page-hero__media {
   background: #111b30;
 }
-.page-hero .page-hero__backdrop {
+.page-hero .page-hero__illustration {
   z-index: 0;
   object-fit: cover;
   object-position: var(--hero-focal-x) var(--hero-focal-y);
-  transform: scale(1.045);
-  filter: blur(1.1rem) saturate(.55) brightness(.52);
-}
-.page-hero .page-hero__illustration {
-  z-index: 1;
-  object-fit: contain;
-  object-position: right center;
+  transform: none;
   filter: saturate(.9) contrast(1.02);
 }
 .page-hero .page-hero__veil {
   background:
-    linear-gradient(90deg, rgb(12 22 40 / .97) 0%, rgb(12 22 40 / .91) 27%, rgb(12 22 40 / .64) 48%, rgb(12 22 40 / .18) 76%, rgb(12 22 40 / .06) 100%),
+    linear-gradient(90deg, rgb(12 22 40 / .9) 0%, rgb(12 22 40 / .76) 30%, rgb(12 22 40 / .46) 55%, rgb(12 22 40 / .14) 82%, rgb(12 22 40 / .04) 100%),
     linear-gradient(0deg, rgb(12 22 40 / .34), transparent 48%);
 }
 .page-hero .page-hero__copy { max-width: min(43rem, 51vw); }
 
 @media (max-width: 767px) {
   .page-hero .page-hero__illustration {
-    object-position: center top;
+    object-position: var(--hero-focal-x) var(--hero-focal-y);
   }
   .page-hero .page-hero__veil {
     background:
