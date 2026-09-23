@@ -12,6 +12,8 @@ const content = {
       ['Information we receive', 'We only collect information that you choose to submit through municipal contact and feedback forms.'],
       ['How information is used', 'Submitted information is used to respond to enquiries, process feedback and improve municipal service delivery.'],
       ['Protection and disclosure', 'Information is handled in accordance with applicable Government of Uganda data protection and access-to-information requirements.'],
+      ['AI information assistant', 'Mr. Ssabagabo uses questions and a short conversation history to find approved public municipal information. Do not enter passwords, identification numbers, payment-card data, medical records or confidential case information.'],
+      ['AI limitations', 'The assistant provides general guidance and may make mistakes. Published council documents and confirmation from the responsible municipal office remain authoritative.'],
     ],
   },
   accessibility: {

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import {
   PhArrowSquareOut, PhCheck, PhCloudArrowUp, PhFileText, PhFolderOpen, PhNewspaper,
   PhCloudSun, PhEye, PhLeaf, PhPencilSimple, PhPlus, PhSignOut, PhSpinnerGap, PhSquaresFour, PhTrash, PhUsersThree, PhWarningCircle,
+  PhRobot,
 } from '@phosphor-icons/vue'
 import { cmsAuth, cmsEntries } from '../../services/cms'
 import { createSeedEntries, formatCmsDate, loadPublishedContent } from '../../stores/cmsContent'
@@ -78,6 +79,24 @@ const pageGroups = [
       { key: 'lead', label: 'Department lead' }, { key: 'contact', label: 'Contact email', type: 'email' },
       { key: 'units', label: 'Units and sub-departments', type: 'list' }, { key: 'services', label: 'Services offered', type: 'list' },
       { key: 'team', label: 'Department team', type: 'team', required: true },
+    ] },
+    { key: 'service_guides', label: 'AI service guides', mobileLabel: 'AI guides', page: 'Departments & services', section: 'Mr. Ssabagabo approved guidance', icon: PhRobot, route: '/services', fields: [
+      { key: 'title', label: 'Service guide title', required: true },
+      { key: 'audience', label: 'Who this guidance is for', type: 'textarea', required: true },
+      { key: 'summary', label: 'Approved service summary', type: 'textarea', required: true },
+      { key: 'department', label: 'Responsible directorate', required: true },
+      { key: 'office', label: 'Responsible office', required: true },
+      { key: 'steps', label: 'Process steps', type: 'list', required: true },
+      { key: 'requirements', label: 'Verified requirements', type: 'list' },
+      { key: 'fees', label: 'Official fees or confirmation guidance', type: 'textarea', required: true },
+      { key: 'processingTime', label: 'Published processing time or confirmation guidance', type: 'textarea', required: true },
+      { key: 'location', label: 'Service location' },
+      { key: 'openingHours', label: 'Opening hours' },
+      { key: 'phone', label: 'Official telephone', type: 'tel' },
+      { key: 'email', label: 'Official email', type: 'email' },
+      { key: 'sourceTitle', label: 'Authoritative source title', required: true },
+      { key: 'sourceUrl', label: 'Public source URL', type: 'url', required: true },
+      { key: 'lastReviewed', label: 'Last reviewed', type: 'date', required: true },
     ] },
   ] },
   { label: 'News & resources', items: [
@@ -264,6 +283,10 @@ const saveEntry = async () => {
       if (duplicate) throw new Error('A published environment bulletin already exists for this date.')
     }
     if (selectedCollection.value === 'publications' && !payload.url) throw new Error('Upload the publication document before saving.')
+    if (selectedCollection.value === 'service_guides' && editor.value.status === 'published') {
+      if (!payload.steps?.length) throw new Error('Add at least one verified process step before publishing.')
+      if (!payload.sourceTitle || !payload.sourceUrl || !payload.lastReviewed) throw new Error('Add the source title, public URL and review date before publishing.')
+    }
     if (selectedCollection.value === 'page_presentations') {
       if (!payload.image || !String(payload.imageAlt || '').trim()) throw new Error('Add a hero image and a useful image description before saving.')
       if (Boolean(payload.ctaLabel) !== Boolean(payload.ctaTo)) throw new Error('Add both the action label and destination, or leave both empty.')
@@ -644,6 +667,14 @@ onMounted(async () => {
               <PhCloudArrowUp :size="21" />
             </article>
 
+            <article v-else-if="selectedCollection === 'service_guides'" class="cms-preview-service-guide">
+              <header><span><PhRobot :size="25" weight="fill" /></span><div><p>Mr. Ssabagabo knowledge</p><h3>{{ previewItem.title || 'Service guide title' }}</h3></div></header>
+              <p>{{ previewItem.summary || 'Approved service summary' }}</p>
+              <section><strong>Responsible office</strong><span>{{ previewItem.office || previewItem.department || 'Municipal office' }}</span></section>
+              <ol><li v-for="step in previewItem.steps" :key="step">{{ step }}</li></ol>
+              <footer><span>{{ previewItem.sourceTitle || 'Authoritative public source' }}</span><time>Reviewed {{ formatCmsDate(previewItem.lastReviewed) || 'Review date' }}</time></footer>
+            </article>
+
             <EducationDepartment v-else-if="selectedCollection === 'departments' && previewItem.slug === 'education-sports'" :department="previewItem" preview />
             <article v-else-if="selectedCollection === 'departments'" class="cms-preview-department">
               <header><p>Municipal department</p><h3>{{ previewItem.name || 'Department name' }}</h3><div>{{ previewItem.summary || 'Department introduction' }}</div></header>
@@ -790,6 +821,17 @@ onMounted(async () => {
 .cms-preview-news { display: grid; width: min(100%, 44rem); min-width: 0; overflow: hidden; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: white; box-shadow: 0 1rem 3rem rgb(7 59 44 / .1); }.cms-preview-news > img,.cms-preview-news > .cms-preview-placeholder { width: 100%; height: 100%; min-height: 24rem; object-fit: cover; }.cms-preview-news__body { display: flex; min-width: 0; justify-content: center; flex-direction: column; padding: clamp(1.5rem, 4vw, 2.5rem); }.cms-preview-news__body > p { overflow-wrap: anywhere; color: #8b6719; font-size: .65rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-news__body h3 { margin-top: 1rem; overflow-wrap: anywhere; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 900; line-height: 1.08; }.cms-preview-news__body > div { margin-top: 1rem; overflow-wrap: anywhere; color: #617168; font-size: .85rem; line-height: 1.65; }
 .cms-preview-publication { display: grid; width: min(100%, 42rem); min-width: 0; grid-template-columns: auto minmax(0, 1fr) auto; gap: 1rem; align-items: center; background: white; padding: 1.25rem; box-shadow: 0 1rem 3rem rgb(7 59 44 / .08); }.cms-preview-publication > span { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 50%; background: #fff5e9; color: #a94d0b; }.cms-preview-publication h3,.cms-preview-publication p { overflow-wrap: anywhere; }.cms-preview-publication h3 { font-size: .95rem; font-weight: 900; }.cms-preview-publication p { margin-top: .25rem; color: #738078; font-size: .72rem; font-weight: 700; }.cms-preview-publication > svg { color: #698078; }
 .cms-preview-department { width: min(100%, 50rem); min-width: 0; overflow: hidden; background: white; box-shadow: 0 1rem 3rem rgb(7 59 44 / .1); }.cms-preview-department > header { background: #073b2c; padding: clamp(1.5rem, 5vw, 3.5rem); color: white; }.cms-preview-department > header p,.cms-preview-department > section > span { color: #e8c774; font-size: .68rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }.cms-preview-department > header h3 { margin-top: .8rem; overflow-wrap: anywhere; font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 900; line-height: 1; }.cms-preview-department > header div { max-width: 42rem; margin-top: 1rem; overflow-wrap: anywhere; color: rgb(255 255 255 / .68); font-size: .9rem; line-height: 1.7; }.cms-preview-department > section { padding: clamp(1.5rem, 4vw, 2.5rem); }.cms-preview-department > section + section { border-top: 1px solid rgb(7 59 44 / .1); }.cms-preview-department > section > p { margin-top: .8rem; overflow-wrap: anywhere; color: #627168; font-size: .88rem; line-height: 1.7; }.cms-preview-team { display: grid; margin-top: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: 1rem; }.cms-preview-team article { min-width: 0; overflow: hidden; background: #eef3ef; }.cms-preview-team article > img,.cms-preview-team article > .cms-preview-placeholder { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }.cms-preview-team article > div:last-child { border-top: 3px solid #17634c; padding: .85rem; }.cms-preview-team p,.cms-preview-team h4 { overflow-wrap: anywhere; }.cms-preview-team p { color: #17634c; font-size: .6rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-team h4 { margin-top: .3rem; font-size: .9rem; font-weight: 900; }.cms-preview-department__empty { background: #eef3ef; padding: 1rem; }
+.cms-preview-service-guide { width: min(100%, 38rem); overflow: hidden; border: 1px solid rgb(23 35 58 / .12); border-radius: .75rem; background: white; box-shadow: 0 1rem 3rem rgb(17 27 48 / .1); }
+.cms-preview-service-guide > header { display: flex; align-items: center; gap: .8rem; background: #17233a; padding: 1.25rem; color: white; }
+.cms-preview-service-guide > header > span { display: grid; width: 2.8rem; height: 2.8rem; flex: 0 0 auto; place-items: center; border-radius: .55rem; background: #8f3f48; }
+.cms-preview-service-guide > header p { color: rgb(255 255 255 / .62); font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.cms-preview-service-guide > header h3 { margin-top: .2rem; font-size: 1.2rem; font-weight: 900; }
+.cms-preview-service-guide > p { padding: 1.25rem 1.25rem .5rem; color: #526078; font-size: .82rem; line-height: 1.65; }
+.cms-preview-service-guide > section { display: grid; gap: .15rem; margin: .75rem 1.25rem; border-left: 3px solid #8f3f48; background: #f7eeee; padding: .7rem; }
+.cms-preview-service-guide > section strong { color: #71323a; font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; }
+.cms-preview-service-guide > section span { color: #17233a; font-size: .8rem; font-weight: 800; }
+.cms-preview-service-guide > ol { display: grid; gap: .55rem; padding: .5rem 2.5rem 1.25rem; color: #243552; font-size: .8rem; line-height: 1.55; }
+.cms-preview-service-guide > footer { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid rgb(23 35 58 / .1); padding: .8rem 1.25rem; color: #697386; font-size: .65rem; }
 @keyframes admin-spin { to { transform: rotate(360deg); } }
 @media (max-width: 1300px) { .admin-workspace.has-editor { grid-template-columns: 1fr; }.admin-editor { position: static; }.admin-editor__fields { max-height: none; } }
 @media (max-width: 1050px) { .admin-workspace.has-editor { grid-template-columns: 1fr; }.admin-editor { position: static; }.admin-editor__fields { max-height: none; } }
