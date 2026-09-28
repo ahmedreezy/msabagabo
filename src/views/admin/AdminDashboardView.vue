@@ -1,12 +1,16 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   PhArrowSquareOut, PhCheck, PhCloudArrowUp, PhFileText, PhFolderOpen, PhNewspaper,
   PhCloudSun, PhEye, PhLeaf, PhPencilSimple, PhPlus, PhSignOut, PhSpinnerGap, PhSquaresFour, PhTrash, PhUsersThree, PhWarningCircle,
+  PhRobot,
 } from '@phosphor-icons/vue'
 import { cmsAuth, cmsEntries } from '../../services/cms'
 import { createSeedEntries, formatCmsDate, loadPublishedContent } from '../../stores/cmsContent'
+import EducationProfileEditor from '../../components/admin/EducationProfileEditor.vue'
+import EducationDepartment from '../../components/EducationDepartment.vue'
+import { educationPublicationIssues, normalizeEducationProfile } from '../../lib/educationProfile.js'
 
 const router = useRouter()
 const pageGroups = [
@@ -76,6 +80,24 @@ const pageGroups = [
       { key: 'units', label: 'Units and sub-departments', type: 'list' }, { key: 'services', label: 'Services offered', type: 'list' },
       { key: 'team', label: 'Department team', type: 'team', required: true },
     ] },
+    { key: 'service_guides', label: 'AI service guides', mobileLabel: 'AI guides', page: 'Departments & services', section: 'Mr. Ssabagabo approved guidance', icon: PhRobot, route: '/services', fields: [
+      { key: 'title', label: 'Service guide title', required: true },
+      { key: 'audience', label: 'Who this guidance is for', type: 'textarea', required: true },
+      { key: 'summary', label: 'Approved service summary', type: 'textarea', required: true },
+      { key: 'department', label: 'Responsible directorate', required: true },
+      { key: 'office', label: 'Responsible office', required: true },
+      { key: 'steps', label: 'Process steps', type: 'list', required: true },
+      { key: 'requirements', label: 'Verified requirements', type: 'list' },
+      { key: 'fees', label: 'Official fees or confirmation guidance', type: 'textarea', required: true },
+      { key: 'processingTime', label: 'Published processing time or confirmation guidance', type: 'textarea', required: true },
+      { key: 'location', label: 'Service location' },
+      { key: 'openingHours', label: 'Opening hours' },
+      { key: 'phone', label: 'Official telephone', type: 'tel' },
+      { key: 'email', label: 'Official email', type: 'email' },
+      { key: 'sourceTitle', label: 'Authoritative source title', required: true },
+      { key: 'sourceUrl', label: 'Public source URL', type: 'url', required: true },
+      { key: 'lastReviewed', label: 'Last reviewed', type: 'date', required: true },
+    ] },
   ] },
   { label: 'News & resources', items: [
     { key: 'publications', label: 'Publications', mobileLabel: 'Files', page: 'News & resources', section: 'Document library', icon: PhFileText, route: '/news#publications', fields: [
@@ -99,6 +121,7 @@ const documentExtensions = {
 const loading = ref(true)
 const saving = ref(false)
 const uploading = ref(false)
+const educationUploading = ref(false)
 const seeding = ref(false)
 const entries = ref([])
 const profile = ref(null)
@@ -108,10 +131,16 @@ const editor = ref(null)
 const deleteConfirmation = ref(false)
 const previewOpen = ref(false)
 const previewItem = ref(null)
+let previewReturnFocus
 const feedback = reactive({ type: '', message: '' })
 const mediaPreviews = reactive({})
 
 const definition = computed(() => collections.find((item) => item.key === selectedCollection.value))
+const isEducationPilot = computed(() => selectedCollection.value === 'departments' && editor.value?.payload.slug === 'education-sports')
+const invalidateEducationBasics = (event) => {
+  if (!isEducationPilot.value || !editor.value.payload.educationProfile || event.target.closest('.education-editor')) return
+  if (/^(cms-field-|team-)/.test(event.target.id)) editor.value.payload.educationProfile.approved = false
+}
 const canPublish = computed(() => ['publisher', 'admin'].includes(profile.value?.role))
 const canDelete = computed(() => ['publisher', 'admin'].includes(profile.value?.role))
 const draftCount = computed(() => entries.value.filter((entry) => entry.status === 'draft').length)
@@ -153,7 +182,7 @@ const clearMediaPreviews = () => {
 const mediaPreview = (field) => mediaPreviews[field.key] || editor.value?.payload?.[field.key]
 
 const hydratePayload = (payload = {}) => {
-  const next = { ...payload }
+  const next = JSON.parse(JSON.stringify(payload))
   definition.value.fields.forEach((field) => {
     if (field.type === 'list') next[field.key] = Array.isArray(next[field.key]) ? next[field.key].join('\n') : next[field.key] || ''
     else if (field.type === 'team') next[field.key] = Array.isArray(next[field.key]) ? next[field.key].map((member) => ({ name: '', role: '', photo: '', ...member })) : []
@@ -196,7 +225,8 @@ const editEntry = (entry) => {
 }
 
 const serializePayload = () => {
-  const payload = { ...editor.value.payload }
+  const payload = JSON.parse(JSON.stringify(editor.value.payload))
+  if (payload.educationProfile) payload.educationProfile = normalizeEducationProfile(payload.educationProfile)
   definition.value.fields.forEach((field) => {
     if (field.type === 'list') payload[field.key] = String(payload[field.key] || '').split('\n').map((item) => item.trim()).filter(Boolean)
     if (field.type === 'team') payload[field.key] = (payload[field.key] || []).map((member) => ({
@@ -208,7 +238,8 @@ const serializePayload = () => {
   return payload
 }
 
-const previewEntry = () => {
+const previewEntry = async () => {
+  previewReturnFocus = document.activeElement
   const payload = serializePayload()
   definition.value.fields.forEach((field) => {
     if (field.type === 'media' && mediaPreview(field)) payload[field.key] = mediaPreview(field)
@@ -219,19 +250,29 @@ const previewEntry = () => {
   previewItem.value = payload
   previewOpen.value = true
   document.body.style.overflow = 'hidden'
+  await nextTick()
+  document.querySelector('.admin-preview-dialog__header button')?.focus()
 }
 
 const closePreview = () => {
   previewOpen.value = false
   previewItem.value = null
   document.body.style.overflow = ''
+  previewReturnFocus?.focus()
 }
 
 const handlePreviewKeydown = (event) => {
   if (event.key === 'Escape' && previewOpen.value) closePreview()
+  if (event.key !== 'Tab' || !previewOpen.value) return
+  const focusable = [...document.querySelectorAll('.admin-preview-dialog a[href], .admin-preview-dialog button:not(:disabled), .admin-preview-dialog input:not(:disabled), .admin-preview-dialog select:not(:disabled), .admin-preview-dialog summary')].filter((element) => element.getClientRects().length)
+  const first = focusable[0]
+  const last = focusable.at(-1)
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
 }
 
 const saveEntry = async () => {
+  if (uploading.value || educationUploading.value) return
   saving.value = true
   try {
     const payload = serializePayload()
@@ -242,6 +283,10 @@ const saveEntry = async () => {
       if (duplicate) throw new Error('A published environment bulletin already exists for this date.')
     }
     if (selectedCollection.value === 'publications' && !payload.url) throw new Error('Upload the publication document before saving.')
+    if (selectedCollection.value === 'service_guides' && editor.value.status === 'published') {
+      if (!payload.steps?.length) throw new Error('Add at least one verified process step before publishing.')
+      if (!payload.sourceTitle || !payload.sourceUrl || !payload.lastReviewed) throw new Error('Add the source title, public URL and review date before publishing.')
+    }
     if (selectedCollection.value === 'page_presentations') {
       if (!payload.image || !String(payload.imageAlt || '').trim()) throw new Error('Add a hero image and a useful image description before saving.')
       if (Boolean(payload.ctaLabel) !== Boolean(payload.ctaTo)) throw new Error('Add both the action label and destination, or leave both empty.')
@@ -249,8 +294,14 @@ const saveEntry = async () => {
       if (duplicate) throw new Error('A page hero already exists for this page.')
     }
     if (selectedCollection.value === 'departments' && editor.value.status === 'published') {
-      if (!payload.team?.length) throw new Error('Add at least one team member before publishing this department.')
-      if (payload.team.some((member) => !member.name || !member.role || !member.photo)) throw new Error('Every team member needs a photo, name and role before publishing.')
+      if (payload.educationProfile) {
+        const issues = educationPublicationIssues(payload)
+        if (issues.length) throw new Error(issues[0])
+      } else if (payload.slug !== 'education-sports') {
+        if (!payload.team?.length) throw new Error('Add at least one team member before publishing this department.')
+        if (payload.team.some((member) => !member.name || !member.role || !member.photo)) throw new Error('Every team member needs a photo, name and role before publishing.')
+      }
+      if ((payload.team || []).some((member) => !member.name || !member.role)) throw new Error('Every team member needs a name and role before publishing.')
     }
     const saved = await cmsEntries.save({ ...editor.value, title: primaryTitle, slug: payload.slug || editor.value.slug, payload }, session.value.user.id)
     setFeedback('success', saved.status === 'published' ? 'Changes published.' : 'Draft saved.')
@@ -312,6 +363,7 @@ const uploadMedia = async (event, field) => {
 
 const addTeamMember = () => {
   editor.value.payload.team.push({ name: '', role: '', photo: '' })
+  if (editor.value.payload.educationProfile) editor.value.payload.educationProfile.approved = false
 }
 
 const removeTeamMember = (index) => {
@@ -319,6 +371,7 @@ const removeTeamMember = (index) => {
   if (mediaPreviews[previewKey]?.startsWith('blob:')) URL.revokeObjectURL(mediaPreviews[previewKey])
   delete mediaPreviews[previewKey]
   editor.value.payload.team.splice(index, 1)
+  if (editor.value.payload.educationProfile) editor.value.payload.educationProfile.approved = false
 }
 
 const uploadTeamPhoto = async (event, index) => {
@@ -330,6 +383,7 @@ const uploadTeamPhoto = async (event, index) => {
   uploading.value = true
   try {
     editor.value.payload.team[index].photo = await cmsEntries.upload(file)
+    if (editor.value.payload.educationProfile) editor.value.payload.educationProfile.approved = false
     URL.revokeObjectURL(mediaPreviews[previewKey])
     delete mediaPreviews[previewKey]
     setFeedback('success', 'Team photo uploaded.')
@@ -465,11 +519,11 @@ onMounted(async () => {
           </button>
         </div>
 
-        <form v-if="editor" class="admin-editor" @submit.prevent="saveEntry">
+        <form v-if="editor" class="admin-editor" :novalidate="isEducationPilot" @submit.prevent="saveEntry">
           <div class="admin-editor__heading"><div><p>{{ editor.id ? 'Edit entry' : 'New entry' }}</p><h2>{{ editor.title || 'Untitled' }}</h2></div><button type="button" aria-label="Close editor" @click="editor = null">×</button></div>
-          <div class="admin-editor__fields">
+          <div class="admin-editor__fields" @input="invalidateEducationBasics">
             <div v-for="field in definition.fields" :key="field.key" class="admin-field" :class="{ 'is-wide': ['textarea', 'list', 'media', 'team', 'file'].includes(field.type) }">
-              <label :for="field.type === 'team' ? undefined : `cms-field-${field.key}`"><span>{{ field.label }} <b v-if="field.required">Required</b></span></label>
+              <label :for="field.type === 'team' ? undefined : `cms-field-${field.key}`"><span>{{ field.label }} <b v-if="field.required && !(isEducationPilot && field.type === 'team')">Required</b></span></label>
               <textarea v-if="field.type === 'textarea'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" rows="4" :required="field.required"></textarea>
               <textarea v-else-if="field.type === 'list'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" rows="5" :required="field.required" placeholder="One item per line"></textarea>
               <select v-else-if="field.type === 'select'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :required="field.required"><option value="" disabled>Select an option</option><option v-for="option in field.options" :key="option" :value="option">{{ option }}</option></select>
@@ -481,13 +535,13 @@ onMounted(async () => {
                 </div>
                 <div v-if="!editor.payload.team.length" class="admin-team-empty">
                   <strong>No team members added</strong>
-                  <p>Add each person’s photograph, full name and official role.</p>
+                  <p>{{ isEducationPilot ? 'Add verified full names and official roles. Photographs are optional.' : 'Add each person’s photograph, full name and official role.' }}</p>
                   <button type="button" @click="addTeamMember"><PhPlus :size="17" /> Add the first member</button>
                 </div>
                 <article v-for="(member, index) in editor.payload.team" v-else :key="index" class="admin-team-member">
                   <div class="admin-team-photo">
                     <img v-if="teamPhotoPreview(member, index)" :src="teamPhotoPreview(member, index)" :alt="member.name ? `${member.name} preview` : 'Team member photo preview'" />
-                    <div v-else><PhPlus :size="25" /><span>Photo required</span></div>
+                    <div v-else><PhPlus :size="25" /><span>{{ isEducationPilot ? 'Photo optional' : 'Photo required' }}</span></div>
                     <label>
                       <input type="file" accept="image/jpeg,image/png,image/webp" @change="uploadTeamPhoto($event, index)" />
                       <PhCloudArrowUp :size="17" /> {{ member.photo ? 'Replace photo' : 'Choose photo' }}
@@ -528,6 +582,7 @@ onMounted(async () => {
               </div>
               <input v-else :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :type="field.type || 'text'" :required="field.required" :min="field.min" :max="field.max" :step="field.step" />
             </div>
+            <EducationProfileEditor v-if="isEducationPilot" :key="editor.id || 'new-education'" v-model="editor.payload.educationProfile" :department="editor.payload" @uploading="educationUploading = $event" />
             <label v-if="!definition.chronological"><span>Website position</span><input v-model.number="editor.sort_order" type="number" min="0" /><small>Lower numbers appear first.</small></label>
             <label><span>Publishing state</span><select v-model="editor.status"><option value="draft">Draft</option><option value="published" :disabled="!canPublish">Published</option></select><small v-if="!canPublish">A publisher must approve this entry.</small></label>
           </div>
@@ -537,8 +592,8 @@ onMounted(async () => {
               <span v-else>Delete permanently? <button type="button" @click="removeEntry">Confirm</button><button type="button" @click="deleteConfirmation = false">Cancel</button></span>
             </div>
             <div class="admin-editor__actions">
-              <button class="admin-preview" type="button" :disabled="uploading" @click="previewEntry"><PhEye :size="17" /> Preview changes</button>
-              <button class="admin-save" type="submit" :disabled="saving"><PhSpinnerGap v-if="saving" class="admin-spin" :size="17" /><PhCheck v-else :size="17" weight="bold" /> {{ saving ? 'Saving…' : editor.status === 'published' ? 'Publish changes' : 'Save draft' }}</button>
+              <button class="admin-preview" type="button" :disabled="uploading || educationUploading" @click="previewEntry"><PhEye :size="17" /> Preview changes</button>
+              <button class="admin-save" type="submit" :disabled="saving || uploading || educationUploading"><PhSpinnerGap v-if="saving" class="admin-spin" :size="17" /><PhCheck v-else :size="17" weight="bold" /> {{ saving ? 'Saving…' : editor.status === 'published' ? 'Publish changes' : 'Save draft' }}</button>
             </div>
           </footer>
         </form>
@@ -547,7 +602,7 @@ onMounted(async () => {
 
     <Teleport to="body">
       <div v-if="previewOpen && previewItem" class="admin-preview-dialog" role="presentation" @click.self="closePreview">
-        <section class="admin-preview-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="cms-preview-title">
+        <section class="admin-preview-dialog__panel" :class="{ 'admin-preview-dialog__panel--education': selectedCollection === 'departments' && previewItem.slug === 'education-sports' }" role="dialog" aria-modal="true" aria-labelledby="cms-preview-title">
           <header class="admin-preview-dialog__header">
             <div><p>Website component preview</p><h2 id="cms-preview-title">{{ definition.label }}</h2></div>
             <button type="button" aria-label="Close preview" @click="closePreview">×</button>
@@ -612,6 +667,15 @@ onMounted(async () => {
               <PhCloudArrowUp :size="21" />
             </article>
 
+            <article v-else-if="selectedCollection === 'service_guides'" class="cms-preview-service-guide">
+              <header><span><PhRobot :size="25" weight="fill" /></span><div><p>Mr. Ssabagabo knowledge</p><h3>{{ previewItem.title || 'Service guide title' }}</h3></div></header>
+              <p>{{ previewItem.summary || 'Approved service summary' }}</p>
+              <section><strong>Responsible office</strong><span>{{ previewItem.office || previewItem.department || 'Municipal office' }}</span></section>
+              <ol><li v-for="step in previewItem.steps" :key="step">{{ step }}</li></ol>
+              <footer><span>{{ previewItem.sourceTitle || 'Authoritative public source' }}</span><time>Reviewed {{ formatCmsDate(previewItem.lastReviewed) || 'Review date' }}</time></footer>
+            </article>
+
+            <EducationDepartment v-else-if="selectedCollection === 'departments' && previewItem.slug === 'education-sports'" :department="previewItem" preview />
             <article v-else-if="selectedCollection === 'departments'" class="cms-preview-department">
               <header><p>Municipal department</p><h3>{{ previewItem.name || 'Department name' }}</h3><div>{{ previewItem.summary || 'Department introduction' }}</div></header>
               <section><span>Mandate</span><p>{{ previewItem.mandate || 'Department mandate' }}</p></section>
@@ -745,6 +809,8 @@ onMounted(async () => {
 .admin-preview-dialog__header > div { min-width: 0; }.admin-preview-dialog__header p { color: #8b6719; font-size: .66rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }.admin-preview-dialog__header h2 { margin-top: .25rem; overflow: hidden; font-size: 1.25rem; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }.admin-preview-dialog__header > button { display: grid; width: 2.7rem; height: 2.7rem; flex: none; place-items: center; color: #53645b; font-size: 1.8rem; }
 .admin-preview-dialog__canvas { overflow-y: auto; overscroll-behavior: contain; padding: clamp(1rem, 4vw, 3rem); background: #e9ede8; }
 .admin-preview-dialog__canvas > article { margin-inline: auto; }
+.admin-preview-dialog__panel--education { width: min(100%, 90rem); }
+.admin-preview-dialog__panel--education .admin-preview-dialog__canvas { padding: 0; }
 .admin-preview-dialog__footer { display: flex; min-height: 4.5rem; align-items: center; justify-content: space-between; gap: 1rem; border-top: 1px solid rgb(7 59 44 / .12); padding: .85rem 1.4rem; background: white; }.admin-preview-dialog__footer p { color: #68766f; font-size: .75rem; }.admin-preview-dialog__footer button { min-height: 2.8rem; background: #073b2c; padding: .65rem .9rem; color: white; font-size: .78rem; font-weight: 850; }
 .cms-preview-placeholder { display: grid; place-items: center; background: #dfe6df; color: #65756d; font-size: .78rem; font-weight: 800; }
 .cms-preview-link { display: inline-flex; align-items: center; gap: .45rem; margin-top: auto; padding-top: 1.4rem; color: #17634c; font-size: .8rem; font-weight: 850; }
@@ -755,6 +821,17 @@ onMounted(async () => {
 .cms-preview-news { display: grid; width: min(100%, 44rem); min-width: 0; overflow: hidden; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: white; box-shadow: 0 1rem 3rem rgb(7 59 44 / .1); }.cms-preview-news > img,.cms-preview-news > .cms-preview-placeholder { width: 100%; height: 100%; min-height: 24rem; object-fit: cover; }.cms-preview-news__body { display: flex; min-width: 0; justify-content: center; flex-direction: column; padding: clamp(1.5rem, 4vw, 2.5rem); }.cms-preview-news__body > p { overflow-wrap: anywhere; color: #8b6719; font-size: .65rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-news__body h3 { margin-top: 1rem; overflow-wrap: anywhere; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 900; line-height: 1.08; }.cms-preview-news__body > div { margin-top: 1rem; overflow-wrap: anywhere; color: #617168; font-size: .85rem; line-height: 1.65; }
 .cms-preview-publication { display: grid; width: min(100%, 42rem); min-width: 0; grid-template-columns: auto minmax(0, 1fr) auto; gap: 1rem; align-items: center; background: white; padding: 1.25rem; box-shadow: 0 1rem 3rem rgb(7 59 44 / .08); }.cms-preview-publication > span { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 50%; background: #fff5e9; color: #a94d0b; }.cms-preview-publication h3,.cms-preview-publication p { overflow-wrap: anywhere; }.cms-preview-publication h3 { font-size: .95rem; font-weight: 900; }.cms-preview-publication p { margin-top: .25rem; color: #738078; font-size: .72rem; font-weight: 700; }.cms-preview-publication > svg { color: #698078; }
 .cms-preview-department { width: min(100%, 50rem); min-width: 0; overflow: hidden; background: white; box-shadow: 0 1rem 3rem rgb(7 59 44 / .1); }.cms-preview-department > header { background: #073b2c; padding: clamp(1.5rem, 5vw, 3.5rem); color: white; }.cms-preview-department > header p,.cms-preview-department > section > span { color: #e8c774; font-size: .68rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }.cms-preview-department > header h3 { margin-top: .8rem; overflow-wrap: anywhere; font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 900; line-height: 1; }.cms-preview-department > header div { max-width: 42rem; margin-top: 1rem; overflow-wrap: anywhere; color: rgb(255 255 255 / .68); font-size: .9rem; line-height: 1.7; }.cms-preview-department > section { padding: clamp(1.5rem, 4vw, 2.5rem); }.cms-preview-department > section + section { border-top: 1px solid rgb(7 59 44 / .1); }.cms-preview-department > section > p { margin-top: .8rem; overflow-wrap: anywhere; color: #627168; font-size: .88rem; line-height: 1.7; }.cms-preview-team { display: grid; margin-top: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: 1rem; }.cms-preview-team article { min-width: 0; overflow: hidden; background: #eef3ef; }.cms-preview-team article > img,.cms-preview-team article > .cms-preview-placeholder { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }.cms-preview-team article > div:last-child { border-top: 3px solid #17634c; padding: .85rem; }.cms-preview-team p,.cms-preview-team h4 { overflow-wrap: anywhere; }.cms-preview-team p { color: #17634c; font-size: .6rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }.cms-preview-team h4 { margin-top: .3rem; font-size: .9rem; font-weight: 900; }.cms-preview-department__empty { background: #eef3ef; padding: 1rem; }
+.cms-preview-service-guide { width: min(100%, 38rem); overflow: hidden; border: 1px solid rgb(23 35 58 / .12); border-radius: .75rem; background: white; box-shadow: 0 1rem 3rem rgb(17 27 48 / .1); }
+.cms-preview-service-guide > header { display: flex; align-items: center; gap: .8rem; background: #17233a; padding: 1.25rem; color: white; }
+.cms-preview-service-guide > header > span { display: grid; width: 2.8rem; height: 2.8rem; flex: 0 0 auto; place-items: center; border-radius: .55rem; background: #8f3f48; }
+.cms-preview-service-guide > header p { color: rgb(255 255 255 / .62); font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.cms-preview-service-guide > header h3 { margin-top: .2rem; font-size: 1.2rem; font-weight: 900; }
+.cms-preview-service-guide > p { padding: 1.25rem 1.25rem .5rem; color: #526078; font-size: .82rem; line-height: 1.65; }
+.cms-preview-service-guide > section { display: grid; gap: .15rem; margin: .75rem 1.25rem; border-left: 3px solid #8f3f48; background: #f7eeee; padding: .7rem; }
+.cms-preview-service-guide > section strong { color: #71323a; font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; }
+.cms-preview-service-guide > section span { color: #17233a; font-size: .8rem; font-weight: 800; }
+.cms-preview-service-guide > ol { display: grid; gap: .55rem; padding: .5rem 2.5rem 1.25rem; color: #243552; font-size: .8rem; line-height: 1.55; }
+.cms-preview-service-guide > footer { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid rgb(23 35 58 / .1); padding: .8rem 1.25rem; color: #697386; font-size: .65rem; }
 @keyframes admin-spin { to { transform: rotate(360deg); } }
 @media (max-width: 1300px) { .admin-workspace.has-editor { grid-template-columns: 1fr; }.admin-editor { position: static; }.admin-editor__fields { max-height: none; } }
 @media (max-width: 1050px) { .admin-workspace.has-editor { grid-template-columns: 1fr; }.admin-editor { position: static; }.admin-editor__fields { max-height: none; } }

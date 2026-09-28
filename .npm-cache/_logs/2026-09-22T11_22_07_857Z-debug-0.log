@@ -1,0 +1,680 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.8.2
+2 info using node@v20.19.1
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\marc code\mssabagabo\msabagabo\.npmrc
+5 silly config load:file:C:\Users\MOES\.npmrc
+6 silly config load:file:C:\Users\MOES\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--force" "--cache" ".npm-cache"
+9 verbose logfile logs-max:10 dir:C:\marc code\mssabagabo\msabagabo\.npm-cache\_logs\2026-09-22T11_22_07_857Z-
+10 verbose logfile C:\marc code\mssabagabo\msabagabo\.npm-cache\_logs\2026-09-22T11_22_07_857Z-debug-0.log
+11 warn using --force Recommended protections disabled.
+12 silly packumentCache heap:2197815296 maxSize:549453824 maxEntrySize:274726912
+13 silly logfile done cleaning log files
+14 silly idealTree buildDeps
+15 verbose shrinkwrap failed to load node_modules/.package-lock.json out of date, updated: node_modules
+16 silly reify mark retired [ 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\aria-hidden' ]
+17 silly reify mark retired [ 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\fsevents' ]
+18 silly reify mark retired [
+18 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-android-arm64'
+18 silly reify ]
+19 silly reify mark retired [
+19 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-darwin-arm64'
+19 silly reify ]
+20 silly reify mark retired [
+20 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-darwin-x64'
+20 silly reify ]
+21 silly reify mark retired [
+21 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm-gnueabihf'
+21 silly reify ]
+22 silly reify mark retired [
+22 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-freebsd-x64'
+22 silly reify ]
+23 silly reify mark retired [
+23 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm64-musl'
+23 silly reify ]
+24 silly reify mark retired [
+24 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-x64-gnu'
+24 silly reify ]
+25 silly reify mark retired [
+25 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm64-gnu'
+25 silly reify ]
+26 silly reify mark retired [
+26 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-win32-arm64-msvc'
+26 silly reify ]
+27 silly reify mark retired [
+27 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-x64-musl'
+27 silly reify ]
+28 silly reify mark retired [ 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\ohash' ]
+29 silly reify mark retired [ 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\reka-ui' ]
+30 silly reify mark retired [
+30 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\dom'
+30 silly reify ]
+31 silly reify mark retired [
+31 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\core'
+31 silly reify ]
+32 silly reify mark retired [
+32 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\utils'
+32 silly reify ]
+33 silly reify mark retired [
+33 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\vue'
+33 silly reify ]
+34 silly reify mark retired [
+34 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@internationalized\\date'
+34 silly reify ]
+35 silly reify mark retired [
+35 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@internationalized\\number'
+35 silly reify ]
+36 silly reify mark retired [
+36 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@fontsource-variable\\noto-serif'
+36 silly reify ]
+37 silly reify mark retired [
+37 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-android-arm64'
+37 silly reify ]
+38 silly reify mark retired [
+38 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-darwin-arm64'
+38 silly reify ]
+39 silly reify mark retired [
+39 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-darwin-x64'
+39 silly reify ]
+40 silly reify mark retired [
+40 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-freebsd-x64'
+40 silly reify ]
+41 silly reify mark retired [
+41 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm64-gnu'
+41 silly reify ]
+42 silly reify mark retired [
+42 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm64-musl'
+42 silly reify ]
+43 silly reify mark retired [
+43 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-ppc64-gnu'
+43 silly reify ]
+44 silly reify mark retired [
+44 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-s390x-gnu'
+44 silly reify ]
+45 silly reify mark retired [
+45 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-x64-gnu'
+45 silly reify ]
+46 silly reify mark retired [
+46 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm-gnueabihf'
+46 silly reify ]
+47 silly reify mark retired [
+47 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-x64-musl'
+47 silly reify ]
+48 silly reify mark retired [
+48 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-openharmony-arm64'
+48 silly reify ]
+49 silly reify mark retired [
+49 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-win32-arm64-msvc'
+49 silly reify ]
+50 silly reify mark retired [
+50 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-android-arm64'
+50 silly reify ]
+51 silly reify mark retired [
+51 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-darwin-arm64'
+51 silly reify ]
+52 silly reify mark retired [
+52 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-darwin-x64'
+52 silly reify ]
+53 silly reify mark retired [
+53 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-freebsd-x64'
+53 silly reify ]
+54 silly reify mark retired [
+54 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm-gnueabihf'
+54 silly reify ]
+55 silly reify mark retired [
+55 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm64-gnu'
+55 silly reify ]
+56 silly reify mark retired [
+56 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm64-musl'
+56 silly reify ]
+57 silly reify mark retired [
+57 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-x64-gnu'
+57 silly reify ]
+58 silly reify mark retired [
+58 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-x64-musl'
+58 silly reify ]
+59 silly reify mark retired [
+59 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-wasm32-wasi'
+59 silly reify ]
+60 silly reify mark retired [
+60 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-win32-arm64-msvc'
+60 silly reify ]
+61 silly reify mark retired [
+61 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tanstack\\virtual-core'
+61 silly reify ]
+62 silly reify mark retired [
+62 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tanstack\\vue-virtual'
+62 silly reify ]
+63 silly reify mark retired [ 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\core' ]
+64 silly reify mark retired [
+64 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\metadata'
+64 silly reify ]
+65 silly reify mark retired [
+65 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\shared'
+65 silly reify ]
+66 silly reify mark retired [
+66 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-darwin-arm64'
+66 silly reify ]
+67 silly reify mark retired [
+67 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-darwin-x64'
+67 silly reify ]
+68 silly reify mark retired [
+68 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-freebsd-x64'
+68 silly reify ]
+69 silly reify mark retired [
+69 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-android-arm64'
+69 silly reify ]
+70 silly reify mark retired [
+70 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm64-gnu'
+70 silly reify ]
+71 silly reify mark retired [
+71 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm-gnueabihf'
+71 silly reify ]
+72 silly reify mark retired [
+72 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm64-musl'
+72 silly reify ]
+73 silly reify mark retired [
+73 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-x64-gnu'
+73 silly reify ]
+74 silly reify mark retired [
+74 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-x64-musl'
+74 silly reify ]
+75 silly reify mark retired [
+75 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-win32-arm64-msvc'
+75 silly reify ]
+76 silly reify moves {
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\aria-hidden': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.aria-hidden-RZrUFiJ8',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\fsevents': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.fsevents-7J3UIDe6',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-android-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-android-arm64-YplWJ43N',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-darwin-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-darwin-arm64-Bv16eIkn',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-darwin-x64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-darwin-x64-Ql9fNFLH',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm-gnueabihf': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-linux-arm-gnueabihf-jCgPb7Eu',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-freebsd-x64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-freebsd-x64-SkfWN293',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm64-musl': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-linux-arm64-musl-qNNcwla0',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-x64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-linux-x64-gnu-6koy6r9d',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-linux-arm64-gnu-FuF3SwQS',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-win32-arm64-msvc': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-win32-arm64-msvc-tspb29o3',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-x64-musl': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.lightningcss-linux-x64-musl-n6Pz2nWB',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\ohash': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.ohash-RY94wE6J',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\reka-ui': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\.reka-ui-CTeoY2N6',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\dom': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\.dom-JHCwhD6v',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\core': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\.core-1SAqkiVJ',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\utils': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\.utils-E5VpvWTT',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\vue': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@floating-ui\\.vue-YTH9aSxI',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@internationalized\\date': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@internationalized\\.date-WnKiIc1S',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@internationalized\\number': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@internationalized\\.number-quqVuDeo',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@fontsource-variable\\noto-serif': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@fontsource-variable\\.noto-serif-iH2qf7n9',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-android-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-android-arm64-K3ajMeg7',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-darwin-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-darwin-arm64-tpCTPNZx',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-darwin-x64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-darwin-x64-BMmMnGEK',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-freebsd-x64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-freebsd-x64-K1WWA0eH',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-linux-arm64-gnu-zaVQ9iS8',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm64-musl': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-linux-arm64-musl-mLPMNLCB',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-ppc64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-linux-ppc64-gnu-cw5xOSW3',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-s390x-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-linux-s390x-gnu-WFeRPDWp',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-x64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-linux-x64-gnu-ic9PT8v9',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm-gnueabihf': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-linux-arm-gnueabihf-Slhy6SLc',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-x64-musl': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-linux-x64-musl-XHUhN0kV',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-openharmony-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-openharmony-arm64-8EBu07Go',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-win32-arm64-msvc': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\.binding-win32-arm64-msvc-IBWL0xPS',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-android-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-android-arm64-RNZkQU0O',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-darwin-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-darwin-arm64-3I9uube5',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-darwin-x64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-darwin-x64-mbCt9nTk',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-freebsd-x64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-freebsd-x64-vRYXMyvp',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm-gnueabihf': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-linux-arm-gnueabihf-lChMF1Ha',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-linux-arm64-gnu-3brGL5UB',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm64-musl': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-linux-arm64-musl-8Y5KVhfl',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-x64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-linux-x64-gnu-aZfMJ7KS',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-x64-musl': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-linux-x64-musl-sgFAUdf2',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-wasm32-wasi': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-wasm32-wasi-TUN0LQie',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-win32-arm64-msvc': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\.oxide-win32-arm64-msvc-P6e3QAlL',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tanstack\\virtual-core': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tanstack\\.virtual-core-n0mA0o1A',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tanstack\\vue-virtual': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tanstack\\.vue-virtual-SUMjjZAb',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\core': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\.core-C20Ztt21',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\metadata': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\.metadata-Z1ozI7f7',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\shared': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@vueuse\\.shared-GcVc8kFc',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-darwin-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-darwin-arm64-5NGChmsw',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-darwin-x64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-darwin-x64-6y4oPRL7',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-freebsd-x64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-freebsd-x64-W9SMhrM7',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-android-arm64': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-android-arm64-8pPEtyZb',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-linux-arm64-gnu-oGhTjyiG',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm-gnueabihf': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-linux-arm-gnueabihf-lXvQ0Q8K',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm64-musl': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-linux-arm64-musl-io9HKsba',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-x64-gnu': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-linux-x64-gnu-MIzaivqC',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-x64-musl': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-linux-x64-musl-7KLFQUUk',
+76 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-win32-arm64-msvc': 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\.lightningcss-win32-arm64-msvc-ncbJ6cZK'
+76 silly reify }
+77 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-wasm32-wasi
+78 silly reify mark deleted [
+78 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-wasm32-wasi'
+78 silly reify ]
+79 silly audit bulk request {
+79 silly audit   '@babel/generator': [ '8.0.0' ],
+79 silly audit   '@babel/helper-string-parser': [ '8.0.0', '7.29.7' ],
+79 silly audit   '@babel/helper-validator-identifier': [ '8.0.4', '7.29.7' ],
+79 silly audit   '@babel/parser': [ '8.0.4', '7.29.8' ],
+79 silly audit   '@babel/types': [ '8.0.4', '7.29.8' ],
+79 silly audit   '@floating-ui/core': [ '1.8.0' ],
+79 silly audit   '@floating-ui/dom': [ '1.8.0' ],
+79 silly audit   '@floating-ui/utils': [ '0.2.12' ],
+79 silly audit   '@floating-ui/vue': [ '1.1.11' ],
+79 silly audit   'vue-demi': [ '0.14.10' ],
+79 silly audit   '@fontsource-variable/noto-sans': [ '5.3.0' ],
+79 silly audit   '@fontsource-variable/noto-serif': [ '5.3.0' ],
+79 silly audit   '@internationalized/date': [ '3.12.4' ],
+79 silly audit   '@internationalized/number': [ '3.6.8' ],
+79 silly audit   '@jridgewell/gen-mapping': [ '0.3.13' ],
+79 silly audit   '@jridgewell/remapping': [ '2.3.5' ],
+79 silly audit   '@jridgewell/resolve-uri': [ '3.1.2' ],
+79 silly audit   '@jridgewell/sourcemap-codec': [ '1.5.5' ],
+79 silly audit   '@jridgewell/trace-mapping': [ '0.3.31' ],
+79 silly audit   '@oxc-project/types': [ '0.143.0' ],
+79 silly audit   '@phosphor-icons/vue': [ '2.2.1' ],
+79 silly audit   '@playwright/test': [ '1.63.0' ],
+79 silly audit   '@rolldown/binding-android-arm64': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-darwin-arm64': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-darwin-x64': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-freebsd-x64': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-linux-arm-gnueabihf': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-linux-arm64-gnu': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-linux-arm64-musl': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-linux-ppc64-gnu': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-linux-s390x-gnu': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-linux-x64-gnu': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-linux-x64-musl': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-openharmony-arm64': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-win32-arm64-msvc': [ '1.2.3' ],
+79 silly audit   '@rolldown/binding-win32-x64-msvc': [ '1.2.3' ],
+79 silly audit   '@rolldown/pluginutils': [ '1.0.1' ],
+79 silly audit   '@supabase/auth-js': [ '2.112.3' ],
+79 silly audit   '@supabase/functions-js': [ '2.112.3' ],
+79 silly audit   '@supabase/phoenix': [ '0.4.5' ],
+79 silly audit   '@supabase/postgrest-js': [ '2.112.3' ],
+79 silly audit   '@supabase/realtime-js': [ '2.112.3' ],
+79 silly audit   '@supabase/storage-js': [ '2.112.3' ],
+79 silly audit   '@supabase/supabase-js': [ '2.112.3' ],
+79 silly audit   '@swc/helpers': [ '0.5.23' ],
+79 silly audit   '@tailwindcss/node': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-android-arm64': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-darwin-arm64': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-darwin-x64': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-freebsd-x64': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-linux-arm-gnueabihf': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-linux-arm64-gnu': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-linux-arm64-musl': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-linux-x64-gnu': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-linux-x64-musl': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-win32-arm64-msvc': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/oxide-win32-x64-msvc': [ '4.3.3' ],
+79 silly audit   '@tailwindcss/vite': [ '4.3.3' ],
+79 silly audit   '@tanstack/virtual-core': [ '3.17.11' ],
+79 silly audit   '@tanstack/vue-virtual': [ '3.13.39' ],
+79 silly audit   '@types/jsesc': [ '2.5.1' ],
+79 silly audit   '@types/web-bluetooth': [ '0.0.21' ],
+79 silly audit   '@vitejs/plugin-vue': [ '6.0.8' ],
+79 silly audit   '@vue-macros/common': [ '3.1.4' ],
+79 silly audit   '@vue/compiler-core': [ '3.5.41' ],
+79 silly audit   '@vue/compiler-dom': [ '3.5.41' ],
+79 silly audit   '@vue/compiler-sfc': [ '3.5.41' ],
+79 silly audit   '@vue/compiler-ssr': [ '3.5.41' ],
+79 silly audit   '@vue/devtools-api': [ '8.2.1' ],
+79 silly audit   '@vue/devtools-kit': [ '8.2.1' ],
+79 silly audit   '@vue/devtools-shared': [ '8.2.1' ],
+79 silly audit   '@vue/reactivity': [ '3.5.41' ],
+79 silly audit   '@vue/runtime-core': [ '3.5.41' ],
+79 silly audit   '@vue/runtime-dom': [ '3.5.41' ],
+79 silly audit   '@vue/server-renderer': [ '3.5.41' ],
+79 silly audit   '@vue/shared': [ '3.5.41' ],
+79 silly audit   '@vueuse/core': [ '14.4.0' ],
+79 silly audit   '@vueuse/metadata': [ '14.4.0' ],
+79 silly audit   '@vueuse/shared': [ '14.4.0' ],
+79 silly audit   acorn: [ '8.18.0' ],
+79 silly audit   'aria-hidden': [ '1.2.6' ],
+79 silly audit   'ast-kit': [ '2.2.0' ],
+79 silly audit   'ast-walker-scope': [ '0.9.0' ],
+79 silly audit   birpc: [ '2.9.0' ],
+79 silly audit   chokidar: [ '5.0.0' ],
+79 silly audit   confbox: [ '0.2.4', '0.1.8' ],
+79 silly audit   csstype: [ '3.2.3' ],
+79 silly audit   defu: [ '6.1.7' ],
+79 silly audit   'detect-libc': [ '2.1.2' ],
+79 silly audit   'enhanced-resolve': [ '5.24.5' ],
+79 silly audit   entities: [ '7.0.1' ],
+79 silly audit   'estree-walker': [ '2.0.2' ],
+79 silly audit   exsolve: [ '1.1.1' ],
+79 silly audit   fdir: [ '6.5.0' ],
+79 silly audit   fsevents: [ '2.3.3' ],
+79 silly audit   'graceful-fs': [ '4.2.11' ],
+79 silly audit   hookable: [ '5.5.3' ],
+79 silly audit   'iceberg-js': [ '0.8.1' ],
+79 silly audit   jiti: [ '2.7.0' ],
+79 silly audit   jsesc: [ '3.1.0' ],
+79 silly audit   json5: [ '2.2.3' ],
+79 silly audit   lightningcss: [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-android-arm64': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-darwin-arm64': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-darwin-x64': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-freebsd-x64': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-linux-arm-gnueabihf': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-linux-arm64-gnu': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-linux-arm64-musl': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-linux-x64-gnu': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-linux-x64-musl': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-win32-arm64-msvc': [ '1.32.0', '1.33.0' ],
+79 silly audit   'lightningcss-win32-x64-msvc': [ '1.32.0', '1.33.0' ],
+79 silly audit   'local-pkg': [ '1.2.1' ],
+79 silly audit   'magic-string': [ '0.30.21' ],
+79 silly audit   'magic-string-ast': [ '1.0.3' ],
+79 silly audit   mlly: [ '1.8.2' ],
+79 silly audit   'pkg-types': [ '1.3.1', '2.3.1' ],
+79 silly audit   'muggle-string': [ '0.4.1' ],
+79 silly audit   nanoid: [ '3.3.18' ],
+79 silly audit   nostics: [ '1.2.0' ],
+79 silly audit   ohash: [ '2.0.12' ],
+79 silly audit   pathe: [ '2.0.3' ],
+79 silly audit   'perfect-debounce': [ '2.1.0' ],
+79 silly audit   picocolors: [ '1.1.1' ],
+79 silly audit   picomatch: [ '4.0.5' ],
+79 silly audit   playwright: [ '1.63.0' ],
+79 silly audit   'playwright-core': [ '1.63.0' ],
+79 silly audit   postcss: [ '8.5.26' ],
+79 silly audit   quansync: [ '0.2.11' ],
+79 silly audit   readdirp: [ '5.1.1' ],
+79 silly audit   'reka-ui': [ '2.10.4' ],
+79 silly audit   rolldown: [ '1.2.3' ],
+79 silly audit   scule: [ '1.3.0' ],
+79 silly audit   'source-map-js': [ '1.2.1' ],
+79 silly audit   tailwindcss: [ '4.3.3' ],
+79 silly audit   tapable: [ '2.3.3' ],
+79 silly audit   tinyglobby: [ '0.2.17' ],
+79 silly audit   tslib: [ '2.8.1' ],
+79 silly audit   ufo: [ '1.6.4' ],
+79 silly audit   unplugin: [ '3.3.0' ],
+79 silly audit   'unplugin-utils': [ '0.3.2' ],
+79 silly audit   vite: [ '8.2.1' ],
+79 silly audit   vue: [ '3.5.41' ],
+79 silly audit   'vue-router': [ '5.2.0' ],
+79 silly audit   'webpack-virtual-modules': [ '0.6.2' ],
+79 silly audit   yaml: [ '2.9.0' ],
+79 silly audit   '@tailwindcss/oxide-wasm32-wasi': [ '4.3.3' ]
+79 silly audit }
+80 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-win32-arm64-msvc
+81 silly reify mark deleted [
+81 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-win32-arm64-msvc'
+81 silly reify ]
+82 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-linux-x64-musl
+83 silly reify mark deleted [
+83 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-x64-musl'
+83 silly reify ]
+84 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-linux-x64-gnu
+85 silly reify mark deleted [
+85 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-x64-gnu'
+85 silly reify ]
+86 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-linux-arm64-musl
+87 silly reify mark deleted [
+87 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm64-musl'
+87 silly reify ]
+88 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-linux-arm-gnueabihf
+89 silly reify mark deleted [
+89 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm-gnueabihf'
+89 silly reify ]
+90 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-linux-arm64-gnu
+91 silly reify mark deleted [
+91 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-linux-arm64-gnu'
+91 silly reify ]
+92 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-android-arm64
+93 silly reify mark deleted [
+93 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-android-arm64'
+93 silly reify ]
+94 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-freebsd-x64
+95 silly reify mark deleted [
+95 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-freebsd-x64'
+95 silly reify ]
+96 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-darwin-x64
+97 silly reify mark deleted [
+97 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-darwin-x64'
+97 silly reify ]
+98 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\vite\node_modules\lightningcss-darwin-arm64
+99 silly reify mark deleted [
+99 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\vite\\node_modules\\lightningcss-darwin-arm64'
+99 silly reify ]
+100 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-win32-arm64-msvc
+101 silly reify mark deleted [
+101 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-win32-arm64-msvc'
+101 silly reify ]
+102 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-linux-x64-musl
+103 silly reify mark deleted [
+103 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-x64-musl'
+103 silly reify ]
+104 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-linux-x64-gnu
+105 silly reify mark deleted [
+105 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-x64-gnu'
+105 silly reify ]
+106 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-linux-arm64-musl
+107 silly reify mark deleted [
+107 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm64-musl'
+107 silly reify ]
+108 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-linux-arm64-gnu
+109 silly reify mark deleted [
+109 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm64-gnu'
+109 silly reify ]
+110 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-linux-arm-gnueabihf
+111 silly reify mark deleted [
+111 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-linux-arm-gnueabihf'
+111 silly reify ]
+112 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-freebsd-x64
+113 silly reify mark deleted [
+113 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-freebsd-x64'
+113 silly reify ]
+114 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-darwin-x64
+115 silly reify mark deleted [
+115 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-darwin-x64'
+115 silly reify ]
+116 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-darwin-arm64
+117 silly reify mark deleted [
+117 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-darwin-arm64'
+117 silly reify ]
+118 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@tailwindcss\oxide-android-arm64
+119 silly reify mark deleted [
+119 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@tailwindcss\\oxide-android-arm64'
+119 silly reify ]
+120 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-win32-arm64-msvc
+121 silly reify mark deleted [
+121 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-win32-arm64-msvc'
+121 silly reify ]
+122 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-openharmony-arm64
+123 silly reify mark deleted [
+123 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-openharmony-arm64'
+123 silly reify ]
+124 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-linux-x64-musl
+125 silly reify mark deleted [
+125 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-x64-musl'
+125 silly reify ]
+126 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-linux-arm-gnueabihf
+127 silly reify mark deleted [
+127 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm-gnueabihf'
+127 silly reify ]
+128 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-linux-x64-gnu
+129 silly reify mark deleted [
+129 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-x64-gnu'
+129 silly reify ]
+130 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-linux-s390x-gnu
+131 silly reify mark deleted [
+131 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-s390x-gnu'
+131 silly reify ]
+132 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-linux-ppc64-gnu
+133 silly reify mark deleted [
+133 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-ppc64-gnu'
+133 silly reify ]
+134 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-linux-arm64-musl
+135 silly reify mark deleted [
+135 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm64-musl'
+135 silly reify ]
+136 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-linux-arm64-gnu
+137 silly reify mark deleted [
+137 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-linux-arm64-gnu'
+137 silly reify ]
+138 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-freebsd-x64
+139 silly reify mark deleted [
+139 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-freebsd-x64'
+139 silly reify ]
+140 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-darwin-x64
+141 silly reify mark deleted [
+141 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-darwin-x64'
+141 silly reify ]
+142 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-darwin-arm64
+143 silly reify mark deleted [
+143 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-darwin-arm64'
+143 silly reify ]
+144 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\@rolldown\binding-android-arm64
+145 silly reify mark deleted [
+145 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\@rolldown\\binding-android-arm64'
+145 silly reify ]
+146 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-linux-x64-musl
+147 silly reify mark deleted [
+147 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-x64-musl'
+147 silly reify ]
+148 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-win32-arm64-msvc
+149 silly reify mark deleted [
+149 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-win32-arm64-msvc'
+149 silly reify ]
+150 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-linux-arm64-gnu
+151 silly reify mark deleted [
+151 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm64-gnu'
+151 silly reify ]
+152 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-linux-x64-gnu
+153 silly reify mark deleted [
+153 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-x64-gnu'
+153 silly reify ]
+154 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-linux-arm64-musl
+155 silly reify mark deleted [
+155 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm64-musl'
+155 silly reify ]
+156 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-freebsd-x64
+157 silly reify mark deleted [
+157 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-freebsd-x64'
+157 silly reify ]
+158 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-linux-arm-gnueabihf
+159 silly reify mark deleted [
+159 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-linux-arm-gnueabihf'
+159 silly reify ]
+160 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-darwin-x64
+161 silly reify mark deleted [
+161 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-darwin-x64'
+161 silly reify ]
+162 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-darwin-arm64
+163 silly reify mark deleted [
+163 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-darwin-arm64'
+163 silly reify ]
+164 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\lightningcss-android-arm64
+165 silly reify mark deleted [
+165 silly reify   'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\lightningcss-android-arm64'
+165 silly reify ]
+166 verbose reify failed optional dependency C:\marc code\mssabagabo\msabagabo\node_modules\fsevents
+167 silly reify mark deleted [ 'C:\\marc code\\mssabagabo\\msabagabo\\node_modules\\fsevents' ]
+168 silly tarball no local data for @tanstack/vue-virtual@https://registry.npmjs.org/@tanstack/vue-virtual/-/vue-virtual-3.13.39.tgz. Extracting by manifest.
+169 silly tarball no local data for @fontsource-variable/noto-serif@https://registry.npmjs.org/@fontsource-variable/noto-serif/-/noto-serif-5.3.0.tgz. Extracting by manifest.
+170 silly tarball no local data for @vueuse/core@https://registry.npmjs.org/@vueuse/core/-/core-14.4.0.tgz. Extracting by manifest.
+171 silly tarball no local data for @vueuse/shared@https://registry.npmjs.org/@vueuse/shared/-/shared-14.4.0.tgz. Extracting by manifest.
+172 silly tarball no local data for @tanstack/virtual-core@https://registry.npmjs.org/@tanstack/virtual-core/-/virtual-core-3.17.11.tgz. Extracting by manifest.
+173 silly tarball no local data for @vueuse/metadata@https://registry.npmjs.org/@vueuse/metadata/-/metadata-14.4.0.tgz. Extracting by manifest.
+174 silly tarball no local data for vue-demi@https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz. Extracting by manifest.
+175 silly tarball no local data for @floating-ui/vue@https://registry.npmjs.org/@floating-ui/vue/-/vue-1.1.11.tgz. Extracting by manifest.
+176 silly tarball no local data for @floating-ui/utils@https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.12.tgz. Extracting by manifest.
+177 silly tarball no local data for @internationalized/number@https://registry.npmjs.org/@internationalized/number/-/number-3.6.8.tgz. Extracting by manifest.
+178 silly tarball no local data for @floating-ui/dom@https://registry.npmjs.org/@floating-ui/dom/-/dom-1.8.0.tgz. Extracting by manifest.
+179 silly tarball no local data for @floating-ui/core@https://registry.npmjs.org/@floating-ui/core/-/core-1.8.0.tgz. Extracting by manifest.
+180 silly tarball no local data for @internationalized/date@https://registry.npmjs.org/@internationalized/date/-/date-3.12.4.tgz. Extracting by manifest.
+181 silly tarball no local data for reka-ui@https://registry.npmjs.org/reka-ui/-/reka-ui-2.10.4.tgz. Extracting by manifest.
+182 silly tarball no local data for ohash@https://registry.npmjs.org/ohash/-/ohash-2.0.12.tgz. Extracting by manifest.
+183 silly tarball no local data for aria-hidden@https://registry.npmjs.org/aria-hidden/-/aria-hidden-1.2.6.tgz. Extracting by manifest.
+184 http fetch GET 200 https://registry.npmjs.org/vue-demi/-/vue-demi-0.14.10.tgz 760ms (cache miss)
+185 http fetch GET 200 https://registry.npmjs.org/ohash/-/ohash-2.0.12.tgz 778ms (cache miss)
+186 http fetch GET 200 https://registry.npmjs.org/aria-hidden/-/aria-hidden-1.2.6.tgz 919ms (cache miss)
+187 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 1041ms
+188 silly audit report {}
+189 http fetch GET 200 https://registry.npmjs.org/@vueuse/metadata/-/metadata-14.4.0.tgz 1598ms (cache miss)
+190 http fetch GET 200 https://registry.npmjs.org/@floating-ui/vue/-/vue-1.1.11.tgz 1634ms (cache miss)
+191 http fetch GET 200 https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.12.tgz 1658ms (cache miss)
+192 http fetch GET 200 https://registry.npmjs.org/@vueuse/shared/-/shared-14.4.0.tgz 1817ms (cache miss)
+193 http fetch GET 200 https://registry.npmjs.org/@floating-ui/core/-/core-1.8.0.tgz 2723ms (cache miss)
+194 http fetch GET 200 https://registry.npmjs.org/@tanstack/vue-virtual/-/vue-virtual-3.13.39.tgz 2918ms (cache miss)
+195 http fetch GET 200 https://registry.npmjs.org/@floating-ui/dom/-/dom-1.8.0.tgz 2966ms (cache miss)
+196 http fetch GET 200 https://registry.npmjs.org/@tanstack/virtual-core/-/virtual-core-3.17.11.tgz 3872ms (cache miss)
+197 http fetch GET 200 https://registry.npmjs.org/@internationalized/date/-/date-3.12.4.tgz 4118ms (cache miss)
+198 http fetch GET 200 https://registry.npmjs.org/@vueuse/core/-/core-14.4.0.tgz 4408ms (cache miss)
+199 http fetch GET 200 https://registry.npmjs.org/@internationalized/number/-/number-3.6.8.tgz 4407ms (cache miss)
+200 http fetch GET 200 https://registry.npmjs.org/reka-ui/-/reka-ui-2.10.4.tgz 11534ms (cache miss)
+201 http fetch GET 200 https://registry.npmjs.org/@fontsource-variable/noto-serif/-/noto-serif-5.3.0.tgz 17474ms (cache miss)
+202 info run vue-demi@0.14.10 postinstall node_modules/@floating-ui/vue/node_modules/vue-demi node -e "try{require('./scripts/postinstall.js')}catch(e){}"
+203 info run vue-demi@0.14.10 postinstall { code: 0, signal: null }
+204 silly CHANGE node_modules/vite/node_modules/lightningcss-win32-arm64-msvc
+205 silly CHANGE node_modules/vite/node_modules/lightningcss-linux-x64-musl
+206 silly CHANGE node_modules/vite/node_modules/lightningcss-linux-x64-gnu
+207 silly CHANGE node_modules/vite/node_modules/lightningcss-linux-arm64-musl
+208 silly CHANGE node_modules/vite/node_modules/lightningcss-linux-arm-gnueabihf
+209 silly CHANGE node_modules/vite/node_modules/lightningcss-linux-arm64-gnu
+210 silly CHANGE node_modules/vite/node_modules/lightningcss-android-arm64
+211 silly CHANGE node_modules/vite/node_modules/lightningcss-freebsd-x64
+212 silly CHANGE node_modules/vite/node_modules/lightningcss-darwin-x64
+213 silly CHANGE node_modules/vite/node_modules/lightningcss-darwin-arm64
+214 silly CHANGE node_modules/@vueuse/shared
+215 silly CHANGE node_modules/@vueuse/metadata
+216 silly CHANGE node_modules/@vueuse/core
+217 silly CHANGE node_modules/@tanstack/vue-virtual
+218 silly CHANGE node_modules/@tanstack/virtual-core
+219 silly CHANGE node_modules/@tailwindcss/oxide-win32-arm64-msvc
+220 silly CHANGE node_modules/@tailwindcss/oxide-wasm32-wasi
+221 silly CHANGE node_modules/@tailwindcss/oxide-linux-x64-musl
+222 silly CHANGE node_modules/@tailwindcss/oxide-linux-x64-gnu
+223 silly CHANGE node_modules/@tailwindcss/oxide-linux-arm64-musl
+224 silly CHANGE node_modules/@tailwindcss/oxide-linux-arm64-gnu
+225 silly CHANGE node_modules/@tailwindcss/oxide-linux-arm-gnueabihf
+226 silly CHANGE node_modules/@tailwindcss/oxide-freebsd-x64
+227 silly CHANGE node_modules/@tailwindcss/oxide-darwin-x64
+228 silly CHANGE node_modules/@tailwindcss/oxide-darwin-arm64
+229 silly CHANGE node_modules/@tailwindcss/oxide-android-arm64
+230 silly CHANGE node_modules/@rolldown/binding-win32-arm64-msvc
+231 silly CHANGE node_modules/@rolldown/binding-openharmony-arm64
+232 silly CHANGE node_modules/@rolldown/binding-linux-x64-musl
+233 silly CHANGE node_modules/@rolldown/binding-linux-arm-gnueabihf
+234 silly CHANGE node_modules/@rolldown/binding-linux-x64-gnu
+235 silly CHANGE node_modules/@rolldown/binding-linux-s390x-gnu
+236 silly CHANGE node_modules/@rolldown/binding-linux-ppc64-gnu
+237 silly CHANGE node_modules/@rolldown/binding-linux-arm64-musl
+238 silly CHANGE node_modules/@rolldown/binding-linux-arm64-gnu
+239 silly CHANGE node_modules/@rolldown/binding-freebsd-x64
+240 silly CHANGE node_modules/@rolldown/binding-darwin-x64
+241 silly CHANGE node_modules/@rolldown/binding-darwin-arm64
+242 silly CHANGE node_modules/@rolldown/binding-android-arm64
+243 silly CHANGE node_modules/@fontsource-variable/noto-serif
+244 silly CHANGE node_modules/@internationalized/number
+245 silly CHANGE node_modules/@internationalized/date
+246 silly CHANGE node_modules/@floating-ui/vue
+247 silly CHANGE node_modules/@floating-ui/vue/node_modules/vue-demi
+248 silly CHANGE node_modules/@floating-ui/utils
+249 silly CHANGE node_modules/@floating-ui/core
+250 silly CHANGE node_modules/@floating-ui/dom
+251 silly CHANGE node_modules/reka-ui
+252 silly CHANGE node_modules/ohash
+253 silly CHANGE node_modules/lightningcss-linux-x64-musl
+254 silly CHANGE node_modules/lightningcss-win32-arm64-msvc
+255 silly CHANGE node_modules/lightningcss-linux-arm64-gnu
+256 silly CHANGE node_modules/lightningcss-linux-x64-gnu
+257 silly CHANGE node_modules/lightningcss-linux-arm64-musl
+258 silly CHANGE node_modules/lightningcss-freebsd-x64
+259 silly CHANGE node_modules/lightningcss-linux-arm-gnueabihf
+260 silly CHANGE node_modules/lightningcss-darwin-x64
+261 silly CHANGE node_modules/lightningcss-darwin-arm64
+262 silly CHANGE node_modules/lightningcss-android-arm64
+263 silly CHANGE node_modules/fsevents
+264 silly CHANGE node_modules/aria-hidden
+265 verbose cwd C:\marc code\mssabagabo\msabagabo
+266 verbose os Windows_NT 10.0.26200
+267 verbose node v20.19.1
+268 verbose npm  v10.8.2
+269 verbose exit 0
+270 info ok

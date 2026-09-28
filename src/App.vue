@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router'
 import { useRoute } from 'vue-router'
 import SiteFooter from './components/SiteFooter.vue'
 import SiteHeader from './components/SiteHeader.vue'
+import MrSsabagabo from './components/MrSsabagabo.vue'
 
 const route = useRoute()
 </script>
@@ -18,5 +19,6 @@ const route = useRoute()
       </RouterView>
     </main>
     <SiteFooter v-if="!route.meta.admin" />
+    <MrSsabagabo v-if="!route.meta.admin" />
   </div>
 </template>

@@ -28,6 +28,39 @@ The protected CMS is available at `/admin`. It uses Supabase Authentication, Pos
 
 Never place a Supabase secret key, `service_role` key, database password, or personal access token in a `VITE_` variable or commit it to Git. Every `VITE_` variable is bundled into the browser; this application only needs the publishable key.
 
+## Mr. Ssabagabo AI service guide
+
+The public website includes an AI municipal information guide. Its browser component calls the `mr-ssabagabo` Supabase Edge Function, which searches only published `service_guides`, `departments` and `publications` before requesting a grounded answer from the OpenAI Responses API.
+
+### Deploy
+
+1. Apply `supabase/migrations/006_mr_ssabagabo.sql` to the Supabase project.
+2. Add the server-only Edge Function secrets:
+
+   ```sh
+   supabase secrets set OPENAI_API_KEY=... OPENAI_CHAT_MODEL=gpt-5.4-mini CHAT_ALLOWED_ORIGINS=https://your-domain.example CHAT_RATE_LIMIT_SALT=...
+   ```
+
+3. Deploy the function:
+
+   ```sh
+   supabase functions deploy mr-ssabagabo
+   ```
+
+4. In `/admin`, open **Departments & services > AI service guides**. Verify each process with the responsible office before publishing it.
+
+If the browser reports `Failed to send a request to the Edge Function`, verify deployment with:
+
+```sh
+curl -i https://YOUR_PROJECT_REF.supabase.co/functions/v1/mr-ssabagabo
+```
+
+A `404` response with `Requested function was not found` means step 3 has not been completed for that Supabase project. The database migration and function deployment are both required.
+
+The OpenAI API key and service-role key must remain server-side. The function sends only the visitor's question, a short conversation history and retrieved public excerpts. It sets `store: false` on every model request. Do not add private CMS collections to `search_public_assistant_knowledge`.
+
+The migration includes one conservative education-enquiry guide. It does not claim unverified requirements, fees or processing times. Replace it with Client Charter guidance after municipal review.
+
 Roles:
 
 - `editor`: creates and updates drafts.
