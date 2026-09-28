@@ -46,14 +46,6 @@ const isExternal = (to) => /^(https?:|mailto:|tel:)/i.test(to || '')
   <section class="page-hero" :class="`page-hero--${variant}`" :style="heroStyle">
     <figure class="page-hero__media">
       <img
-        class="page-hero__backdrop"
-        :src="content.image"
-        alt=""
-        aria-hidden="true"
-        loading="eager"
-        decoding="async"
-      />
-      <img
         class="page-hero__illustration"
         :src="content.image"
         :alt="content.imageAlt"

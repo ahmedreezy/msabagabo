@@ -27,9 +27,15 @@ let scrollFrame
 let headerResizeObserver
 let homeSections = []
 
-const syncHeaderHeight = () => {
+const HEADER_COMPACT_ENTER_Y = 64
+const HEADER_COMPACT_EXIT_Y = 8
+
+const syncHeaderHeight = (syncHeroHeight = false) => {
   const height = headerElement.value?.offsetHeight
-  if (height) document.documentElement.style.setProperty('--site-header-height', `${height}px`)
+  if (!height) return
+
+  document.documentElement.style.setProperty('--site-header-height', `${height}px`)
+  if (syncHeroHeight) document.documentElement.style.setProperty('--hero-header-height', `${height}px`)
 }
 
 const navigation = [
@@ -102,14 +108,18 @@ const handleOutsidePointer = (event) => {
 
 const handleResize = () => {
   if (window.innerWidth >= 1200) closeMenus()
-  syncHeaderHeight()
+  syncHeaderHeight(!isScrolled.value)
   handleScroll()
 }
 
 const handleScroll = () => {
   if (scrollFrame) return
   scrollFrame = window.requestAnimationFrame(() => {
-    isScrolled.value = window.scrollY > 24
+    const compactHeader = isScrolled.value
+      ? window.scrollY > HEADER_COMPACT_EXIT_Y
+      : window.scrollY > HEADER_COMPACT_ENTER_Y
+
+    if (compactHeader !== isScrolled.value) isScrolled.value = compactHeader
     updateActiveHomeSection()
     scrollFrame = undefined
   })
@@ -156,9 +166,9 @@ onMounted(() => {
   document.addEventListener('pointerdown', handleOutsidePointer)
   nextTick(() => {
     collectHomeSections()
-    syncHeaderHeight()
+    syncHeaderHeight(true)
     if ('ResizeObserver' in window && headerElement.value) {
-      headerResizeObserver = new ResizeObserver(syncHeaderHeight)
+      headerResizeObserver = new ResizeObserver(() => syncHeaderHeight())
       headerResizeObserver.observe(headerElement.value)
     }
   })
@@ -169,6 +179,7 @@ onBeforeUnmount(() => {
   document.body.style.overflow = ''
   headerResizeObserver?.disconnect()
   document.documentElement.style.removeProperty('--site-header-height')
+  document.documentElement.style.removeProperty('--hero-header-height')
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('resize', handleResize)
@@ -270,4 +281,5 @@ onBeforeUnmount(() => {
       </div>
     </Transition>
   </header>
+  <div class="site-header-spacer" aria-hidden="true"></div>
 </template>
