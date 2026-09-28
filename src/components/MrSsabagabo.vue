@@ -35,6 +35,8 @@ const panel = ref(null)
 const input = ref(null)
 const messageList = ref(null)
 
+const isNetlifyPreview = /(^|\.)netlify\.(app|live)$/i.test(window.location.hostname)
+
 const remainingCharacters = computed(() => 500 - question.value.length)
 
 const safeHref = (url) => {
@@ -131,7 +133,10 @@ onBeforeUnmount(() => document.body.classList.remove('assistant-open'))
 </script>
 
 <template>
-  <div class="municipal-assistant">
+  <div
+    class="municipal-assistant"
+    :class="{ 'municipal-assistant--netlify-preview': isNetlifyPreview }"
+  >
     <button
       v-if="!isOpen"
       ref="trigger"
@@ -236,7 +241,8 @@ onBeforeUnmount(() => document.body.classList.remove('assistant-open'))
 </template>
 
 <style scoped>
-.municipal-assistant { position: fixed; right: clamp(1rem, 2.5vw, 2rem); bottom: clamp(1rem, 2.5vw, 2rem); z-index: 60; }
+.municipal-assistant { --assistant-bottom-offset: clamp(1rem, 2.5vw, 2rem); position: fixed; right: clamp(1rem, 2.5vw, 2rem); bottom: var(--assistant-bottom-offset); z-index: 60; }
+.municipal-assistant.municipal-assistant--netlify-preview { --assistant-bottom-offset: 5.5rem; }
 .assistant-trigger { display: flex; align-items: center; gap: .75rem; min-height: 3.75rem; border: 1px solid rgb(255 255 255 / .16); border-radius: .75rem; background: #17233a; padding: .55rem 1rem .55rem .6rem; color: #f8fafc; box-shadow: 0 1rem 3rem rgb(17 27 48 / .24); cursor: pointer; transition: transform 220ms ease, background-color 220ms ease; }
 .assistant-trigger:hover { transform: translateY(-2px); background: #243552; }
 .assistant-trigger:active { transform: scale(.98); }
@@ -244,7 +250,7 @@ onBeforeUnmount(() => document.body.classList.remove('assistant-open'))
 .assistant-trigger > span:last-child { display: grid; gap: .12rem; text-align: left; }
 .assistant-trigger strong { font-size: .86rem; line-height: 1.2; }
 .assistant-trigger small { color: rgb(255 255 255 / .66); font-size: .68rem; }
-.assistant-panel { display: grid; width: min(25rem, calc(100vw - 2rem)); height: min(43rem, calc(100dvh - 2rem)); grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; border: 1px solid rgb(17 27 48 / .14); border-radius: .9rem; background: #f8fafc; box-shadow: 0 1.5rem 5rem rgb(17 27 48 / .28); }
+.assistant-panel { display: grid; width: min(25rem, calc(100vw - 2rem)); height: min(43rem, calc(100dvh - var(--assistant-bottom-offset) - 1rem)); grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; border: 1px solid rgb(17 27 48 / .14); border-radius: .9rem; background: #f8fafc; box-shadow: 0 1.5rem 5rem rgb(17 27 48 / .28); }
 .assistant-header { display: flex; align-items: center; gap: .75rem; min-height: 4.5rem; background: #17233a; padding: .7rem .75rem; color: #f8fafc; }
 .assistant-avatar { display: grid; width: 2.8rem; height: 2.8rem; flex: 0 0 auto; place-items: center; border-radius: .6rem; background: #8f3f48; }
 .assistant-header__copy { display: grid; flex: 1; gap: .08rem; }
@@ -286,9 +292,10 @@ onBeforeUnmount(() => document.body.classList.remove('assistant-open'))
 .assistant-compose__meta a { display: inline-flex; align-items: center; gap: .2rem; color: #526078; font-weight: 750; }
 @keyframes assistant-pulse { 0%, 80%, 100% { transform: scale(.65); opacity: .45; } 40% { transform: scale(1); opacity: 1; } }
 @media (max-width: 639px) {
-  .municipal-assistant { right: .65rem; bottom: .65rem; left: .65rem; }
+  .municipal-assistant { --assistant-bottom-offset: .65rem; right: .65rem; left: .65rem; }
+  .municipal-assistant.municipal-assistant--netlify-preview { --assistant-bottom-offset: 5.5rem; }
   .assistant-trigger { margin-left: auto; }
-  .assistant-panel { width: 100%; height: calc(100dvh - 1.3rem); }
+  .assistant-panel { width: 100%; height: calc(100dvh - var(--assistant-bottom-offset) - .65rem); }
 }
 @media (prefers-reduced-motion: reduce) {
   .assistant-trigger { transition: none; }
