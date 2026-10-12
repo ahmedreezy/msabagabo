@@ -68,3 +68,7 @@ Roles:
 - `admin`: publisher permissions plus staff-role management at the database level.
 
 Use **Import starter content** once on an empty CMS to copy the current website content into drafts. Publishing an entry makes it available to the public website automatically; local source data remains the fallback if Supabase is unavailable.
+
+### Product-owner content update
+
+Apply `supabase/migrations/007_product_owner_content.sql` and then `supabase/migrations/008_content_revisions.sql` before importing the 2026 product-owner content. The first migration adds the CMS-managed FAQ collection; the second keeps revisions separate from live content and adds atomic release publishing. Use **Import starter content** in `/admin` to create missing records and non-destructive revisions as drafts. Resolve the editorial flags in `docs/product-owner-content-matrix.md`, mark each record approved, and use **Publish approved owner release** as a publisher or administrator.

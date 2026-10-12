@@ -409,7 +409,7 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="council-newsroom__layout">
-          <div class="news-editorial home-reveal">
+          <div v-if="updates.length" class="news-editorial home-reveal">
             <article class="news-editorial__feature">
               <img :src="updates[0].image" :alt="updates[0].title" />
               <div><p>{{ updates[0].type }} <span>/</span> {{ formatCmsDate(updates[0].date) }}</p><h3>{{ updates[0].title }}</h3><div>{{ updates[0].excerpt }}</div><RouterLink class="home-text-link" to="/news">Read the update <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink></div>
@@ -420,6 +420,7 @@ onBeforeUnmount(() => {
               <span><PhArrowRight :size="17" weight="bold" /></span>
             </RouterLink>
           </div>
+          <div v-else class="news-editorial home-reveal" role="status">Published council updates will appear here.</div>
 
           <aside class="notice-desk home-reveal" aria-labelledby="notice-heading">
             <div class="notice-desk__heading"><span><PhMegaphone :size="22" /></span><div><p>Official desk</p><h3 id="notice-heading">Notices &amp; advertisements</h3></div></div>
