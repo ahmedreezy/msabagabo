@@ -67,7 +67,7 @@ Roles:
 - `publisher`: publishes and deletes content.
 - `admin`: publisher permissions plus staff-role management at the database level.
 
-Use **Import starter content** once on an empty CMS to copy the current website content into drafts. Publishing an entry makes it available to the public website automatically; local source data remains the fallback if Supabase is unavailable.
+Use **Import starter content** once on an empty CMS to copy the current website content into drafts. Publishing an entry makes it available to the public website automatically. The site uses the complete approved bundled snapshot when Supabase is unavailable or has no published directorate baseline; it never merges a partial CMS response with individual fallback records.
 
 ### Product-owner content update
 

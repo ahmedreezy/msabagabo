@@ -44,15 +44,28 @@ test('owner department content and FAQs remain visible alongside existing CMS re
   await taxes.click()
   await expect(page.getByText('Bunamwaya, Masajja or Ndejje Division', { exact: false }).first()).toBeVisible()
   await expect(page.getByText('0782 395 800', { exact: false })).toBeVisible()
-  await expect(page.locator('section[aria-labelledby="directorate-faqs-heading"] details')).toHaveCount(7)
+  await expect(page.locator('.directorate-page section[data-section="faqs"] details')).toHaveCount(7)
 
   await page.goto('/directorates/community-services')
-  await expect(page.locator('section[aria-labelledby="directorate-faqs-heading"] details')).toHaveCount(2)
+  await expect(page.locator('.directorate-page section[data-section="faqs"] details')).toHaveCount(2)
 
   await page.goto('/faqs')
   await expect(page.locator('main details')).toHaveCount(9)
   await expect(page.getByText('Which local taxes and fees may a resident or business need to pay?', { exact: true })).toHaveCount(1)
   await expect(page.getByRole('link', { name: 'View directorate' })).toHaveCount(2)
+})
+
+test('every directorate uses the shared document layout and contained index illustration', async ({ page }) => {
+  await page.goto('/directorates')
+  await expect(page.locator('.directorates-hero__media')).toBeVisible()
+  await expect(page.locator('.page-hero')).toHaveCount(0)
+
+  for (const department of departments) {
+    await page.goto(`/directorates/${department.slug}`)
+    await expect(page.locator('.education-page')).toBeVisible()
+    await expect(page.locator('.page-hero')).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: department.name, exact: true })).toBeVisible()
+  }
 })
 
 test('complete GKMA programme remains visible alongside existing CMS projects', async ({ page }) => {
