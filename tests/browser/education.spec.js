@@ -112,7 +112,10 @@ test('published content hides empty sections, notes and missing photos', async (
 })
 
 test('existing departments keep their layout and unknown slugs show not found', async ({ page }) => {
-  await mockCms(page)
+  await mockCms(page, [{
+    id: 'leader-entry', collection: 'leadership', slug: 'mayor', title: 'Mayor',
+    payload: { name: 'Published CMS leader', role: 'Mayor' }, status: 'published', sort_order: 0,
+  }])
   await page.goto('/directorates/health')
   await expect(page.getByRole('heading', { name: 'Health', exact: true })).toBeVisible()
   await expect(page.locator('.education-page')).toHaveCount(0)
@@ -164,7 +167,7 @@ test('CMS publishes reviewed records without portraits and edits require fresh a
 })
 
 test('production excludes local drafts and unresolved published profiles', async ({ page }) => {
-  await mockCms(page)
+  await mockCms(page, [entryFor(baseDepartment(), 'published')])
   await page.goto('http://127.0.0.1:4174/departments/education-sports')
   await expect(page.locator('.education-page h1')).toHaveText('Education & Sports')
   await expect(page.locator('.education-draft-bar, .education-review-note, .education-schools')).toHaveCount(0)

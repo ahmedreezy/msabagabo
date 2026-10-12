@@ -3,13 +3,15 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { PhArrowRight, PhCheck, PhEnvelopeSimple, PhGavel, PhUsersThree } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
-import { cmsContent } from '../stores/cmsContent'
+import DirectorateFaqSection from '../components/DirectorateFaqSection.vue'
+import { cmsContent, formatCmsDate } from '../stores/cmsContent'
 import EducationDepartment from '../components/EducationDepartment.vue'
 import NotFoundView from './NotFoundView.vue'
 import { publicEducationProfile } from '../lib/educationProfile.js'
 
 const route = useRoute()
 const department = computed(() => cmsContent.departments.find((item) => item.slug === route.params.slug))
+const departmentFaqs = computed(() => cmsContent.faqs.filter((item) => item.departmentSlug === department.value?.slug))
 const educationDraft = ref(null)
 const educationPreview = computed(() => import.meta.env.DEV && !!educationDraft.value && !publicEducationProfile(department.value || {}))
 const educationDepartment = computed(() => educationPreview.value ? { ...department.value, educationProfile: department.value?.educationProfile || educationDraft.value } : department.value)
@@ -22,7 +24,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <EducationDepartment v-if="department?.slug === 'education-sports'" :department="educationDepartment" :preview="educationPreview" />
+  <EducationDepartment v-if="department?.slug === 'education-sports'" :department="educationDepartment" :faqs="departmentFaqs" :preview="educationPreview" />
   <div v-else-if="department">
     <PageIntro
       eyebrow="Municipal directorate"
@@ -56,6 +58,7 @@ onMounted(async () => {
             <p class="section-kicker">Mandate</p>
             <h2 class="mt-4 text-3xl font-extrabold tracking-[-0.04em] text-ink">What the directorate is responsible for</h2>
             <p class="cms-safe-text mt-5 text-base leading-8 text-ink/65">{{ department.mandate }}</p>
+            <p v-if="department.fieldSources?.mandate" class="mt-4 text-xs font-semibold text-ink/45">Source: {{ department.fieldSources.mandate.sourceTitle }} · {{ department.fieldSources.mandate.sourceSection }}</p>
           </section>
 
           <details class="editorial-disclosure bg-orange-50 px-6 sm:px-8">
@@ -76,6 +79,7 @@ onMounted(async () => {
                 {{ unit }}
               </div>
             </div>
+            <p v-if="department.fieldSources?.units" class="pb-6 text-xs font-semibold text-ink/45">Source: {{ department.fieldSources.units.sourceTitle }} · {{ department.fieldSources.units.sourceSection }}</p>
           </details>
 
           <section>
@@ -87,6 +91,8 @@ onMounted(async () => {
               </div>
             </div>
           </section>
+
+          <DirectorateFaqSection :faqs="departmentFaqs" />
 
           <section>
             <p class="section-kicker">People serving this directorate</p>
@@ -104,6 +110,11 @@ onMounted(async () => {
             </div>
             <p v-else class="mt-6 bg-sage-50 p-5 text-sm leading-6 text-ink/60">Team information is being prepared by the directorate.</p>
           </section>
+
+          <footer v-if="department.sourceTitle" class="flex flex-wrap justify-between gap-4 bg-canvas p-5 text-xs leading-5 text-ink/58">
+            <span><strong class="text-ink/75">Source:</strong> {{ department.sourceTitle }}</span>
+            <span v-if="department.lastReviewed">Reviewed {{ formatCmsDate(department.lastReviewed) }}</span>
+          </footer>
         </div>
       </div>
     </section>

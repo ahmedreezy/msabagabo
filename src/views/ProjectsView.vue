@@ -20,7 +20,9 @@ const projects = computed(() => cmsContent.projects)
               <span class="bg-sage-100 px-2.5 py-1 text-[0.65rem] font-bold text-civic-800">{{ project.status }}</span>
             </div>
             <h2 class="mt-4 text-xl font-extrabold tracking-[-0.03em]">{{ project.title }}</h2>
-            <button class="mt-6 inline-flex items-center gap-2 text-sm font-bold text-civic-700" type="button">Project details <PhArrowUpRight :size="16" weight="bold" /></button>
+            <p v-if="project.summary" class="mt-4 line-clamp-3 text-sm leading-6 text-ink/62">{{ project.summary }}</p>
+            <RouterLink v-if="project.slug" class="mt-6 inline-flex items-center gap-2 text-sm font-bold text-civic-700" :to="`/projects/${project.slug}`">Project details <PhArrowUpRight :size="16" weight="bold" /></RouterLink>
+            <span v-else class="mt-6 inline-flex items-center gap-2 text-sm font-bold text-ink/45">Details being prepared</span>
           </div>
         </article>
       </div>
