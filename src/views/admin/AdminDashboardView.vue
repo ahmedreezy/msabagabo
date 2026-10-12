@@ -12,6 +12,7 @@ import EducationProfileEditor from '../../components/admin/EducationProfileEdito
 import FaqContentEditor from '../../components/admin/FaqContentEditor.vue'
 import ProjectDetailsEditor from '../../components/admin/ProjectDetailsEditor.vue'
 import FaqAnswer from '../../components/FaqAnswer.vue'
+import DirectorateDepartment from '../../components/DirectorateDepartment.vue'
 import EducationDepartment from '../../components/EducationDepartment.vue'
 import { educationPublicationIssues, normalizeEducationProfile } from '../../lib/educationProfile.js'
 
@@ -794,19 +795,7 @@ onMounted(async () => {
             </article>
 
             <EducationDepartment v-else-if="selectedCollection === 'departments' && previewItem.slug === 'education-sports'" :department="previewItem" preview />
-            <article v-else-if="selectedCollection === 'departments'" class="cms-preview-department">
-              <header><p>Municipal department</p><h3>{{ previewItem.name || 'Department name' }}</h3><div>{{ previewItem.summary || 'Department introduction' }}</div></header>
-              <section><span>Mandate</span><p>{{ previewItem.mandate || 'Department mandate' }}</p></section>
-              <section><span>Department team</span>
-                <div v-if="previewItem.team?.length" class="cms-preview-team">
-                  <article v-for="(member, index) in previewItem.team" :key="index">
-                    <img v-if="member.photo" :src="member.photo" :alt="member.name || 'Team member'" /><div v-else class="cms-preview-placeholder">Photo</div>
-                    <div><p>{{ member.role || 'Official role' }}</p><h4>{{ member.name || 'Full name' }}</h4></div>
-                  </article>
-                </div>
-                <p v-else class="cms-preview-department__empty">Team members will appear here.</p>
-              </section>
-            </article>
+            <DirectorateDepartment v-else-if="selectedCollection === 'departments'" :department="previewItem" preview />
           </div>
 
           <footer class="admin-preview-dialog__footer"><p>Preview only · Your changes have not been saved or published.</p><button type="button" @click="closePreview">Back to editing</button></footer>

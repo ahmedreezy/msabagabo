@@ -118,7 +118,8 @@ test('existing departments keep their layout and unknown slugs show not found', 
   }])
   await page.goto('/directorates/health')
   await expect(page.getByRole('heading', { name: 'Health', exact: true })).toBeVisible()
-  await expect(page.locator('.education-page')).toHaveCount(0)
+  await expect(page.locator('.directorate-page')).toBeVisible()
+  await expect(page.locator('.education-school-filters')).toHaveCount(0)
   await page.goto('/directorates/no-such-department')
   await expect(page.getByRole('heading', { name: 'We could not find that page.' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Administration', exact: true })).toHaveCount(0)
@@ -178,6 +179,16 @@ test('production excludes local drafts and unresolved published profiles', async
   await page.reload()
   await expect(page.locator('.education-schools')).toHaveCount(0)
   await expect(page.locator('body')).not.toContainText('INTERNAL NOTE MUST STAY PRIVATE')
+})
+
+test('production keeps the approved snapshot until a department baseline is published', async ({ page }) => {
+  await mockCms(page, [{
+    id: 'leader-entry', collection: 'leadership', slug: 'mayor', title: 'Mayor',
+    payload: { name: 'Published CMS leader', role: 'Mayor' }, status: 'published', sort_order: 0,
+  }])
+  await page.goto('http://127.0.0.1:4174/directorates/administration')
+  await expect(page.getByRole('heading', { name: 'Administration', exact: true })).toBeVisible()
+  await expect(page.locator('.directorate-page')).toBeVisible()
 })
 
 test('production shows reviewed guidance, documents and image fallbacks', async ({ page }) => {

@@ -52,15 +52,23 @@ export const cmsFallbacks = {
   faqs: fallbackFaqs,
 }
 
-const hasDevelopmentDepartmentBaseline = (entries) => entries.some((entry) => entry.collection === 'departments')
+const hasDepartmentBaseline = (entries) => entries.some((entry) => entry.collection === 'departments')
+const restoreFallbackSnapshot = () => {
+  Object.entries(cmsFallbacks).forEach(([collection, items]) => {
+    cmsContent[collection] = sortCollection(collection, clone(items))
+  })
+}
 
 export const loadPublishedContent = async () => {
   try {
     const entries = await cmsEntries.published()
     // A connected project may contain only early CMS collections while its full
-    // website release is still being reviewed. Keep localhost usable until the
-    // directorate baseline exists; production remains CMS-only.
-    if (import.meta.env.DEV && !hasDevelopmentDepartmentBaseline(entries)) return
+    // website release is still being reviewed. Use one complete approved snapshot
+    // until a directorate baseline exists; never mix partial CMS and fallback rows.
+    if (!hasDepartmentBaseline(entries)) {
+      restoreFallbackSnapshot()
+      return
+    }
     const grouped = entries.reduce((result, entry) => {
       if (!result[entry.collection]) result[entry.collection] = []
       result[entry.collection].push({ ...entry.payload, _cmsId: entry.id, _publishedAt: entry.published_at })
@@ -71,7 +79,7 @@ export const loadPublishedContent = async () => {
       cmsContent[collection] = sortCollection(collection, grouped[collection] || [])
     })
   } catch (error) {
-    Object.entries(cmsFallbacks).forEach(([collection, items]) => { cmsContent[collection] = sortCollection(collection, clone(items)) })
+    restoreFallbackSnapshot()
     console.warn('Published CMS content could not be loaded; the approved bundled snapshot is active.', error)
   } finally {
     cmsContent.loaded = true
