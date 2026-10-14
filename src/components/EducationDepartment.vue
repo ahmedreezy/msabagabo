@@ -6,7 +6,9 @@ import { emailLink, filterSchools, normalizeEducationProfile, phoneLink, publicE
 import { departmentFaqs, departmentSectors } from '../lib/departmentContent.js'
 import './education.css'
 
-const props = defineProps({ department: { type: Object, required: true }, preview: Boolean })
+import DirectorateFaqSection from './DirectorateFaqSection.vue'
+
+const props = defineProps({ department: { type: Object, required: true }, faqs: { type: Array, default: () => [] }, preview: Boolean })
 const route = useRoute()
 const prefix = useId()
 const page = ref(null)
@@ -29,6 +31,7 @@ const sections = computed(() => [
   { id: 'guidance', label: 'Services & guidance', visible: props.preview || profile.value.guidance.length },
   { id: 'schools', label: 'Find a school', visible: props.preview || profile.value.schools.length },
   { id: 'responsibilities', label: 'Responsibilities & units', visible: props.department.mandate || props.department.authority || responsibilities.value.length },
+  { id: 'faqs', label: 'Frequently asked questions', visible: props.faqs.length },
   { id: 'contact', label: 'Leadership & contact', visible: true },
   { id: 'activities', label: 'Projects & activities', visible: props.preview || profile.value.activities.length },
   { id: 'documents', label: 'Documents', visible: props.preview || profile.value.documents.length },
@@ -158,9 +161,13 @@ onBeforeUnmount(() => { observer?.disconnect(); headerObserver?.disconnect() })
 
         <section v-if="sections.some(({ id }) => id === 'responsibilities')" :id="anchorId('responsibilities')" data-section="responsibilities" tabindex="-1" class="education-section">
           <p class="education-eyebrow">The department’s work</p><h2>Responsibilities &amp; units</h2><p v-if="department.mandate" class="education-section__intro">{{ department.mandate }}</p>
+          <p v-if="department.fieldSources?.mandate" class="education-inline-review">Source: {{ department.fieldSources.mandate.sourceTitle }} · {{ department.fieldSources.mandate.sourceSection }}</p>
           <dl class="education-units"><div v-for="unit in responsibilities" :key="unit.id"><dt>{{ unit.title }}</dt><dd v-if="unit.description">{{ unit.description }}</dd></div></dl>
           <div v-if="department.authority" class="education-authority"><h3>Mandate and legal authority</h3><p>{{ department.authority }}</p></div>
+          <div v-if="department.sourceTitle" class="education-authority"><h3>Content source</h3><p>{{ department.sourceTitle }}<span v-if="department.lastReviewed"> · Reviewed {{ formatDate(department.lastReviewed) }}</span></p></div>
         </section>
+
+        <DirectorateFaqSection v-if="props.faqs.length" :faqs="props.faqs" :section-id="anchorId('faqs')" :heading-id="`${prefix}-faqs-heading`" variant="education" data-section="faqs" />
 
         <section :id="anchorId('contact')" data-section="contact" tabindex="-1" class="education-section">
           <p class="education-eyebrow">People and support</p><h2>Leadership &amp; contact</h2>
