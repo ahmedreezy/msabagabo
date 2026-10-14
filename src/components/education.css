@@ -31,6 +31,10 @@
 .education-section:first-of-type { padding-top: 0; border-top: 0; }
 .education-section h2 { margin-top: .5rem; font-size: clamp(1.8rem, 2.6vw, 2.7rem); font-weight: 780; line-height: 1.15; letter-spacing: -.035em; text-wrap: balance; }
 .education-section h3 { font-size: 1.1rem; font-weight: 750; line-height: 1.5; }
+.education-faqs { margin-top: 1.5rem; }
+.education-faqs article { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: .8rem; border-bottom: 1px solid var(--edu-line); padding-block: 1.5rem; }
+.education-faqs article > span { color: #935e0e; font-family: ui-monospace, monospace; font-size: .7rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.education-faqs article p { margin-top: .65rem; color: var(--edu-muted); font-size: .9rem; line-height: 1.8; white-space: pre-line; }
 .education-section p, .education-section dd, .education-section li { line-height: 1.75; }
 .education-section__intro { max-width: 43rem; margin-top: 1rem; color: var(--edu-muted); font-size: .97rem; }
 .education-section__heading { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }

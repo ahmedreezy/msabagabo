@@ -4,6 +4,7 @@ import {
   projects as fallbackProjects,
   publications as fallbackPublications,
   environmentBulletins as fallbackEnvironment,
+  homepageAchievements as fallbackAchievements,
   homepageStats as fallbackStats,
   leadership as fallbackLeadership,
   officialFaqs as fallbackFaqs,
@@ -28,20 +29,21 @@ const sortCollection = (collection, items) => {
 const initialItems = (items) => isSupabaseConfigured && !import.meta.env.DEV ? [] : clone(items)
 
 export const cmsContent = reactive({
-  departments: initialItems(fallbackDepartments),
-  projects: initialItems(fallbackProjects),
-  publications: initialItems(fallbackPublications),
-  stats: initialItems(fallbackStats),
-  leadership: initialItems(fallbackLeadership),
-  page_presentations: initialItems(fallbackPagePresentations),
-  updates: sortCollection('updates', initialItems(fallbackUpdates)),
-  environment: sortCollection('environment', initialItems(fallbackEnvironment)),
-  faqs: initialItems(fallbackFaqs),
+  departments: clone(fallbackDepartments),
+  achievements: clone(fallbackAchievements),
+  projects: clone(fallbackProjects),
+  publications: clone(fallbackPublications),
+  stats: clone(fallbackStats),
+  leadership: clone(fallbackLeadership),
+  page_presentations: clone(fallbackPagePresentations),
+  updates: sortCollection('updates', clone(fallbackUpdates)),
+  environment: sortCollection('environment', clone(fallbackEnvironment)),
   loaded: false,
 })
 
 export const cmsFallbacks = {
   departments: fallbackDepartments,
+  achievements: fallbackAchievements,
   projects: fallbackProjects,
   publications: fallbackPublications,
   stats: fallbackStats,

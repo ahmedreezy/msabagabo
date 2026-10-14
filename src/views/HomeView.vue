@@ -43,33 +43,21 @@ const statisticIcons = {
   health: PhFirstAidKit,
 }
 
+const achievementIcons = {
+  road: PhRoadHorizon,
+  education: PhGraduationCap,
+  book: PhBookOpenText,
+  verified: PhSealCheck,
+}
+
 const projects = computed(() => cmsContent.projects)
+const achievements = computed(() => cmsContent.achievements.map((achievement) => ({
+  ...achievement,
+  iconComponent: achievementIcons[achievement.icon] || PhSealCheck,
+})))
 const updates = computed(() => cmsContent.updates)
 const leadership = computed(() => cmsContent.leadership)
 const statistics = computed(() => cmsContent.stats.map((stat) => ({ ...stat, icon: statisticIcons[stat.icon] || PhUsersThree })))
-
-const achievements = [
-  {
-    title: 'Stronger road maintenance capacity',
-    description: 'A municipal road grader was acquired using locally generated property-tax revenue.',
-    icon: PhRoadHorizon,
-  },
-  {
-    title: 'Expanded learning infrastructure',
-    description: 'Classroom blocks, sanitation facilities, rainwater tanks and desks have been delivered to municipal schools.',
-    icon: PhGraduationCap,
-  },
-  {
-    title: 'Supported universal education',
-    description: 'Sixteen primary schools and two secondary schools receive government capitation support.',
-    icon: PhBookOpenText,
-  },
-  {
-    title: 'Improved organised transport',
-    description: 'Lubugumu and Busingiri–Nyanama taxi parks were opened to support safer urban mobility.',
-    icon: PhSealCheck,
-  },
-]
 
 const notices = [
   {
@@ -363,11 +351,11 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="projects-achievements" data-nav-section="/projects" aria-labelledby="projects-heading">
+    <section class="projects-achievements" data-nav-section="/programmes-projects" aria-labelledby="projects-heading">
       <div class="site-container">
         <div class="projects-achievements__header home-reveal">
           <div><p class="home-eyebrow"><span>03</span> Delivery in action</p><h2 id="projects-heading">Ongoing activities &amp; achievements</h2></div>
-          <RouterLink class="home-pill-link" to="/projects">View all projects <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
+          <RouterLink class="home-pill-link" to="/programmes-projects">View programmes &amp; projects <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
         </div>
 
         <div class="delivery-compact-grid home-reveal">
@@ -378,7 +366,7 @@ onBeforeUnmount(() => {
               <div class="project-editorial-card__content">
                 <div><span>{{ project.sector }}</span><em>{{ project.status }}</em></div>
                 <h3>{{ project.title }}</h3>
-                <RouterLink to="/projects" :aria-label="`Read about ${project.title}`"><PhArrowUpRight :size="20" weight="bold" /></RouterLink>
+                <RouterLink to="/programmes-projects" :aria-label="`Read about ${project.title}`"><PhArrowUpRight :size="20" weight="bold" /></RouterLink>
               </div>
             </article>
           </div>
@@ -391,7 +379,7 @@ onBeforeUnmount(() => {
             <div class="achievement-ledger__list">
               <article v-for="(achievement, index) in achievements" :key="achievement.title">
                 <span>{{ String(index + 1).padStart(2, '0') }}</span>
-                <component :is="achievement.icon" :size="22" weight="regular" />
+                <component :is="achievement.iconComponent" :size="22" weight="regular" />
                 <div><h3>{{ achievement.title }}</h3><p>{{ achievement.description }}</p></div>
               </article>
             </div>
@@ -450,7 +438,7 @@ onBeforeUnmount(() => {
           <button v-for="(_, index) in resources" :key="index" type="button" :class="{ 'is-active': railState.resources === index }" :aria-label="`Show resource slide ${index + 1}`" :aria-current="railState.resources === index ? 'true' : undefined" @click="scrollRailTo(resourcesRail, index)"></button>
         </div>
         <div class="government-resources__contact home-reveal">
-          <div><PhChatCircleText :size="24" weight="regular" /><span><strong>Can’t find what you need?</strong><small>Our help desk can direct you to the right directorate.</small></span></div>
+          <div><PhChatCircleText :size="24" weight="regular" /><span><strong>Can’t find what you need?</strong><small>Our help desk can direct you to the right department.</small></span></div>
           <RouterLink class="home-pill-link home-pill-link--light" to="/contact">Contact the council <span><PhArrowRight :size="16" weight="bold" /></span></RouterLink>
         </div>
       </div>

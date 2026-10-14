@@ -17,14 +17,14 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
     },
     {
-      path: '/directorates',
-      alias: '/departments',
+      path: '/departments',
+      alias: '/directorates',
       name: 'departments',
       component: () => import('../views/DepartmentsView.vue'),
     },
     {
-      path: '/directorates/:slug',
-      alias: '/departments/:slug',
+      path: '/departments/:slug',
+      alias: '/directorates/:slug',
       name: 'department-detail',
       component: () => import('../views/DepartmentDetailView.vue'),
     },
@@ -34,7 +34,8 @@ const router = createRouter({
       component: () => import('../views/ServicesView.vue'),
     },
     {
-      path: '/projects',
+      path: '/programmes-projects',
+      alias: '/projects',
       name: 'projects',
       component: () => import('../views/ProjectsView.vue'),
     },
@@ -121,8 +122,6 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to) {
-    // The Education page waits for its optional CMS sections before resolving anchors.
-    if (to.name === 'department-detail' && to.params.slug === 'education-sports' && to.hash) return false
     if (to.hash) return { el: to.hash, top: 24, behavior: 'smooth' }
     return { top: 0 }
   },
