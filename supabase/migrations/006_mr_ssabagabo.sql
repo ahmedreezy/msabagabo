@@ -138,7 +138,7 @@ values (
   jsonb_build_object(
     'title', 'Education and school enquiries',
     'audience', 'Parents, guardians, school leaders and people seeking guidance about schools.',
-    'summary', 'The Education & Sports Directorate provides guidance about municipal education services, school standards and the government school directory.',
+    'summary', 'The Education & Sports Department provides guidance about municipal education services, school standards and the government school directory.',
     'department', 'Education & Sports',
     'office', 'Municipal Education Office',
     'steps', jsonb_build_array(
@@ -154,7 +154,7 @@ values (
     'phone', '0800 256 260',
     'email', 'education@msabagabo.go.ug',
     'sourceTitle', 'Makindye Ssabagabo Municipal Council website',
-    'sourceUrl', '/directorates/education-sports',
+    'sourceUrl', '/departments/education-sports',
     'lastReviewed', to_char(current_date, 'YYYY-MM-DD')
   ),
   'published',

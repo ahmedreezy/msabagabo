@@ -40,7 +40,7 @@ const content = {
 
 const page = computed(() => content[route.meta.kind] || content.sitemap)
 const links = [
-  ['Home', '/'], ['About Us', '/about'], ['Directorates', '/directorates'], ['Projects', '/projects'], ['Tenders', '/tenders'],
+  ['Home', '/'], ['About Us', '/about'], ['Departments', '/departments'], ['Programmes & projects', '/programmes-projects'], ['Tenders', '/tenders'],
   ['Services', '/services'], ['Careers', '/careers'], ['Open government', '/open-government'], ['FAQs', '/faqs'], ['Contact Us', '/contact'],
 ]
 </script>

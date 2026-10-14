@@ -8,9 +8,8 @@ import {
 } from '@phosphor-icons/vue'
 import { cmsAuth, cmsEntries } from '../../services/cms'
 import { createSeedEntries, formatCmsDate, loadPublishedContent } from '../../stores/cmsContent'
-import EducationProfileEditor from '../../components/admin/EducationProfileEditor.vue'
-import EducationDepartment from '../../components/EducationDepartment.vue'
-import { educationPublicationIssues, normalizeEducationProfile } from '../../lib/educationProfile.js'
+import DepartmentStructureEditor from '../../components/admin/DepartmentStructureEditor.vue'
+import ProgrammeEditor from '../../components/admin/ProgrammeEditor.vue'
 
 const router = useRouter()
 const pageGroups = [
@@ -51,7 +50,7 @@ const pageGroups = [
       { key: 'slug', label: 'Leadership position', type: 'select', required: true, options: ['mayor', 'town-clerk', 'speaker', 'heads-of-directorates'] },
       { key: 'name', label: 'Officer full name' },
       { key: 'role', label: 'Official role', required: true },
-      { key: 'office', label: 'Office or directorate', required: true },
+      { key: 'office', label: 'Office or department', required: true },
       { key: 'description', label: 'Responsibility summary', type: 'textarea', required: true },
       { key: 'image', label: 'Officer photograph', type: 'media' },
       { key: 'mark', label: 'Fallback initials', required: true },
@@ -61,9 +60,21 @@ const pageGroups = [
       { key: 'detail', label: 'Supporting text' },
       { key: 'icon', label: 'Visual icon', type: 'select', options: ['users', 'map', 'pin', 'home', 'education', 'health'] },
     ] },
-    { key: 'projects', label: 'Featured projects', mobileLabel: 'Projects', page: 'Homepage', section: 'Delivery in action', icon: PhFolderOpen, route: '/projects', fields: [
-      { key: 'title', label: 'Project title', required: true }, { key: 'sector', label: 'Sector', required: true },
-      { key: 'status', label: 'Project status', required: true }, { key: 'image', label: 'Project image', type: 'media' },
+    { key: 'projects', label: 'Ongoing activities', mobileLabel: 'Projects', page: 'Homepage', section: 'Ongoing activities & achievements', icon: PhFolderOpen, route: '/#projects-heading', fields: [
+      { key: 'recordType', label: 'Entry type', type: 'select', required: true, options: ['Programme', 'Project'] },
+      { key: 'title', label: 'Title', required: true }, { key: 'slug', label: 'Page identifier', required: true },
+      { key: 'sector', label: 'Sector', required: true }, { key: 'status', label: 'Current status', required: true },
+      { key: 'summary', label: 'Public overview', type: 'textarea', required: true },
+      { key: 'startDate', label: 'Start date', type: 'date' }, { key: 'endDate', label: 'Planned completion', type: 'date' },
+      { key: 'implementer', label: 'Implementing organisation' }, { key: 'funders', label: 'Funding organisations', type: 'list' },
+      { key: 'pillars', label: 'Programme pillars', type: 'list' }, { key: 'components', label: 'Funding components', type: 'list' },
+      { key: 'lastUpdated', label: 'Progress last updated', type: 'date' }, { key: 'sourceUrl', label: 'Official source URL', type: 'url' },
+      { key: 'image', label: 'Featured image', type: 'media' },
+    ] },
+    { key: 'achievements', label: 'Key achievements', mobileLabel: 'Results', page: 'Homepage', section: 'Ongoing activities & achievements', icon: PhCheck, route: '/#projects-heading', fields: [
+      { key: 'title', label: 'Achievement title', required: true },
+      { key: 'description', label: 'Public description', type: 'textarea', required: true },
+      { key: 'icon', label: 'Visual icon', type: 'select', required: true, options: ['road', 'education', 'book', 'verified'] },
     ] },
     { key: 'updates', label: 'Latest news', mobileLabel: 'News', page: 'Homepage', section: 'News & notices', icon: PhNewspaper, route: '/news', chronological: true, fields: [
       { key: 'date', label: 'Publication date', type: 'date', required: true }, { key: 'type', label: 'Update type', required: true },
@@ -75,16 +86,16 @@ const pageGroups = [
     { key: 'departments', label: 'Departments', mobileLabel: 'Depts', page: 'Departments & services', section: 'Department directory', icon: PhSquaresFour, route: '/departments', fields: [
       { key: 'name', label: 'Department name', required: true }, { key: 'shortName', label: 'Short name' },
       { key: 'slug', label: 'Page URL', required: true }, { key: 'summary', label: 'Introduction', type: 'textarea', required: true },
-      { key: 'mandate', label: 'Mandate', type: 'textarea' }, { key: 'authority', label: 'Legal authority', type: 'textarea' },
+      { key: 'mandate', label: 'Mandate', type: 'textarea', required: true }, { key: 'authority', label: 'Legal authority', type: 'textarea' },
       { key: 'lead', label: 'Department lead' }, { key: 'contact', label: 'Contact email', type: 'email' },
       { key: 'units', label: 'Units and sub-departments', type: 'list' }, { key: 'services', label: 'Services offered', type: 'list' },
-      { key: 'team', label: 'Department team', type: 'team', required: true },
+      { key: 'team', label: 'Department team', type: 'team' },
     ] },
     { key: 'service_guides', label: 'AI service guides', mobileLabel: 'AI guides', page: 'Departments & services', section: 'Mr. Ssabagabo approved guidance', icon: PhRobot, route: '/services', fields: [
       { key: 'title', label: 'Service guide title', required: true },
       { key: 'audience', label: 'Who this guidance is for', type: 'textarea', required: true },
       { key: 'summary', label: 'Approved service summary', type: 'textarea', required: true },
-      { key: 'department', label: 'Responsible directorate', required: true },
+      { key: 'department', label: 'Responsible department', required: true },
       { key: 'office', label: 'Responsible office', required: true },
       { key: 'steps', label: 'Process steps', type: 'list', required: true },
       { key: 'requirements', label: 'Verified requirements', type: 'list' },
@@ -121,7 +132,6 @@ const documentExtensions = {
 const loading = ref(true)
 const saving = ref(false)
 const uploading = ref(false)
-const educationUploading = ref(false)
 const seeding = ref(false)
 const entries = ref([])
 const profile = ref(null)
@@ -136,11 +146,6 @@ const feedback = reactive({ type: '', message: '' })
 const mediaPreviews = reactive({})
 
 const definition = computed(() => collections.find((item) => item.key === selectedCollection.value))
-const isEducationPilot = computed(() => selectedCollection.value === 'departments' && editor.value?.payload.slug === 'education-sports')
-const invalidateEducationBasics = (event) => {
-  if (!isEducationPilot.value || !editor.value.payload.educationProfile || event.target.closest('.education-editor')) return
-  if (/^(cms-field-|team-)/.test(event.target.id)) editor.value.payload.educationProfile.approved = false
-}
 const canPublish = computed(() => ['publisher', 'admin'].includes(profile.value?.role))
 const canDelete = computed(() => ['publisher', 'admin'].includes(profile.value?.role))
 const draftCount = computed(() => entries.value.filter((entry) => entry.status === 'draft').length)
@@ -193,6 +198,15 @@ const hydratePayload = (payload = {}) => {
     else if (field.type === 'boolean') next[field.key] = Boolean(next[field.key])
     else if (next[field.key] == null) next[field.key] = ''
   })
+  if (definition.value.key === 'departments') {
+    next.sectors = Array.isArray(next.sectors) ? next.sectors : []
+    next.faqs = Array.isArray(next.faqs) ? next.faqs : []
+  }
+  if (definition.value.key === 'projects') {
+    next.recordType ||= 'Project'
+    next.contracts = Array.isArray(next.contracts) ? next.contracts : []
+    next.activities = Array.isArray(next.activities) ? next.activities : []
+  }
   return next
 }
 
@@ -226,7 +240,6 @@ const editEntry = (entry) => {
 
 const serializePayload = () => {
   const payload = JSON.parse(JSON.stringify(editor.value.payload))
-  if (payload.educationProfile) payload.educationProfile = normalizeEducationProfile(payload.educationProfile)
   definition.value.fields.forEach((field) => {
     if (field.type === 'list') payload[field.key] = String(payload[field.key] || '').split('\n').map((item) => item.trim()).filter(Boolean)
     if (field.type === 'team') payload[field.key] = (payload[field.key] || []).map((member) => ({
@@ -235,6 +248,14 @@ const serializePayload = () => {
       photo: String(member.photo || '').trim(),
     }))
   })
+  if (selectedCollection.value === 'departments') {
+    payload.sectors = (payload.sectors || []).map((sector) => ({ id: sector.id, name: String(sector.name || '').trim(), summary: String(sector.summary || '').trim() })).filter((sector) => sector.name)
+    payload.faqs = (payload.faqs || []).map((faq) => ({ id: faq.id, question: String(faq.question || '').trim(), answer: String(faq.answer || '').trim(), sectorId: faq.sectorId || '' })).filter((faq) => faq.question || faq.answer)
+  }
+  if (selectedCollection.value === 'projects') {
+    payload.contracts = (payload.contracts || []).map((contract) => ({ ...contract, works: String(contract.works || '').trim() })).filter((contract) => contract.lot || contract.works)
+    payload.activities = (payload.activities || []).map((activity) => ({ ...activity, planned: String(activity.planned || '').trim(), implemented: String(activity.implemented || '').trim() })).filter((activity) => activity.planned || activity.implemented)
+  }
   return payload
 }
 
@@ -272,7 +293,7 @@ const handlePreviewKeydown = (event) => {
 }
 
 const saveEntry = async () => {
-  if (uploading.value || educationUploading.value) return
+  if (uploading.value) return
   saving.value = true
   try {
     const payload = serializePayload()
@@ -294,14 +315,8 @@ const saveEntry = async () => {
       if (duplicate) throw new Error('A page hero already exists for this page.')
     }
     if (selectedCollection.value === 'departments' && editor.value.status === 'published') {
-      if (payload.educationProfile) {
-        const issues = educationPublicationIssues(payload)
-        if (issues.length) throw new Error(issues[0])
-      } else if (payload.slug !== 'education-sports') {
-        if (!payload.team?.length) throw new Error('Add at least one team member before publishing this department.')
-        if (payload.team.some((member) => !member.name || !member.role || !member.photo)) throw new Error('Every team member needs a photo, name and role before publishing.')
-      }
       if ((payload.team || []).some((member) => !member.name || !member.role)) throw new Error('Every team member needs a name and role before publishing.')
+      if ((payload.faqs || []).some((faq) => !faq.question || !faq.answer)) throw new Error('Every FAQ needs both a question and an approved answer.')
     }
     const saved = await cmsEntries.save({ ...editor.value, title: primaryTitle, slug: payload.slug || editor.value.slug, payload }, session.value.user.id)
     setFeedback('success', saved.status === 'published' ? 'Changes published.' : 'Draft saved.')
@@ -347,7 +362,7 @@ const uploadMedia = async (event, field) => {
         image.onerror = () => { URL.revokeObjectURL(source); reject(new Error('The selected image could not be read.')) }
         image.src = source
       })
-      if (dimensions.width < 1920 || dimensions.height < 1080) throw new Error('Hero images must be at least 1920 × 1080 pixels.')
+      if (dimensions.width < 1600 || dimensions.height < 900) throw new Error('Hero images must be at least 1600 × 900 pixels.')
     }
     editor.value.payload[field.key] = await cmsEntries.upload(file)
     URL.revokeObjectURL(mediaPreviews[field.key])
@@ -363,7 +378,6 @@ const uploadMedia = async (event, field) => {
 
 const addTeamMember = () => {
   editor.value.payload.team.push({ name: '', role: '', photo: '' })
-  if (editor.value.payload.educationProfile) editor.value.payload.educationProfile.approved = false
 }
 
 const removeTeamMember = (index) => {
@@ -371,7 +385,6 @@ const removeTeamMember = (index) => {
   if (mediaPreviews[previewKey]?.startsWith('blob:')) URL.revokeObjectURL(mediaPreviews[previewKey])
   delete mediaPreviews[previewKey]
   editor.value.payload.team.splice(index, 1)
-  if (editor.value.payload.educationProfile) editor.value.payload.educationProfile.approved = false
 }
 
 const uploadTeamPhoto = async (event, index) => {
@@ -383,7 +396,6 @@ const uploadTeamPhoto = async (event, index) => {
   uploading.value = true
   try {
     editor.value.payload.team[index].photo = await cmsEntries.upload(file)
-    if (editor.value.payload.educationProfile) editor.value.payload.educationProfile.approved = false
     URL.revokeObjectURL(mediaPreviews[previewKey])
     delete mediaPreviews[previewKey]
     setFeedback('success', 'Team photo uploaded.')
@@ -519,11 +531,11 @@ onMounted(async () => {
           </button>
         </div>
 
-        <form v-if="editor" class="admin-editor" :novalidate="isEducationPilot" @submit.prevent="saveEntry">
+        <form v-if="editor" class="admin-editor" @submit.prevent="saveEntry">
           <div class="admin-editor__heading"><div><p>{{ editor.id ? 'Edit entry' : 'New entry' }}</p><h2>{{ editor.title || 'Untitled' }}</h2></div><button type="button" aria-label="Close editor" @click="editor = null">×</button></div>
-          <div class="admin-editor__fields" @input="invalidateEducationBasics">
+          <div class="admin-editor__fields">
             <div v-for="field in definition.fields" :key="field.key" class="admin-field" :class="{ 'is-wide': ['textarea', 'list', 'media', 'team', 'file'].includes(field.type) }">
-              <label :for="field.type === 'team' ? undefined : `cms-field-${field.key}`"><span>{{ field.label }} <b v-if="field.required && !(isEducationPilot && field.type === 'team')">Required</b></span></label>
+              <label :for="field.type === 'team' ? undefined : `cms-field-${field.key}`"><span>{{ field.label }} <b v-if="field.required">Required</b></span></label>
               <textarea v-if="field.type === 'textarea'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" rows="4" :required="field.required"></textarea>
               <textarea v-else-if="field.type === 'list'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" rows="5" :required="field.required" placeholder="One item per line"></textarea>
               <select v-else-if="field.type === 'select'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :required="field.required"><option value="" disabled>Select an option</option><option v-for="option in field.options" :key="option" :value="option">{{ option }}</option></select>
@@ -535,13 +547,13 @@ onMounted(async () => {
                 </div>
                 <div v-if="!editor.payload.team.length" class="admin-team-empty">
                   <strong>No team members added</strong>
-                  <p>{{ isEducationPilot ? 'Add verified full names and official roles. Photographs are optional.' : 'Add each person’s photograph, full name and official role.' }}</p>
+                  <p>Add verified full names and official roles. Photographs are optional.</p>
                   <button type="button" @click="addTeamMember"><PhPlus :size="17" /> Add the first member</button>
                 </div>
                 <article v-for="(member, index) in editor.payload.team" v-else :key="index" class="admin-team-member">
                   <div class="admin-team-photo">
                     <img v-if="teamPhotoPreview(member, index)" :src="teamPhotoPreview(member, index)" :alt="member.name ? `${member.name} preview` : 'Team member photo preview'" />
-                    <div v-else><PhPlus :size="25" /><span>{{ isEducationPilot ? 'Photo optional' : 'Photo required' }}</span></div>
+                    <div v-else><PhPlus :size="25" /><span>Photo optional</span></div>
                     <label>
                       <input type="file" accept="image/jpeg,image/png,image/webp" @change="uploadTeamPhoto($event, index)" />
                       <PhCloudArrowUp :size="17" /> {{ member.photo ? 'Replace photo' : 'Choose photo' }}
@@ -566,7 +578,7 @@ onMounted(async () => {
                   <input :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" type="url" placeholder="Paste an image URL" />
                   <label><input type="file" :accept="selectedCollection === 'page_presentations' ? 'image/jpeg,image/png,image/webp' : 'image/jpeg,image/png,image/webp,image/gif'" @change="uploadMedia($event, field)" /><PhCloudArrowUp :size="18" /> {{ uploading ? 'Uploading…' : mediaPreview(field) ? 'Replace image' : 'Choose image' }}</label>
                 </div>
-                <small>{{ selectedCollection === 'page_presentations' ? 'JPEG, PNG or WebP · Minimum 1920 × 1080 pixels. Use the focal-point fields and preview to check desktop and mobile crops.' : 'Images are cropped to fit the website layout. Use “Preview this section” to check the final placement.' }}</small>
+                <small>{{ selectedCollection === 'page_presentations' ? 'JPEG, PNG or WebP · Minimum 1600 × 900 pixels. Use the focal-point fields and preview to check desktop and mobile crops.' : 'Images are cropped to fit the website layout. Use “Preview this section” to check the final placement.' }}</small>
               </div>
               <div v-else-if="field.type === 'file'" class="admin-document-field">
                 <div v-if="editor.payload[field.key]" class="admin-document-current">
@@ -582,7 +594,8 @@ onMounted(async () => {
               </div>
               <input v-else :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :type="field.type || 'text'" :required="field.required" :min="field.min" :max="field.max" :step="field.step" />
             </div>
-            <EducationProfileEditor v-if="isEducationPilot" :key="editor.id || 'new-education'" v-model="editor.payload.educationProfile" :department="editor.payload" @uploading="educationUploading = $event" />
+            <DepartmentStructureEditor v-if="selectedCollection === 'departments'" v-model="editor.payload" />
+            <ProgrammeEditor v-if="selectedCollection === 'projects'" v-model="editor.payload" />
             <label v-if="!definition.chronological"><span>Website position</span><input v-model.number="editor.sort_order" type="number" min="0" /><small>Lower numbers appear first.</small></label>
             <label><span>Publishing state</span><select v-model="editor.status"><option value="draft">Draft</option><option value="published" :disabled="!canPublish">Published</option></select><small v-if="!canPublish">A publisher must approve this entry.</small></label>
           </div>
@@ -592,8 +605,8 @@ onMounted(async () => {
               <span v-else>Delete permanently? <button type="button" @click="removeEntry">Confirm</button><button type="button" @click="deleteConfirmation = false">Cancel</button></span>
             </div>
             <div class="admin-editor__actions">
-              <button class="admin-preview" type="button" :disabled="uploading || educationUploading" @click="previewEntry"><PhEye :size="17" /> Preview changes</button>
-              <button class="admin-save" type="submit" :disabled="saving || uploading || educationUploading"><PhSpinnerGap v-if="saving" class="admin-spin" :size="17" /><PhCheck v-else :size="17" weight="bold" /> {{ saving ? 'Saving…' : editor.status === 'published' ? 'Publish changes' : 'Save draft' }}</button>
+              <button class="admin-preview" type="button" :disabled="uploading" @click="previewEntry"><PhEye :size="17" /> Preview changes</button>
+              <button class="admin-save" type="submit" :disabled="saving || uploading"><PhSpinnerGap v-if="saving" class="admin-spin" :size="17" /><PhCheck v-else :size="17" weight="bold" /> {{ saving ? 'Saving…' : editor.status === 'published' ? 'Publish changes' : 'Save draft' }}</button>
             </div>
           </footer>
         </form>
@@ -635,10 +648,18 @@ onMounted(async () => {
               <img v-if="previewItem.image" :src="previewItem.image" :alt="previewItem.title || 'Project image preview'" />
               <div v-else class="cms-preview-placeholder">Project image</div>
               <div class="cms-preview-project__body">
-                <div><span>{{ previewItem.sector || 'Project sector' }}</span><em>{{ previewItem.status || 'Project status' }}</em></div>
+                <div><span>{{ previewItem.recordType || 'Project' }} · {{ previewItem.sector || 'Project sector' }}</span><em>{{ previewItem.status || 'Project status' }}</em></div>
                 <h3>{{ previewItem.title || 'Project title' }}</h3>
+                <p>{{ previewItem.summary || 'Add a public overview.' }}</p>
                 <span class="cms-preview-link">Project details <PhArrowSquareOut :size="16" /></span>
               </div>
+            </article>
+
+            <article v-else-if="selectedCollection === 'achievements'" class="cms-preview-stat">
+              <PhCheck :size="26" weight="bold" />
+              <strong>Result</strong>
+              <h3>{{ previewItem.title || 'Achievement title' }}</h3>
+              <p>{{ previewItem.description || 'The public achievement description will appear here.' }}</p>
             </article>
 
             <article v-else-if="selectedCollection === 'updates'" class="cms-preview-news">
@@ -675,10 +696,11 @@ onMounted(async () => {
               <footer><span>{{ previewItem.sourceTitle || 'Authoritative public source' }}</span><time>Reviewed {{ formatCmsDate(previewItem.lastReviewed) || 'Review date' }}</time></footer>
             </article>
 
-            <EducationDepartment v-else-if="selectedCollection === 'departments' && previewItem.slug === 'education-sports'" :department="previewItem" preview />
             <article v-else-if="selectedCollection === 'departments'" class="cms-preview-department">
               <header><p>Municipal department</p><h3>{{ previewItem.name || 'Department name' }}</h3><div>{{ previewItem.summary || 'Department introduction' }}</div></header>
               <section><span>Mandate</span><p>{{ previewItem.mandate || 'Department mandate' }}</p></section>
+              <section><span>Sectors under the department</span><p>{{ previewItem.sectors?.map((sector) => sector.name).filter(Boolean).join(' · ') || previewItem.units?.join(' · ') || 'Add sectors' }}</p></section>
+              <section><span>Frequently asked questions</span><p>{{ previewItem.faqs?.length || 0 }} approved {{ previewItem.faqs?.length === 1 ? 'question' : 'questions' }}</p></section>
               <section><span>Department team</span>
                 <div v-if="previewItem.team?.length" class="cms-preview-team">
                   <article v-for="(member, index) in previewItem.team" :key="index">

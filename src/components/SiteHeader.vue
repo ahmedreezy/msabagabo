@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { PhArrowRight, PhCaretDown, PhEnvelopeSimple, PhMagnifyingGlass, PhPhone } from '@phosphor-icons/vue'
 import {
@@ -13,6 +13,7 @@ import {
   NavigationMenuRoot,
   NavigationMenuTrigger,
 } from 'reka-ui'
+import { cmsContent } from '../stores/cmsContent'
 
 const route = useRoute()
 const router = useRouter()
@@ -38,7 +39,7 @@ const syncHeaderHeight = (syncHeroHeight = false) => {
   if (syncHeroHeight) document.documentElement.style.setProperty('--hero-header-height', `${height}px`)
 }
 
-const navigation = [
+const navigation = computed(() => [
   { label: 'Home', to: '/' },
   {
     label: 'About Us',
@@ -50,21 +51,16 @@ const navigation = [
     ],
   },
   {
-    label: 'Directorates',
-    to: '/directorates',
-    activePaths: ['/departments'],
+    label: 'Departments',
+    to: '/departments',
+    activePaths: ['/directorates'],
     children: [
-      { label: 'All directorates', to: '/directorates' },
-      { label: 'Administration', to: '/directorates/administration' },
-      { label: 'Finance & Planning', to: '/directorates/finance-planning' },
-      { label: 'Works & Engineering', to: '/directorates/works-engineering' },
-      { label: 'Health', to: '/directorates/health' },
-      { label: 'Education & Sports', to: '/directorates/education-sports' },
-      { label: 'Natural Resources', to: '/directorates/natural-resources' },
+      { label: 'All departments', to: '/departments' },
+      ...cmsContent.departments.map((department) => ({ label: department.shortName || department.name, to: `/departments/${department.slug}` })),
     ],
   },
   { label: 'Services', to: '/services' },
-  { label: 'Projects', to: '/projects' },
+  { label: 'Programmes & Projects', to: '/programmes-projects', activePaths: ['/projects'] },
   {
     label: 'Opportunities',
     to: '/opportunities',
@@ -86,7 +82,7 @@ const navigation = [
       { label: 'Frequently asked questions', to: '/faqs' },
     ],
   },
-]
+])
 
 const closeMenus = () => {
   menuOpen.value = false

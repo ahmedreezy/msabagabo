@@ -4,6 +4,7 @@ import {
   projects as fallbackProjects,
   publications as fallbackPublications,
   environmentBulletins as fallbackEnvironment,
+  homepageAchievements as fallbackAchievements,
   homepageStats as fallbackStats,
   leadership as fallbackLeadership,
   pagePresentations as fallbackPagePresentations,
@@ -25,6 +26,7 @@ const sortCollection = (collection, items) => {
 
 export const cmsContent = reactive({
   departments: clone(fallbackDepartments),
+  achievements: clone(fallbackAchievements),
   projects: clone(fallbackProjects),
   publications: clone(fallbackPublications),
   stats: clone(fallbackStats),
@@ -37,6 +39,7 @@ export const cmsContent = reactive({
 
 export const cmsFallbacks = {
   departments: fallbackDepartments,
+  achievements: fallbackAchievements,
   projects: fallbackProjects,
   publications: fallbackPublications,
   stats: fallbackStats,

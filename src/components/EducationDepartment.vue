@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } fro
 import { useRoute } from 'vue-router'
 import { PhArrowRight, PhArrowUpRight, PhBookOpenText, PhEnvelopeSimple, PhMagnifyingGlass, PhPhone, PhMapPin } from '@phosphor-icons/vue'
 import { emailLink, filterSchools, normalizeEducationProfile, phoneLink, publicEducationProfile, safeLink } from '../lib/educationProfile.js'
+import { departmentFaqs, departmentSectors } from '../lib/departmentContent.js'
 import './education.css'
 
 const props = defineProps({ department: { type: Object, required: true }, preview: Boolean })
@@ -19,7 +20,12 @@ const profile = computed(() => props.preview ? normalizeEducationProfile(props.d
 const results = computed(() => filterSchools(profile.value.schools, query.value, level.value, programme.value))
 const team = computed(() => (props.department.team || []).filter((person) => person.name && person.role))
 const responsibilities = computed(() => profile.value.units.length ? profile.value.units : (props.department.units || []).map((title, index) => ({ id: `unit-${index}`, title })))
+const sectors = computed(() => departmentSectors(props.department))
+const faqs = computed(() => departmentFaqs(props.department))
 const sections = computed(() => [
+  { id: 'mandate', label: 'Mandate', visible: true },
+  { id: 'sectors', label: 'Sectors', visible: true },
+  { id: 'faqs', label: 'Frequently asked questions', visible: true },
   { id: 'guidance', label: 'Services & guidance', visible: props.preview || profile.value.guidance.length },
   { id: 'schools', label: 'Find a school', visible: props.preview || profile.value.schools.length },
   { id: 'responsibilities', label: 'Responsibilities & units', visible: props.department.mandate || props.department.authority || responsibilities.value.length },
@@ -106,6 +112,22 @@ onBeforeUnmount(() => { observer?.disconnect(); headerObserver?.disconnect() })
 
       <div class="education-content">
         <details v-if="preview" class="education-review-note"><summary>Editorial review notes</summary><p>{{ department.educationProfile?.reviewNotes || 'Review the introduction, mandate, authority and staff before approving this page.' }}</p></details>
+
+        <section :id="anchorId('mandate')" data-section="mandate" tabindex="-1" class="education-section">
+          <p class="education-eyebrow">01 · Mandate</p><h2>What the department is responsible for</h2><p class="education-section__intro">{{ department.mandate }}</p>
+        </section>
+
+        <section :id="anchorId('sectors')" data-section="sectors" tabindex="-1" class="education-section">
+          <p class="education-eyebrow">02 · Structure</p><h2>Sectors under the department</h2>
+          <dl v-if="sectors.length" class="education-units"><div v-for="sector in sectors" :key="sector.id"><dt>{{ sector.name }}</dt><dd v-if="sector.summary">{{ sector.summary }}</dd></div></dl>
+          <p v-else class="education-missing">Sector information is being prepared. Contact the department for its current structure.</p>
+        </section>
+
+        <section :id="anchorId('faqs')" data-section="faqs" tabindex="-1" class="education-section">
+          <p class="education-eyebrow">03 · Public guidance</p><h2>Frequently asked questions</h2>
+          <div v-if="faqs.length" class="education-faqs"><article v-for="(faq, index) in faqs" :key="faq.id"><span>{{ String(index + 1).padStart(2, '0') }}</span><div><h3>{{ faq.question }}</h3><p>{{ faq.answer }}</p></div></article></div>
+          <p v-else class="education-missing">No departmental FAQs have been published yet. Use the contact routes below for current guidance.</p>
+        </section>
 
         <section v-if="preview || profile.guidance.length" :id="anchorId('guidance')" data-section="guidance" tabindex="-1" class="education-section">
           <p class="education-eyebrow">Here to help</p><h2>Services &amp; guidance</h2><p class="education-section__intro">Find the right starting point for your education enquiry.</p>

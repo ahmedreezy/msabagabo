@@ -68,3 +68,17 @@ Roles:
 - `admin`: publisher permissions plus staff-role management at the database level.
 
 Use **Import starter content** once on an empty CMS to copy the current website content into drafts. Publishing an entry makes it available to the public website automatically; local source data remains the fallback if Supabase is unavailable.
+
+### Departments and programmes
+
+Department entries use one shared public structure: **mandate**, **sectors under the department**, then **frequently asked questions**. The CMS provides ordered repeatable editors for sectors and FAQs. Older entries that only contain `units` remain compatible; those units appear as sectors until staff save the richer structure. Department FAQs also feed the central `/faqs` page, so staff should maintain each answer in its department record rather than duplicate it.
+
+The `projects` collection accepts both `Programme` and `Project` entries. Programme entries can include pillars, funding components, capital contracts and planned-versus-implemented activity records. The public canonical route is `/programmes-projects`; the older `/projects` route remains available for existing links.
+
+Starter import creates missing records as drafts and never overwrites existing CMS work. On an established installation, import the missing Internal Audit, Planning Unit and GKMA records, then review existing department entries with the new sector and FAQ editors before publishing. Verify mandates, officer contacts, contract values, dates and reported progress with the responsible municipal office.
+
+### Homepage imagery and delivery results
+
+The homepage hero is managed in `/admin` under **Website presentation → Page heroes → home**. Staff can replace the image, write accessible image text and adjust horizontal or vertical focal points before publishing.
+
+The **Ongoing activities & achievements** section is managed under **Homepage → Ongoing activities** for programme/project cards and their featured images, and **Homepage → Key achievements** for the numbered achievement ledger. Apply `supabase/migrations/007_homepage_achievements.sql` before publishing achievement records on an existing Supabase project.

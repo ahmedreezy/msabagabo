@@ -4978,6 +4978,8 @@ body { background: var(--corporate-canvas); }
     top: calc(100% + 1px);
     left: 50%;
     width: min(20rem, calc(100vw - 2rem));
+    max-height: min(38rem, calc(100dvh - var(--site-header-height, 8rem) - 1rem));
+    overflow-y: auto;
     transform: translateX(-50%);
     border: 1px solid #dfe3e8;
     border-top: 1px solid #dfe3e8 !important;

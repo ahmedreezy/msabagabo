@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { createEducationDraft } from '../src/data/educationDraft.js'
 import { educationPublicationIssues, emptyEducationProfile, filterSchools, moveEducationEntry, normalizeEducationProfile, phoneLink, publicEducationProfile, safeLink } from '../src/lib/educationProfile.js'
+import { allDepartmentFaqs, departmentFaqs, departmentSectors } from '../src/lib/departmentContent.js'
+import { departments, homepageAchievements, pagePresentations, projects } from '../src/data/siteData.js'
 
 const readyDepartment = () => ({
   slug: 'education-sports', name: 'Education & Sports', summary: 'Education information.', team: [],
@@ -96,4 +98,34 @@ test('publication requires valid programme, date, photo caption, source and cont
   assert.match(issues, /photograph caption/)
   assert.match(issues, /source reference/)
   assert.match(issues, /valid contact/)
+})
+
+test('all municipal departments use the shared mandate, sectors and FAQ model', () => {
+  assert.equal(departments.length, 11)
+  assert.ok(departments.every((department) => department.slug && department.name && department.mandate))
+  assert.deepEqual(departments.map(({ slug }) => slug), [
+    'finance-planning', 'administration', 'internal-audit', 'planning-unit', 'education-sports',
+    'works-engineering', 'production-marketing', 'trade-industry-led', 'community-services', 'natural-resources', 'health',
+  ])
+  assert.equal(departmentSectors({ units: ['Legacy unit'] })[0].name, 'Legacy unit')
+  assert.equal(departmentFaqs(departments.find(({ slug }) => slug === 'finance-planning')).length, 7)
+  assert.ok(allDepartmentFaqs(departments).length >= 20)
+})
+
+test('GKMA programme data has structured contracts and progress records', () => {
+  const programme = projects.find(({ recordType }) => recordType === 'Programme')
+  assert.ok(programme)
+  assert.equal(programme.contracts.length, 5)
+  assert.ok(programme.contracts.every((contract) => contract.lot && contract.contractor && contract.works && contract.contractSum.startsWith('UGX ')))
+  assert.ok(programme.activities.length >= 10)
+  assert.ok(programme.activities.every((activity) => activity.planned && activity.implemented && activity.status))
+})
+
+test('homepage uses the supplied municipal image and CMS-ready achievement records', () => {
+  const home = pagePresentations.find(({ slug }) => slug === 'home')
+  assert.equal(home.image, '/images/msmc-aerial-home.jpg')
+  assert.equal(home.isIllustrative, false)
+  assert.ok(home.imageAlt.includes('Aerial view'))
+  assert.equal(homepageAchievements.length, 4)
+  assert.ok(homepageAchievements.every((achievement) => achievement.title && achievement.description && achievement.icon))
 })
