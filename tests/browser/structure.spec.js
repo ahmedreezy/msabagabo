@@ -15,6 +15,17 @@ test('department content follows mandate, sectors and FAQ order', async ({ page 
   expect(positions[1]).toBeLessThan(positions[2])
 })
 
+test('Administration and Education display their department-specific WebP backgrounds', async ({ page }) => {
+  await useFallbackContent(page)
+  await page.goto('/departments/education-sports')
+  await expect(page.locator('.page-hero__illustration')).toHaveAttribute('src', '/images/departments/education-building-v3.webp')
+  await expect(page.locator('.page-hero__illustration')).toHaveAttribute('alt', /storeyed classroom building/)
+
+  await page.goto('/departments/administration')
+  await expect(page.locator('.page-hero__illustration')).toHaveAttribute('src', '/images/departments/administration-offices.webp')
+  await expect(page.locator('.page-hero__illustration')).toHaveAttribute('alt', /administration offices/)
+})
+
 test('programmes page presents contracts and progress without mobile overflow', async ({ page }) => {
   await useFallbackContent(page)
   await page.setViewportSize({ width: 390, height: 844 })

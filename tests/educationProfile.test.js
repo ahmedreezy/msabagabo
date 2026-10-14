@@ -130,6 +130,18 @@ test('homepage uses the supplied municipal image and CMS-ready achievement recor
   assert.ok(homepageAchievements.every((achievement) => achievement.title && achievement.description && achievement.icon))
 })
 
+test('Administration and Education use optimized department hero photographs', () => {
+  const administration = pagePresentations.find(({ slug }) => slug === 'directorate-administration')
+  const education = pagePresentations.find(({ slug }) => slug === 'directorate-education-sports')
+  assert.equal(administration.image, '/images/departments/administration-offices.webp')
+  assert.equal(education.image, '/images/departments/education-building-v3.webp')
+  assert.equal(administration.isIllustrative, false)
+  assert.equal(education.isIllustrative, false)
+  assert.equal(education.credit, '')
+  assert.ok(administration.imageAlt)
+  assert.ok(education.imageAlt)
+})
+
 test('Community-Based Services includes the confirmed MDF directory and public FAQs', () => {
   const community = departments.find(({ slug }) => slug === 'community-services')
   const forum = community.publicBodies.find(({ id }) => id === 'metropolitan-development-forum')

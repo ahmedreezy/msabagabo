@@ -17,7 +17,7 @@ const publicBodies = computed(() => Array.isArray(department.value?.publicBodies
 
 <template>
   <div v-if="department" class="department-page">
-    <PageIntro eyebrow="Municipal department" :title="department.name" :description="department.summary">
+    <PageIntro :page-key="`directorate-${department.slug}`" fallback-key="directorate-default" eyebrow="Municipal department" :title="department.name" :description="department.summary">
       <template #breadcrumb><RouterLink class="hover:text-orange-600" to="/departments">Departments</RouterLink><span class="mx-2 text-ink/25">/</span><span>{{ department.shortName }}</span></template>
     </PageIntro>
 

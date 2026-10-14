@@ -16,7 +16,7 @@ const router = useRouter()
 const pageGroups = [
   { label: 'Website presentation', items: [
     { key: 'page_presentations', label: 'Page heroes', mobileLabel: 'Heroes', page: 'Website presentation', section: 'Page heroes and banners', icon: PhEye, route: '/', fields: [
-      { key: 'slug', label: 'Page', type: 'select', required: true, options: ['home', 'about', 'directorates', 'directorate-default', 'services', 'projects', 'news', 'opportunities', 'tenders', 'careers', 'open-government', 'faqs', 'contact', 'legal-default', 'utility-default'] },
+      { key: 'slug', label: 'Page', type: 'select', required: true, options: ['home', 'about', 'directorates', 'directorate-default', 'directorate-administration', 'directorate-education-sports', 'services', 'projects', 'news', 'opportunities', 'tenders', 'careers', 'open-government', 'faqs', 'contact', 'legal-default', 'utility-default'] },
       { key: 'eyebrow', label: 'Eyebrow', required: true },
       { key: 'title', label: 'Hero title', required: true },
       { key: 'summary', label: 'Short summary', type: 'textarea', required: true },

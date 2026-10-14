@@ -5,6 +5,7 @@ import PageHero from './PageHero.vue'
 
 const props = defineProps({
   pageKey: { type: String, default: '' },
+  fallbackKey: { type: String, default: 'utility-default' },
   eyebrow: { type: String, default: '' },
   title: { type: String, required: true },
   description: { type: String, default: '' },
@@ -32,6 +33,7 @@ const usesDynamicTitle = computed(() => props.preferProps || ['department-detail
 <template>
   <PageHero
     :page-key="resolvedPageKey"
+    :fallback-key="fallbackKey"
     :variant="resolvedVariant"
     :eyebrow="eyebrow"
     :title="title"
