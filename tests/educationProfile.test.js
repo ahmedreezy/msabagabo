@@ -129,3 +129,15 @@ test('homepage uses the supplied municipal image and CMS-ready achievement recor
   assert.equal(homepageAchievements.length, 4)
   assert.ok(homepageAchievements.every((achievement) => achievement.title && achievement.description && achievement.icon))
 })
+
+test('Community-Based Services includes the confirmed MDF directory and public FAQs', () => {
+  const community = departments.find(({ slug }) => slug === 'community-services')
+  const forum = community.publicBodies.find(({ id }) => id === 'metropolitan-development-forum')
+  assert.equal(forum.members.length, 36)
+  assert.equal(forum.members[0].name, 'Mr. Seruwagi Patrick')
+  assert.equal(forum.members[2].name, 'Ms.Namaganda Margaret')
+  assert.equal(forum.members[26].category, 'PLWHIDS')
+  assert.equal(forum.members[35].name, 'Mr. Sebalamu John')
+  assert.ok(community.faqs.some(({ id }) => id === 'community-mdf-purpose'))
+  assert.ok(community.faqs.some(({ id }) => id === 'community-mdf-representation'))
+})

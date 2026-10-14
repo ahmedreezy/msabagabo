@@ -10,6 +10,7 @@ import { cmsAuth, cmsEntries } from '../../services/cms'
 import { createSeedEntries, formatCmsDate, loadPublishedContent } from '../../stores/cmsContent'
 import DepartmentStructureEditor from '../../components/admin/DepartmentStructureEditor.vue'
 import ProgrammeEditor from '../../components/admin/ProgrammeEditor.vue'
+import PublicBodyEditor from '../../components/admin/PublicBodyEditor.vue'
 
 const router = useRouter()
 const pageGroups = [
@@ -317,6 +318,8 @@ const saveEntry = async () => {
     if (selectedCollection.value === 'departments' && editor.value.status === 'published') {
       if ((payload.team || []).some((member) => !member.name || !member.role)) throw new Error('Every team member needs a name and role before publishing.')
       if ((payload.faqs || []).some((faq) => !faq.question || !faq.answer)) throw new Error('Every FAQ needs both a question and an approved answer.')
+      if ((payload.publicBodies || []).some((body) => !body.name || !body.summary || !body.purpose)) throw new Error('Every public forum needs a name, public summary and purpose before publishing.')
+      if ((payload.publicBodies || []).some((body) => !body.members?.length || body.members.some((member) => !member.name || !member.category))) throw new Error('Every public forum needs at least one member, and every member needs a name and represented category.')
     }
     const saved = await cmsEntries.save({ ...editor.value, title: primaryTitle, slug: payload.slug || editor.value.slug, payload }, session.value.user.id)
     setFeedback('success', saved.status === 'published' ? 'Changes published.' : 'Draft saved.')
@@ -595,6 +598,7 @@ onMounted(async () => {
               <input v-else :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :type="field.type || 'text'" :required="field.required" :min="field.min" :max="field.max" :step="field.step" />
             </div>
             <DepartmentStructureEditor v-if="selectedCollection === 'departments'" v-model="editor.payload" />
+            <PublicBodyEditor v-if="selectedCollection === 'departments' && editor.payload.slug === 'community-services'" v-model="editor.payload" />
             <ProgrammeEditor v-if="selectedCollection === 'projects'" v-model="editor.payload" />
             <label v-if="!definition.chronological"><span>Website position</span><input v-model.number="editor.sort_order" type="number" min="0" /><small>Lower numbers appear first.</small></label>
             <label><span>Publishing state</span><select v-model="editor.status"><option value="draft">Draft</option><option value="published" :disabled="!canPublish">Published</option></select><small v-if="!canPublish">A publisher must approve this entry.</small></label>
@@ -701,6 +705,7 @@ onMounted(async () => {
               <section><span>Mandate</span><p>{{ previewItem.mandate || 'Department mandate' }}</p></section>
               <section><span>Sectors under the department</span><p>{{ previewItem.sectors?.map((sector) => sector.name).filter(Boolean).join(' · ') || previewItem.units?.join(' · ') || 'Add sectors' }}</p></section>
               <section><span>Frequently asked questions</span><p>{{ previewItem.faqs?.length || 0 }} approved {{ previewItem.faqs?.length === 1 ? 'question' : 'questions' }}</p></section>
+              <section v-if="previewItem.publicBodies?.length"><span>Public forums and committees</span><p>{{ previewItem.publicBodies.map((body) => `${body.name} · ${body.members?.length || 0} members`).join(' · ') }}</p></section>
               <section><span>Department team</span>
                 <div v-if="previewItem.team?.length" class="cms-preview-team">
                   <article v-for="(member, index) in previewItem.team" :key="index">

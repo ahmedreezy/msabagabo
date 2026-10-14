@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { departments } from '../../src/data/siteData.js'
 
 const user = { id: '11111111-1111-4111-8111-111111111111', aud: 'authenticated', role: 'authenticated', email: 'editor@example.test' }
-const baseDepartment = () => structuredClone(departments.find(({ slug }) => slug === 'education-sports'))
+const baseDepartment = (slug = 'education-sports') => structuredClone(departments.find((department) => department.slug === slug))
 const entryFor = (payload, status = 'draft') => ({ id: 'department-entry', collection: 'departments', slug: payload.slug, title: payload.name, payload, status, sort_order: 0, updated_at: '2026-09-07T10:00:00Z', published_at: status === 'published' ? '2026-09-07T10:00:00Z' : null })
 
 async function mockCms(page, initial = []) {
@@ -35,13 +35,13 @@ async function login(page) {
   }, { user })
 }
 
-async function openEditor(page) {
+async function openEditor(page, departmentName = 'Education & Sports') {
   await login(page)
   await page.goto('/admin')
   await expect(page.locator('.admin-profile')).toContainText('Test publisher')
   await expect(page.locator('.admin-state')).not.toContainText('Loading content')
   await page.locator('.admin-sidebar').getByRole('button', { name: 'Departments', exact: true }).click()
-  await page.locator('.admin-row').filter({ hasText: 'Education & Sports' }).click()
+  await page.locator('.admin-row').filter({ hasText: departmentName }).click()
   await expect(page.locator('.structured-editor')).toBeVisible()
 }
 
@@ -93,6 +93,24 @@ test('Education uses the shared CMS structure editor, preview and publishing flo
   await expect.poll(() => cms.writes()).toBe(1)
   expect(cms.entries()[0].status).toBe('published')
   expect(cms.entries()[0].payload.faqs[0].question).toBe('How do I contact the Education Department?')
+})
+
+test('Community-Based Services CMS edits and preserves the confirmed MDF directory', async ({ page }) => {
+  const community = baseDepartment('community-services')
+  const cms = await mockCms(page, [entryFor(community)])
+  await openEditor(page, 'Community-Based Services')
+  await expect(page.locator('.public-body-editor')).toBeVisible()
+  await expect(page.locator('.public-body-editor__member')).toHaveCount(36)
+  const memberRows = page.locator('.public-body-editor__member')
+  await expect(memberRows.first().getByRole('textbox', { name: /^Member name/ })).toHaveValue('Mr. Seruwagi Patrick')
+  await expect(memberRows.last().getByRole('textbox', { name: /^Member name/ })).toHaveValue('Mr. Sebalamu John')
+
+  await page.getByRole('button', { name: 'Preview changes', exact: true }).click()
+  await expect(page.getByRole('dialog')).toContainText('MSMC Metropolitan Development Forum · 36 members')
+  await page.getByRole('button', { name: 'Back to editing' }).click()
+  await page.getByRole('button', { name: 'Save draft', exact: true }).click()
+  await expect.poll(() => cms.writes()).toBe(1)
+  expect(cms.entries()[0].payload.publicBodies[0].members).toHaveLength(36)
 })
 
 test('unknown department slugs still show not found', async ({ page }) => {

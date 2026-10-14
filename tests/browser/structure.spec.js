@@ -37,8 +37,8 @@ test('FAQ directory includes collected answers and supports search and departmen
   await useFallbackContent(page)
   await page.goto('/faqs')
   await expect(page.locator('.page-hero h1')).toHaveText('Straight answers. Useful next steps.')
-  await expect(page.locator('.faq-answer')).toHaveCount(29)
-  await expect(page.locator('.faq-search__summary')).toContainText('29 answers')
+  await expect(page.locator('.faq-answer')).toHaveCount(31)
+  await expect(page.locator('.faq-search__summary')).toContainText('31 answers')
 
   await page.getByRole('searchbox', { name: 'Search frequently asked questions' }).fill('property rates')
   await expect(page.locator('.faq-answer')).toHaveCount(1)
@@ -46,6 +46,19 @@ test('FAQ directory includes collected answers and supports search and departmen
 
   await page.getByRole('button', { name: /Clear FAQ search/ }).click()
   await page.getByRole('button', { name: /Community Services/ }).click()
-  await expect(page.locator('.faq-answer')).toHaveCount(2)
+  await expect(page.locator('.faq-answer')).toHaveCount(4)
   await expect(page.locator('.faq-group')).toContainText('Community-Based Services')
+})
+
+test('Community-Based Services publishes the confirmed MDF member directory', async ({ page }) => {
+  await useFallbackContent(page)
+  await page.goto('/departments/community-services')
+  await expect(page.locator('.department-faqs article')).toHaveCount(4)
+  await expect(page.locator('.public-body__members li')).toHaveCount(36)
+  await expect(page.locator('.public-body__intro')).toContainText('36 confirmed members')
+
+  await page.getByRole('searchbox', { name: 'Search forum members' }).fill('J.B Walusimbi')
+  await expect(page.locator('.public-body__members li')).toHaveCount(1)
+  await expect(page.locator('.public-body__members')).toContainText('Eng. J.B Walusimbi')
+  await expect(page.locator('.public-body__members')).toContainText('Professional Agencies (Engineers)')
 })
