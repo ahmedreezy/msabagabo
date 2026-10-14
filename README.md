@@ -82,3 +82,9 @@ Starter import creates missing records as drafts and never overwrites existing C
 The homepage hero is managed in `/admin` under **Website presentation → Page heroes → home**. Staff can replace the image, write accessible image text and adjust horizontal or vertical focal points before publishing.
 
 The **Ongoing activities & achievements** section is managed under **Homepage → Ongoing activities** for programme/project cards and their featured images, and **Homepage → Key achievements** for the numbered achievement ledger. Apply `supabase/migrations/007_homepage_achievements.sql` before publishing achievement records on an existing Supabase project.
+
+### Metropolitan Development Forum
+
+The confirmed MSMC Metropolitan Development Forum is published on the Community-Based Services department page. In `/admin`, open **Departments → Community-Based Services → Public forums and committees** to edit its description, confirmation date, member names, represented categories and display order. The same department editor manages the MDF FAQs, which automatically feed the central `/faqs` directory.
+
+Apply `supabase/migrations/008_cbs_metropolitan_development_forum.sql` to enrich an existing Community-Based Services CMS record. The migration preserves the rest of the department payload, installs the confirmed 36-member directory and appends the two MDF FAQs only when they are missing.

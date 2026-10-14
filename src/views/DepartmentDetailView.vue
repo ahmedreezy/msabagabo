@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { PhArrowRight, PhEnvelopeSimple, PhGavel, PhUsersThree } from '@phosphor-icons/vue'
 import PageIntro from '../components/PageIntro.vue'
+import PublicBodyDirectory from '../components/PublicBodyDirectory.vue'
 import { cmsContent } from '../stores/cmsContent'
 import NotFoundView from './NotFoundView.vue'
 import { departmentFaqs, departmentSectors } from '../lib/departmentContent.js'
@@ -11,6 +12,7 @@ const route = useRoute()
 const department = computed(() => cmsContent.departments.find((item) => item.slug === route.params.slug))
 const sectors = computed(() => departmentSectors(department.value))
 const faqs = computed(() => departmentFaqs(department.value))
+const publicBodies = computed(() => Array.isArray(department.value?.publicBodies) ? department.value.publicBodies.filter((body) => body?.name) : [])
 </script>
 
 <template>
@@ -20,7 +22,7 @@ const faqs = computed(() => departmentFaqs(department.value))
     </PageIntro>
 
     <nav class="department-jump" aria-label="On this page">
-      <div class="site-container"><strong>On this page</strong><a href="#mandate">Mandate</a><a href="#sectors">Sectors</a><a href="#department-faqs">Frequently asked questions</a><a href="#department-contact">Contact</a></div>
+      <div class="site-container"><strong>On this page</strong><a href="#mandate">Mandate</a><a href="#sectors">Sectors</a><a href="#department-faqs">Frequently asked questions</a><a v-if="publicBodies.length" href="#public-bodies">Development forum</a><a href="#department-contact">Contact</a></div>
     </nav>
 
     <div class="site-container department-layout">
@@ -41,6 +43,11 @@ const faqs = computed(() => departmentFaqs(department.value))
           <div class="department-section__heading"><h2>Frequently asked questions</h2><span>{{ faqs.length }} {{ faqs.length === 1 ? 'answer' : 'answers' }}</span></div>
           <div v-if="faqs.length" class="department-faqs"><article v-for="(faq, index) in faqs" :key="faq.id"><span>{{ String(index + 1).padStart(2, '0') }}</span><div><h3>{{ faq.question }}</h3><p>{{ faq.answer }}</p></div></article></div>
           <div v-else class="department-empty"><h3>No departmental FAQs have been published yet</h3><p>Use the official contact route for current guidance.</p></div>
+        </section>
+
+        <section v-if="publicBodies.length" id="public-bodies" class="department-section" tabindex="-1">
+          <p class="section-kicker">04 · Community representation</p>
+          <PublicBodyDirectory v-for="body in publicBodies" :key="body.id || body.name" :body="body" />
         </section>
 
         <details v-if="department.authority" class="department-authority"><summary><span><PhGavel :size="22" /> Legal authority</span></summary><p>{{ department.authority }}</p></details>
