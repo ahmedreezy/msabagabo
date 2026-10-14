@@ -111,6 +111,21 @@ const pageGroups = [
     ] },
   ] },
   { label: 'News & resources', items: [
+    { key: 'faqs', label: 'Frequently asked questions', mobileLabel: 'FAQs', page: 'News & resources', section: 'Public guidance', icon: PhFileText, route: '/faqs', fields: [
+      { key: 'slug', label: 'Question URL key', required: true },
+      { key: 'category', label: 'Service area', required: true },
+      { key: 'departmentSlug', label: 'Owning directorate', type: 'select', required: true, options: ['administration', 'finance-planning', 'works-engineering', 'health', 'education-sports', 'natural-resources', 'trade-industry-led', 'production-marketing', 'community-services', 'internal-audit', 'planning-unit'] },
+      { key: 'question', label: 'Question', type: 'textarea', required: true },
+      { key: 'department', label: 'Responsible department', required: true },
+      { key: 'responsibleOffice', label: 'Responsible office' },
+      { key: 'relatedLabel', label: 'Related-link label' },
+      { key: 'relatedTo', label: 'Related link or website path' },
+      { key: 'sourceTitle', label: 'Content source', required: true },
+      { key: 'sourceSection', label: 'Source section', required: true },
+      { key: 'lastReviewed', label: 'Last reviewed', type: 'date', required: true },
+      { key: 'reviewStatus', label: 'Review status', type: 'select', required: true, options: ['needs-review', 'approved'] },
+      { key: 'reviewNotes', label: 'Internal review notes', type: 'list' },
+    ] },
     { key: 'publications', label: 'Publications', mobileLabel: 'Files', page: 'News & resources', section: 'Document library', icon: PhFileText, route: '/news#publications', fields: [
       { key: 'title', label: 'Document title', required: true }, { key: 'category', label: 'Category', required: true },
       { key: 'format', label: 'File format', type: 'select', required: true, options: ['PDF', 'Word document', 'Excel spreadsheet', 'PowerPoint presentation', 'CSV', 'Text document'] },
@@ -133,6 +148,7 @@ const loading = ref(true)
 const saving = ref(false)
 const uploading = ref(false)
 const seeding = ref(false)
+const publishingRelease = ref(false)
 const entries = ref([])
 const profile = ref(null)
 const session = ref(null)
@@ -235,7 +251,7 @@ const newEntry = () => {
 const editEntry = (entry) => {
   clearMediaPreviews()
   deleteConfirmation.value = false
-  editor.value = { ...entry, payload: hydratePayload(entry.payload) }
+  editor.value = { ...entry, _liveStatus: entry.live_status || entry.status, payload: hydratePayload(entry.payload) }
 }
 
 const serializePayload = () => {
@@ -299,6 +315,7 @@ const saveEntry = async () => {
     const payload = serializePayload()
     const primaryTitle = payload.title || payload.name || payload.label || payload.office || (selectedCollection.value === 'environment' && payload.date ? `Daily environment · ${payload.date}` : '')
     if (!primaryTitle) throw new Error('Add a title or label before saving.')
+    if (payload.reviewStatus === 'approved' && !canPublish.value) throw new Error('A publisher must approve this content.')
     if (selectedCollection.value === 'environment' && editor.value.status === 'published') {
       const duplicate = entries.value.find((entry) => entry.id !== editor.value.id && entry.status === 'published' && entry.payload.date === payload.date)
       if (duplicate) throw new Error('A published environment bulletin already exists for this date.')
@@ -307,6 +324,17 @@ const saveEntry = async () => {
     if (selectedCollection.value === 'service_guides' && editor.value.status === 'published') {
       if (!payload.steps?.length) throw new Error('Add at least one verified process step before publishing.')
       if (!payload.sourceTitle || !payload.sourceUrl || !payload.lastReviewed) throw new Error('Add the source title, public URL and review date before publishing.')
+    }
+    if (selectedCollection.value === 'faqs' && editor.value.status === 'published') {
+      if (!payload.sourceTitle || !payload.lastReviewed) throw new Error('Add the content source and review date before publishing.')
+      if (!payload.departmentSlug) throw new Error('Choose the owning directorate before publishing.')
+      if (!payload.answerBlocks?.length) throw new Error('Add at least one structured answer section before publishing.')
+      if (payload.reviewStatus !== 'approved') throw new Error('Mark the FAQ review status as approved before publishing.')
+    }
+    if (selectedCollection.value === 'projects' && editor.value.status === 'published' && payload.slug) {
+      if (!payload.summary || !payload.sourceTitle || !payload.lastReviewed) throw new Error('Detailed projects need a summary, content source and review date before publishing.')
+      if (!payload.contractPackages?.length || !payload.implementationUpdates?.length) throw new Error('Detailed projects need structured contracts and implementation activities before publishing.')
+      if (payload.reviewStatus !== 'approved') throw new Error('Mark the project review status as approved before publishing.')
     }
     if (selectedCollection.value === 'page_presentations') {
       if (!payload.image || !String(payload.imageAlt || '').trim()) throw new Error('Add a hero image and a useful image description before saving.')
@@ -318,16 +346,65 @@ const saveEntry = async () => {
       if ((payload.team || []).some((member) => !member.name || !member.role)) throw new Error('Every team member needs a name and role before publishing.')
       if ((payload.faqs || []).some((faq) => !faq.question || !faq.answer)) throw new Error('Every FAQ needs both a question and an approved answer.')
     }
-    const saved = await cmsEntries.save({ ...editor.value, title: primaryTitle, slug: payload.slug || editor.value.slug, payload }, session.value.user.id)
-    setFeedback('success', saved.status === 'published' ? 'Changes published.' : 'Draft saved.')
+    const nextEntry = { ...editor.value, title: primaryTitle, slug: payload.slug || editor.value.slug, payload }
+    let saved
+    if (editor.value.id && editor.value._liveStatus === 'published') {
+      const revision = await cmsEntries.saveRevision(nextEntry, session.value.user.id)
+      saved = editor.value.status === 'published' ? await cmsEntries.publishRevision(revision.revision_id) : revision
+    } else if (editor.value.revision_id) {
+      const revision = await cmsEntries.saveRevision(nextEntry, session.value.user.id)
+      saved = editor.value.status === 'published' ? await cmsEntries.publishRevision(revision.revision_id) : revision
+    } else saved = await cmsEntries.save(nextEntry, session.value.user.id)
+    setFeedback('success', saved.status === 'published' ? 'Changes published.' : 'Draft saved without changing the live page.')
     await loadEntries()
-    editEntry(saved)
+    const refreshed = entries.value.find((entry) => entry.id === saved.id || entry.id === editor.value.id)
+    if (refreshed) editEntry(refreshed)
     await loadPublishedContent()
   } catch (error) {
     setFeedback('error', error.message || 'Changes could not be saved.')
   } finally {
     saving.value = false
   }
+}
+
+const discardRevision = async () => {
+  if (!editor.value?.revision_id || !canDelete.value) return
+  saving.value = true
+  try {
+    await cmsEntries.discardRevision(editor.value.revision_id)
+    setFeedback('success', 'Draft revision discarded. The published page was not changed.')
+    editor.value = null
+    await loadEntries()
+  } catch (error) {
+    setFeedback('error', error.message || 'The draft revision could not be discarded.')
+  } finally { saving.value = false }
+}
+
+const rollbackEntry = async () => {
+  if (!editor.value?.id || !canPublish.value) return
+  saving.value = true
+  try {
+    await cmsEntries.rollback(editor.value.id)
+    setFeedback('success', 'The previous published version has been restored.')
+    editor.value = null
+    await loadEntries()
+    await loadPublishedContent()
+  } catch (error) {
+    setFeedback('error', error.message || 'No previous published version could be restored.')
+  } finally { saving.value = false }
+}
+
+const publishOwnerRelease = async () => {
+  if (!canPublish.value) return
+  publishingRelease.value = true
+  try {
+    const count = await cmsEntries.publishRelease('product-owner-2026')
+    setFeedback('success', `${count || 0} approved owner-content records published.`)
+    await loadEntries()
+    await loadPublishedContent()
+  } catch (error) {
+    setFeedback('error', error.message || 'The owner-content release could not be published.')
+  } finally { publishingRelease.value = false }
 }
 
 const removeEntry = async () => {
@@ -441,11 +518,21 @@ const importStarterContent = async () => {
   seeding.value = true
   try {
     const allEntries = await cmsEntries.list()
-    const existingKeys = new Set(allEntries.map((entry) => `${entry.collection}:${entry.slug || entry.title}`))
-    const missingEntries = createSeedEntries().filter((entry) => !existingKeys.has(`${entry.collection}:${entry.slug || entry.title}`))
-    if (!missingEntries.length) throw new Error('All starter content is already available in the CMS.')
-    for (const item of missingEntries) await cmsEntries.save(item, session.value.user.id)
-    setFeedback('success', `${missingEntries.length} starter ${missingEntries.length === 1 ? 'entry' : 'entries'} imported as drafts.`)
+    const existingByKey = new Map(allEntries.map((entry) => [`${entry.collection}:${entry.slug || entry.title}`, entry]))
+    const seedEntries = createSeedEntries()
+    let imported = 0
+    for (const item of seedEntries) {
+      const existing = existingByKey.get(`${item.collection}:${item.slug || item.title}`)
+      if (!existing) {
+        await cmsEntries.save(item, session.value.user.id)
+        imported++
+      } else if (item.payload.contentRelease === 'product-owner-2026' && existing.release_key !== 'product-owner-2026') {
+        await cmsEntries.saveRevision({ ...existing, ...item, id: existing.id, payload: { ...existing.payload, ...item.payload }, live_status: existing.live_status || existing.status }, session.value.user.id)
+        imported++
+      }
+    }
+    if (!imported) throw new Error('All starter content and owner revisions are already available in the CMS.')
+    setFeedback('success', `${imported} starter ${imported === 1 ? 'record' : 'records'} imported as drafts.`)
     await loadEntries()
   } catch (error) {
     setFeedback('error', error.message || 'Starter content could not be imported.')
@@ -503,6 +590,7 @@ onMounted(async () => {
         <div><p>{{ definition.page }} / {{ definition.section }}</p><h1>{{ definition.label }}</h1><span>Edit the content shown in this section of the website.</span></div>
         <div class="admin-toolbar__actions">
           <a href="/" target="_blank" rel="noreferrer">View website <PhArrowSquareOut :size="17" /></a>
+          <button v-if="canPublish" type="button" :disabled="publishingRelease" @click="publishOwnerRelease"><PhCheck :size="17" /> {{ publishingRelease ? 'Publishing…' : 'Publish approved owner release' }}</button>
           <button type="button" @click="newEntry"><PhPlus :size="17" weight="bold" /> New entry</button>
         </div>
       </header>
@@ -601,6 +689,8 @@ onMounted(async () => {
           </div>
           <footer class="admin-editor__footer">
             <div v-if="editor.id && canDelete" class="admin-delete">
+              <button v-if="editor.revision_id" type="button" @click="discardRevision">Discard draft revision</button>
+              <button v-if="editor._liveStatus === 'published'" type="button" @click="rollbackEntry">Restore previous published version</button>
               <button v-if="!deleteConfirmation" type="button" @click="deleteConfirmation = true"><PhTrash :size="16" /> Delete</button>
               <span v-else>Delete permanently? <button type="button" @click="removeEntry">Confirm</button><button type="button" @click="deleteConfirmation = false">Cancel</button></span>
             </div>
@@ -711,6 +801,9 @@ onMounted(async () => {
                 <p v-else class="cms-preview-department__empty">Team members will appear here.</p>
               </section>
             </article>
+
+            <EducationDepartment v-else-if="selectedCollection === 'departments' && previewItem.slug === 'education-sports'" :department="previewItem" preview />
+            <DirectorateDepartment v-else-if="selectedCollection === 'departments'" :department="previewItem" preview />
           </div>
 
           <footer class="admin-preview-dialog__footer"><p>Preview only · Your changes have not been saved or published.</p><button type="button" @click="closePreview">Back to editing</button></footer>

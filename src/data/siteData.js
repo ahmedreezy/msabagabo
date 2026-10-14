@@ -1,3 +1,9 @@
+import { gkmaProject, officialFaqs, productOwnerProvenance } from './productOwnerContent.js'
+
+export { officialFaqs }
+
+const ownerFieldSource = (sourceSection) => ({ ...productOwnerProvenance, sourceSection })
+
 export const citizenActions = [
   {
     title: 'Land & Property',
@@ -71,6 +77,8 @@ export const departments = [
     lead: 'Municipal Treasurer',
     contact: 'finance@msabagabo.go.ug',
     icon: 'chart',
+    ...productOwnerProvenance,
+    fieldSources: { mandate: ownerFieldSource('Finance & Planning · Mandate'), units: ownerFieldSource('Finance & Planning · Sections') },
   },
   {
     slug: 'administration',
@@ -157,6 +165,8 @@ export const departments = [
     lead: 'Municipal Education Officer',
     contact: 'education@msabagabo.go.ug',
     icon: 'education',
+    ...productOwnerProvenance,
+    fieldSources: { mandate: ownerFieldSource('Education · Mandate') },
   },
   {
     slug: 'works-engineering',
@@ -217,6 +227,8 @@ export const departments = [
     lead: 'Commercial Officer',
     contact: 'trade@msabagabo.go.ug',
     icon: 'storefront',
+    ...productOwnerProvenance,
+    fieldSources: { mandate: ownerFieldSource('Trade and Local Economic Development · Mandate') },
   },
   {
     slug: 'community-services',
@@ -239,6 +251,38 @@ export const departments = [
     lead: 'Principal Community Development Officer',
     contact: 'community@msabagabo.go.ug',
     icon: 'community',
+    ...productOwnerProvenance,
+    fieldSources: { mandate: ownerFieldSource('Community-Based Services · Mandate'), units: ownerFieldSource('Community-Based Services · Sectors') },
+  },
+  {
+    slug: 'internal-audit',
+    name: 'Internal Audit',
+    shortName: 'Internal Audit',
+    summary: 'Provides independent assurance on municipal financial performance, controls, risk management and governance processes.',
+    mandate: 'To provide technical support and guidance on financial performance and quality-assurance services in systems of internal control, risk management and governance processes in the Municipal Council.',
+    authority: 'Applicable public-sector audit, financial-management and local-government requirements.',
+    units: ['Internal Control Review', 'Risk Management', 'Governance Assurance'],
+    services: ['Internal audit assurance', 'Financial-performance review', 'Internal-control review', 'Risk-management guidance', 'Governance-process assurance'],
+    lead: 'Head of Internal Audit',
+    contact: 'info@msabagabo.go.ug',
+    icon: 'chart',
+    ...productOwnerProvenance,
+    fieldSources: { mandate: ownerFieldSource('Internal Audit · Mandate') },
+  },
+  {
+    slug: 'planning-unit',
+    name: 'Planning Unit',
+    shortName: 'Planning Unit',
+    summary: 'Coordinates integrated municipal planning, development programmes and implementation monitoring.',
+    mandate: 'To coordinate and foster integrated economic planning and the implementation of development plans and programmes in the Municipal Council.',
+    authority: 'Applicable national and local-government planning and budgeting requirements.',
+    units: ['Development Planning', 'Monitoring and Evaluation', 'Statistics'],
+    services: ['Development-plan coordination', 'Programme monitoring', 'Planning information', 'Priority-setting guidance', 'Municipal statistics'],
+    lead: 'Municipal Planner',
+    contact: 'planning@msabagabo.go.ug',
+    icon: 'chart',
+    ...productOwnerProvenance,
+    fieldSources: { mandate: ownerFieldSource('Planning Unit · Mandate') },
   },
   {
     slug: 'natural-resources',

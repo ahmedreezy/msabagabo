@@ -16,6 +16,7 @@ const route = useRoute()
 const pageKeyByRoute = {
   departments: 'directorates',
   'department-detail': 'directorate-default',
+  'project-detail': 'projects',
   privacy: 'legal-default',
   accessibility: 'legal-default',
   disclaimer: 'legal-default',
@@ -24,8 +25,8 @@ const pageKeyByRoute = {
 }
 
 const resolvedPageKey = computed(() => props.pageKey || pageKeyByRoute[route.name] || String(route.name || 'utility-default'))
-const resolvedVariant = computed(() => props.variant || (['department-detail', 'privacy', 'accessibility', 'disclaimer', 'site-map', 'not-found'].includes(String(route.name)) ? 'compact' : 'page'))
-const usesDynamicTitle = computed(() => props.preferProps || ['department-detail', 'privacy', 'accessibility', 'disclaimer', 'site-map'].includes(String(route.name)))
+const resolvedVariant = computed(() => props.variant || (['department-detail', 'project-detail', 'privacy', 'accessibility', 'disclaimer', 'site-map', 'not-found'].includes(String(route.name)) ? 'compact' : 'page'))
+const usesDynamicTitle = computed(() => props.preferProps || ['department-detail', 'project-detail', 'privacy', 'accessibility', 'disclaimer', 'site-map'].includes(String(route.name)))
 </script>
 
 <template>

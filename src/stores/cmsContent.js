@@ -7,10 +7,12 @@ import {
   homepageAchievements as fallbackAchievements,
   homepageStats as fallbackStats,
   leadership as fallbackLeadership,
+  officialFaqs as fallbackFaqs,
   pagePresentations as fallbackPagePresentations,
   updates as fallbackUpdates,
 } from '../data/siteData'
 import { cmsEntries } from '../services/cms'
+import { isSupabaseConfigured } from '../lib/supabase'
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 
@@ -23,6 +25,8 @@ const sortCollection = (collection, items) => {
   if (collection === 'updates' || collection === 'environment') return [...items].sort((a, b) => dateValue(b.date) - dateValue(a.date))
   return items
 }
+
+const initialItems = (items) => isSupabaseConfigured && !import.meta.env.DEV ? [] : clone(items)
 
 export const cmsContent = reactive({
   departments: clone(fallbackDepartments),
@@ -47,24 +51,38 @@ export const cmsFallbacks = {
   page_presentations: fallbackPagePresentations,
   updates: fallbackUpdates,
   environment: fallbackEnvironment,
+  faqs: fallbackFaqs,
+}
+
+const hasDepartmentBaseline = (entries) => entries.some((entry) => entry.collection === 'departments')
+const restoreFallbackSnapshot = () => {
+  Object.entries(cmsFallbacks).forEach(([collection, items]) => {
+    cmsContent[collection] = sortCollection(collection, clone(items))
+  })
 }
 
 export const loadPublishedContent = async () => {
   try {
     const entries = await cmsEntries.published()
-    if (!entries.length) return
-
+    // A connected project may contain only early CMS collections while its full
+    // website release is still being reviewed. Use one complete approved snapshot
+    // until a directorate baseline exists; never mix partial CMS and fallback rows.
+    if (!hasDepartmentBaseline(entries)) {
+      restoreFallbackSnapshot()
+      return
+    }
     const grouped = entries.reduce((result, entry) => {
       if (!result[entry.collection]) result[entry.collection] = []
       result[entry.collection].push({ ...entry.payload, _cmsId: entry.id, _publishedAt: entry.published_at })
       return result
     }, {})
 
-    Object.entries(grouped).forEach(([collection, items]) => {
-      if (collection in cmsContent) cmsContent[collection] = sortCollection(collection, items)
+    Object.keys(cmsFallbacks).forEach((collection) => {
+      cmsContent[collection] = sortCollection(collection, grouped[collection] || [])
     })
   } catch (error) {
-    console.warn('Published CMS content could not be loaded; local content remains active.', error)
+    restoreFallbackSnapshot()
+    console.warn('Published CMS content could not be loaded; the approved bundled snapshot is active.', error)
   } finally {
     cmsContent.loaded = true
   }
@@ -87,12 +105,16 @@ export const getPagePresentation = (pageKey, fallbackKey = 'utility-default') =>
 }
 
 export const createSeedEntries = () => Object.entries(cmsFallbacks).flatMap(([collection, items]) =>
-  items.map((payload, index) => ({
-    collection,
-    slug: payload.slug || null,
-    title: payload.title || payload.name || payload.label || payload.office,
-    payload: clone(payload),
-    status: 'draft',
-    sort_order: index,
-  })),
+  items.map((sourcePayload, index) => {
+    const payload = clone(sourcePayload)
+    if (payload.contentRelease === 'product-owner-2026') payload.reviewStatus = 'needs-review'
+    return {
+      collection,
+      slug: payload.slug || null,
+      title: payload.title || payload.name || payload.label || payload.office,
+      payload,
+      status: 'draft',
+      sort_order: index,
+    }
+  }),
 )
