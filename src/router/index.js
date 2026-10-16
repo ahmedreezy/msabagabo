@@ -65,8 +65,9 @@ const router = createRouter({
       component: () => import('../views/CareersView.vue'),
     },
     {
-      path: '/open-government',
-      name: 'open-government',
+      path: '/municipal-notice-board',
+      alias: '/open-government',
+      name: 'municipal-notice-board',
       component: () => import('../views/OpenGovernmentView.vue'),
     },
     {

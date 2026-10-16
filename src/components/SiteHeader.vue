@@ -71,15 +71,14 @@ const navigation = computed(() => [
       { label: 'Internships & trainees', to: '/careers#internships' },
     ],
   },
-  { label: 'Open Gov', to: '/open-government' },
+  { label: 'Municipal Notice Board', to: '/municipal-notice-board', activePaths: ['/open-government'] },
+  { label: 'FAQs', to: '/faqs' },
   {
     label: 'Contact Us',
     to: '/contact',
-    activePaths: ['/faqs'],
     children: [
       { label: 'Contact details', to: '/contact#contact-details' },
       { label: 'Citizen feedback', to: '/contact#e8ebf0ck' },
-      { label: 'Frequently asked questions', to: '/faqs' },
     ],
   },
 ])

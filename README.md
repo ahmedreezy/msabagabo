@@ -14,7 +14,7 @@ Keep `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` configured under th
 
 ## Municipal CMS
 
-The protected CMS is available at `/admin`. It uses Supabase Authentication, Postgres, Row Level Security and Storage.
+The protected CMS is available at `/admin`. It uses Supabase Authentication, Postgres, Row Level Security and Storage. Staff publish approved PDFs through **Public information → Notice board documents**; each record includes an official date, issuing department, category, reference number and public summary.
 
 ### Setup
 
@@ -73,6 +73,8 @@ Use **Import starter content** once on an empty CMS to copy the current website 
 
 Department entries use one shared public structure: **mandate**, **sectors under the department**, then **frequently asked questions**. The CMS provides ordered repeatable editors for sectors and FAQs. Older entries that only contain `units` remain compatible; those units appear as sectors until staff save the richer structure. Department FAQs also feed the central `/faqs` page, so staff should maintain each answer in its department record rather than duplicate it.
 
+Each department page also supports a dedicated Head of Department profile (verified name, title, portrait and welcome message), telephone, email, office location and public hours. Maintain these under **Departments & services → Departments**. Upload departmental documents once under **Public information → Notice board documents** and choose the matching **Show on department page** value; the document will then appear both on the central Municipal Notice Board and the departmental Notice Board.
+
 The `projects` collection accepts both `Programme` and `Project` entries. Programme entries can include pillars, funding components, capital contracts and planned-versus-implemented activity records. The public canonical route is `/programmes-projects`; the older `/projects` route remains available for existing links.
 
 Starter import creates missing records as drafts and never overwrites existing CMS work. On an established installation, import the missing Internal Audit, Planning Unit and GKMA records, then review existing department entries with the new sector and FAQ editors before publishing. Verify mandates, officer contacts, contract values, dates and reported progress with the responsible municipal office.
@@ -85,6 +87,16 @@ The **Ongoing activities & achievements** section is managed under **Homepage �
 
 ### Metropolitan Development Forum
 
-The confirmed MSMC Metropolitan Development Forum is published on the Community-Based Services department page. In `/admin`, open **Departments → Community-Based Services → Public forums and committees** to edit its description, confirmation date, member names, represented categories and display order. The same department editor manages the MDF FAQs, which automatically feed the central `/faqs` directory.
+The confirmed MSMC Metropolitan Development Forum is published as an official PDF on the Municipal Notice Board and linked from the Community-Based Services department page. In `/admin`, upload replacement directories under **Public information → Notice board documents**, then paste the published document URL into **Departments → Community-Based Services → Public forums and committees**. Member names are maintained in the controlled PDF, not as a long webpage list. The same department editor manages the MDF FAQs, which automatically feed the central `/faqs` directory.
 
 Apply `supabase/migrations/008_cbs_metropolitan_development_forum.sql` to enrich an existing Community-Based Services CMS record. The migration preserves the rest of the department payload, installs the confirmed 36-member directory and appends the two MDF FAQs only when they are missing.
+
+Apply `supabase/migrations/012_municipal_notice_board.sql` after deploying the bundled PDF. It publishes the MDF directory in the CMS Notice Board and links the Community-Based Services record to the same download.
+
+The Natural Resources and Physical Planning document packs are stored under `public/documents/natural-resources` and `public/documents/physical-planning`. The GKMA grievance committee source document is published as a branded PDF under `public/documents/works`. Apply `supabase/migrations/013_department_notice_board_documents.sql` after deploying these files to publish all 25 records in the CMS; each record is also routed to its owning department's Notice Board. Regenerate the grievance PDF with `npm run generate:grievance-pdf` while the supplied Word source remains at its configured local path.
+
+The optimized portrait of Principal Engineer Wilber Mukasa is stored at `public/images/departments/wilber-mukasa-principal-engineer.webp`. Apply `supabase/migrations/014_works_principal_engineer_profile.sql` after deploying the image to update the live Works & Services department profile.
+
+The optimized portrait of Principal Education Officer Nsangi Pauline is stored at `public/images/departments/nsangi-pauline-principal-education-officer.webp`. Apply `supabase/migrations/015_education_principal_officer_profile.sql` after deploying the image to update the live Education & Sports department profile.
+
+The Physical Planning & Natural Resources leadership portraits are stored at `public/images/departments/matia-bisirikirwa-head-physical-planning.webp` and `public/images/departments/ssempala-alaphat-senior-environment-officer.webp`. Apply `supabase/migrations/016_physical_planning_environment_leadership.sql` after deploying the images to publish both technical profiles in the live CMS.

@@ -388,7 +388,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="council-newsroom" data-nav-section="/open-government" aria-labelledby="news-heading">
+    <section class="council-newsroom" data-nav-section="/municipal-notice-board" aria-labelledby="news-heading">
       <div class="site-container">
         <div class="council-newsroom__heading home-reveal">
           <p class="home-eyebrow"><span>04</span> Council newsroom</p>

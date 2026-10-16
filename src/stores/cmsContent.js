@@ -23,13 +23,22 @@ const dateValue = (value) => {
 
 const sortCollection = (collection, items) => {
   if (collection === 'updates' || collection === 'environment') return [...items].sort((a, b) => dateValue(b.date) - dateValue(a.date))
+  if (collection === 'departments') {
+    const seen = new Set()
+    return items.filter((item) => {
+      const key = String(item.slug || item.name || '').trim().toLocaleLowerCase()
+      if (!key || seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
   return items
 }
 
 const initialItems = (items) => isSupabaseConfigured && !import.meta.env.DEV ? [] : clone(items)
 
 export const cmsContent = reactive({
-  departments: clone(fallbackDepartments),
+  departments: sortCollection('departments', clone(fallbackDepartments)),
   achievements: clone(fallbackAchievements),
   projects: clone(fallbackProjects),
   publications: clone(fallbackPublications),
