@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict'
+import { closeSync, existsSync, openSync, readSync } from 'node:fs'
+import { resolve } from 'node:path'
 import test from 'node:test'
 import { createEducationDraft } from '../src/data/educationDraft.js'
 import { educationPublicationIssues, emptyEducationProfile, filterSchools, moveEducationEntry, normalizeEducationProfile, phoneLink, publicEducationProfile, safeLink } from '../src/lib/educationProfile.js'
 import { allDepartmentFaqs, departmentFaqs, departmentSectors } from '../src/lib/departmentContent.js'
-import { departments, homepageAchievements, pagePresentations, projects } from '../src/data/siteData.js'
+import { departmentPublications } from '../src/lib/departmentPublications.js'
+import { departments, homepageAchievements, pagePresentations, projects, publications } from '../src/data/siteData.js'
 
 const readyDepartment = () => ({
   slug: 'education-sports', name: 'Education & Sports', summary: 'Education information.', team: [],
@@ -102,6 +105,7 @@ test('publication requires valid programme, date, photo caption, source and cont
 
 test('all municipal departments use the shared mandate, sectors and FAQ model', () => {
   assert.equal(departments.length, 11)
+  assert.equal(new Set(departments.map(({ slug }) => slug)).size, departments.length)
   assert.ok(departments.every((department) => department.slug && department.name && department.mandate))
   assert.deepEqual(departments.map(({ slug }) => slug), [
     'finance-planning', 'administration', 'internal-audit', 'planning-unit', 'education-sports',
@@ -142,6 +146,30 @@ test('Administration and Education use optimized department hero photographs', (
   assert.ok(education.imageAlt)
 })
 
+test('Works publishes the verified Principal Engineer portrait', () => {
+  const works = departments.find(({ slug }) => slug === 'works-engineering')
+  assert.equal(works.hodName, 'Wilber Mukasa')
+  assert.equal(works.hodTitle, 'Principal Engineer')
+  assert.equal(works.hodPhoto, '/images/departments/wilber-mukasa-principal-engineer.webp')
+})
+
+test('Education publishes the verified Principal Education Officer portrait', () => {
+  const education = departments.find(({ slug }) => slug === 'education-sports')
+  assert.equal(education.hodName, 'Nsangi Pauline')
+  assert.equal(education.hodTitle, 'Principal Education Officer')
+  assert.equal(education.hodPhoto, '/images/departments/nsangi-pauline-principal-education-officer.webp')
+})
+
+test('Physical Planning and Natural Resources publishes its two verified technical leaders', () => {
+  const naturalResources = departments.find(({ slug }) => slug === 'natural-resources')
+  assert.equal(naturalResources.featureTeamAsLeadership, true)
+  assert.deepEqual(naturalResources.team.map(({ name, role }) => ({ name, role })), [
+    { name: 'Matia Bisirikirwa', role: 'Head of Physical Planning Unit' },
+    { name: 'Ssempala Alaphat', role: 'Senior Environment Officer' },
+  ])
+  assert.ok(naturalResources.team.every(({ photo }) => photo?.endsWith('.webp')))
+})
+
 test('Community-Based Services includes the confirmed MDF directory and public FAQs', () => {
   const community = departments.find(({ slug }) => slug === 'community-services')
   const forum = community.publicBodies.find(({ id }) => id === 'metropolitan-development-forum')
@@ -150,6 +178,31 @@ test('Community-Based Services includes the confirmed MDF directory and public F
   assert.equal(forum.members[2].name, 'Ms.Namaganda Margaret')
   assert.equal(forum.members[26].category, 'PLWHIDS')
   assert.equal(forum.members[35].name, 'Mr. Sebalamu John')
+  assert.equal(forum.documentUrl, '/documents/msmc-metropolitan-development-forum-members.pdf')
   assert.ok(community.faqs.some(({ id }) => id === 'community-mdf-purpose'))
   assert.ok(community.faqs.some(({ id }) => id === 'community-mdf-representation'))
+})
+
+test('department Notice Boards receive only documents assigned to that department', () => {
+  const community = departments.find(({ slug }) => slug === 'community-services')
+  const administration = departments.find(({ slug }) => slug === 'administration')
+  const naturalResources = departments.find(({ slug }) => slug === 'natural-resources')
+  const works = departments.find(({ slug }) => slug === 'works-engineering')
+  assert.deepEqual(departmentPublications(community, publications).map(({ title }) => title), ['MSMC Metropolitan Development Forum member directory'])
+  assert.equal(departmentPublications(administration, publications).length, 2)
+  assert.equal(departmentPublications(naturalResources, publications).length, 24)
+  assert.deepEqual(departmentPublications(works, publications).map(({ title }) => title), ['GKMA Community and Contractors’ Grievance Redress Committees'])
+  assert.equal(publications.filter(({ url }) => url).length, 26)
+})
+
+test('every published Notice Board download is a bundled PDF', () => {
+  publications.filter(({ url }) => url).forEach(({ title, url }) => {
+    const filePath = resolve('public', url.replace(/^\//, '').replace(/^documents\//, 'documents/'))
+    assert.equal(existsSync(filePath), true, `${title} is missing ${filePath}`)
+    const descriptor = openSync(filePath, 'r')
+    const signature = Buffer.alloc(4)
+    readSync(descriptor, signature, 0, signature.length, 0)
+    closeSync(descriptor)
+    assert.equal(signature.toString('ascii'), '%PDF', `${title} is not a PDF`)
+  })
 })

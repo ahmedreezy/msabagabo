@@ -10,7 +10,7 @@ const generalQuestions = [
   { id: 'department-contacts', question: 'Where can I find department contacts and responsibilities?', answer: 'Each department page lists its mandate, sectors, frequently asked questions, services and official contact route.', link: 'View departments', to: '/departments' },
   { id: 'tender-notices', question: 'Where are tender notices published?', answer: 'Current procurement notices and supplier information are listed on the Tenders page.', link: 'View tenders', to: '/tenders' },
   { id: 'careers', question: 'How can I apply for a council job or internship?', answer: 'Open vacancies and placement notices appear on the Careers page with their application requirements.', link: 'View careers', to: '/careers' },
-  { id: 'public-documents', question: 'Where can I access budgets, plans and policies?', answer: 'The Open Government page brings together available municipal publications and public documents.', link: 'Open document library', to: '/open-government' },
+  { id: 'public-documents', question: 'Where can I access budgets, plans and policies?', answer: 'The Municipal Notice Board brings together approved municipal publications and downloadable public documents.', link: 'Open the Municipal Notice Board', to: '/municipal-notice-board' },
   { id: 'feedback', question: 'How do I report a problem or send feedback?', answer: 'Use the citizen feedback form or contact the council by telephone or email.', link: 'Send feedback', to: '/contact#e8ebf0ck' },
 ]
 

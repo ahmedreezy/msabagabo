@@ -95,18 +95,16 @@ test('Education uses the shared CMS structure editor, preview and publishing flo
   expect(cms.entries()[0].payload.faqs[0].question).toBe('How do I contact the Education Department?')
 })
 
-test('Community-Based Services CMS edits and preserves the confirmed MDF directory', async ({ page }) => {
+test('Community-Based Services CMS links the confirmed MDF PDF instead of editing a public member list', async ({ page }) => {
   const community = baseDepartment('community-services')
   const cms = await mockCms(page, [entryFor(community)])
   await openEditor(page, 'Community-Based Services')
   await expect(page.locator('.public-body-editor')).toBeVisible()
-  await expect(page.locator('.public-body-editor__member')).toHaveCount(36)
-  const memberRows = page.locator('.public-body-editor__member')
-  await expect(memberRows.first().getByRole('textbox', { name: /^Member name/ })).toHaveValue('Mr. Seruwagi Patrick')
-  await expect(memberRows.last().getByRole('textbox', { name: /^Member name/ })).toHaveValue('Mr. Sebalamu John')
+  await expect(page.locator('.public-body-editor__member')).toHaveCount(0)
+  await expect(page.getByRole('textbox', { name: /Notice Board PDF link/ })).toHaveValue('/documents/msmc-metropolitan-development-forum-members.pdf')
 
   await page.getByRole('button', { name: 'Preview changes', exact: true }).click()
-  await expect(page.getByRole('dialog')).toContainText('MSMC Metropolitan Development Forum · 36 members')
+  await expect(page.getByRole('dialog')).toContainText('MSMC Metropolitan Development Forum · PDF linked')
   await page.getByRole('button', { name: 'Back to editing' }).click()
   await page.getByRole('button', { name: 'Save draft', exact: true }).click()
   await expect.poll(() => cms.writes()).toBe(1)

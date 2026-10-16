@@ -84,13 +84,22 @@ const pageGroups = [
     ] },
   ] },
   { label: 'Departments & services', items: [
-    { key: 'departments', label: 'Departments', mobileLabel: 'Depts', page: 'Departments & services', section: 'Department directory', icon: PhSquaresFour, route: '/departments', fields: [
+    { key: 'departments', label: 'Departments', mobileLabel: 'Depts', page: 'Departments & services', section: 'Department service hubs', icon: PhSquaresFour, route: '/departments', description: 'Maintain the department overview, Head of Department profile, contact routes, services, structure and FAQs. Department notices are uploaded separately under Notice board documents.', fields: [
       { key: 'name', label: 'Department name', required: true }, { key: 'shortName', label: 'Short name' },
       { key: 'slug', label: 'Page URL', required: true }, { key: 'summary', label: 'Introduction', type: 'textarea', required: true },
       { key: 'mandate', label: 'Mandate', type: 'textarea', required: true }, { key: 'authority', label: 'Legal authority', type: 'textarea' },
-      { key: 'lead', label: 'Department lead' }, { key: 'contact', label: 'Contact email', type: 'email' },
+      { key: 'lead', label: 'Responsible office or position' },
+      { key: 'hodName', label: 'Head of Department full name' },
+      { key: 'hodTitle', label: 'Head of Department official title' },
+      { key: 'hodPhoto', label: 'Head of Department portrait', type: 'media' },
+      { key: 'hodMessage', label: 'Head of Department welcome message', type: 'textarea' },
+      { key: 'contact', label: 'Department email', type: 'email' },
+      { key: 'phone', label: 'Department telephone', type: 'tel' },
+      { key: 'officeLocation', label: 'Office location' },
+      { key: 'officeHours', label: 'Public office hours' },
       { key: 'units', label: 'Units and sub-departments', type: 'list' }, { key: 'services', label: 'Services offered', type: 'list' },
       { key: 'team', label: 'Department team', type: 'team' },
+      { key: 'featureTeamAsLeadership', label: 'Feature team as department leadership', type: 'boolean', booleanLabel: 'Show these officers as department leadership profiles on the public page' },
     ] },
     { key: 'service_guides', label: 'AI service guides', mobileLabel: 'AI guides', page: 'Departments & services', section: 'Mr. Ssabagabo approved guidance', icon: PhRobot, route: '/services', fields: [
       { key: 'title', label: 'Service guide title', required: true },
@@ -111,7 +120,7 @@ const pageGroups = [
       { key: 'lastReviewed', label: 'Last reviewed', type: 'date', required: true },
     ] },
   ] },
-  { label: 'News & resources', items: [
+  { label: 'Public information', items: [
     { key: 'faqs', label: 'Frequently asked questions', mobileLabel: 'FAQs', page: 'News & resources', section: 'Public guidance', icon: PhFileText, route: '/faqs', fields: [
       { key: 'slug', label: 'Question URL key', required: true },
       { key: 'category', label: 'Service area', required: true },
@@ -127,9 +136,15 @@ const pageGroups = [
       { key: 'reviewStatus', label: 'Review status', type: 'select', required: true, options: ['needs-review', 'approved'] },
       { key: 'reviewNotes', label: 'Internal review notes', type: 'list' },
     ] },
-    { key: 'publications', label: 'Publications', mobileLabel: 'Files', page: 'News & resources', section: 'Document library', icon: PhFileText, route: '/news#publications', fields: [
-      { key: 'title', label: 'Document title', required: true }, { key: 'category', label: 'Category', required: true },
-      { key: 'format', label: 'File format', type: 'select', required: true, options: ['PDF', 'Word document', 'Excel spreadsheet', 'PowerPoint presentation', 'CSV', 'Text document'] },
+    { key: 'publications', label: 'Notice board documents', mobileLabel: 'Notices', page: 'Municipal Notice Board', section: 'Downloadable PDF library', icon: PhFileText, route: '/municipal-notice-board', chronological: true, chronologicalField: 'publishedDate', description: 'Upload an approved PDF and add the details residents need to identify it. Save as a draft until the responsible officer has cleared the document.', fields: [
+      { key: 'title', label: 'Public document title', required: true },
+      { key: 'category', label: 'Document category', type: 'select', required: true, options: ['Public notice', 'Council resolution', 'Budget and finance', 'Planning', 'Physical planning maps', 'Environment and climate', 'Procurement', 'Service standards', 'Policies', 'Committees and forums', 'Reports', 'Forms'] },
+      { key: 'publishedDate', label: 'Official publication date', type: 'date', required: true },
+      { key: 'department', label: 'Issuing department', required: true },
+      { key: 'departmentSlug', label: 'Show on department page', type: 'select', options: ['', 'administration', 'finance-planning', 'works-engineering', 'health', 'education-sports', 'natural-resources', 'trade-industry-led', 'production-marketing', 'community-services', 'internal-audit', 'planning-unit'] },
+      { key: 'referenceNumber', label: 'Document reference number' },
+      { key: 'summary', label: 'Short public description', type: 'textarea', required: true },
+      { key: 'format', label: 'File format', type: 'select', required: true, options: ['PDF'] },
       { key: 'url', label: 'Document file', type: 'file', required: true },
     ] },
   ] },
@@ -168,7 +183,7 @@ const canDelete = computed(() => ['publisher', 'admin'].includes(profile.value?.
 const draftCount = computed(() => entries.value.filter((entry) => entry.status === 'draft').length)
 const publishedCount = computed(() => entries.value.filter((entry) => entry.status === 'published').length)
 const entryDisplayDate = (entry) => definition.value.chronological
-  ? formatCmsDate(entry.payload.date)
+  ? formatCmsDate(entry.payload[definition.value.chronologicalField || 'date'])
   : new Date(entry.updated_at).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' })
 
 const airQualityCategory = (value) => {
@@ -233,8 +248,9 @@ const loadEntries = async () => {
   editor.value = null
   try {
     const loadedEntries = await cmsEntries.list(selectedCollection.value)
+    const chronologicalField = definition.value.chronologicalField || 'date'
     entries.value = definition.value.chronological
-      ? loadedEntries.sort((a, b) => Date.parse(b.payload.date || '') - Date.parse(a.payload.date || ''))
+      ? loadedEntries.sort((a, b) => Date.parse(b.payload[chronologicalField] || '') - Date.parse(a.payload[chronologicalField] || ''))
       : loadedEntries
   } catch (error) {
     setFeedback('error', error.message || 'Content could not be loaded.')
@@ -247,6 +263,7 @@ const newEntry = () => {
   clearMediaPreviews()
   deleteConfirmation.value = false
   editor.value = { id: null, collection: selectedCollection.value, title: '', slug: '', status: 'draft', sort_order: entries.value.length, payload: hydratePayload() }
+  if (selectedCollection.value === 'publications') editor.value.payload.format = 'PDF'
 }
 
 const editEntry = (entry) => {
@@ -346,8 +363,9 @@ const saveEntry = async () => {
     if (selectedCollection.value === 'departments' && editor.value.status === 'published') {
       if ((payload.team || []).some((member) => !member.name || !member.role)) throw new Error('Every team member needs a name and role before publishing.')
       if ((payload.faqs || []).some((faq) => !faq.question || !faq.answer)) throw new Error('Every FAQ needs both a question and an approved answer.')
+      if ((payload.hodName || payload.hodTitle || payload.hodPhoto || payload.hodMessage) && (!payload.hodName || !payload.hodTitle)) throw new Error('Add both the Head of Department name and official title before publishing the HOD profile.')
       if ((payload.publicBodies || []).some((body) => !body.name || !body.summary || !body.purpose)) throw new Error('Every public forum needs a name, public summary and purpose before publishing.')
-      if ((payload.publicBodies || []).some((body) => !body.members?.length || body.members.some((member) => !member.name || !member.category))) throw new Error('Every public forum needs at least one member, and every member needs a name and represented category.')
+      if ((payload.publicBodies || []).some((body) => !body.documentUrl)) throw new Error('Add the Notice Board PDF link for every public forum before publishing.')
     }
     const nextEntry = { ...editor.value, title: primaryTitle, slug: payload.slug || editor.value.slug, payload }
     let saved
@@ -590,11 +608,11 @@ onMounted(async () => {
         <button type="button" aria-label="Sign out" @click="signOut"><PhSignOut :size="20" /></button>
       </div>
       <header class="admin-toolbar">
-        <div><p>{{ definition.page }} / {{ definition.section }}</p><h1>{{ definition.label }}</h1><span>Edit the content shown in this section of the website.</span></div>
+        <div><p>{{ definition.page }} / {{ definition.section }}</p><h1>{{ definition.label }}</h1><span>{{ definition.description || 'Edit the content shown in this section of the website.' }}</span></div>
         <div class="admin-toolbar__actions">
           <a href="/" target="_blank" rel="noreferrer">View website <PhArrowSquareOut :size="17" /></a>
           <button v-if="canPublish" type="button" :disabled="publishingRelease" @click="publishOwnerRelease"><PhCheck :size="17" /> {{ publishingRelease ? 'Publishing…' : 'Publish approved owner release' }}</button>
-          <button type="button" @click="newEntry"><PhPlus :size="17" weight="bold" /> New entry</button>
+          <button type="button" @click="newEntry"><PhPlus :size="17" weight="bold" /> {{ selectedCollection === 'publications' ? 'Add PDF document' : 'New entry' }}</button>
         </div>
       </header>
 
@@ -630,7 +648,7 @@ onMounted(async () => {
               <textarea v-if="field.type === 'textarea'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" rows="4" :required="field.required"></textarea>
               <textarea v-else-if="field.type === 'list'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" rows="5" :required="field.required" placeholder="One item per line"></textarea>
               <select v-else-if="field.type === 'select'" :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :required="field.required"><option value="" disabled>Select an option</option><option v-for="option in field.options" :key="option" :value="option">{{ option }}</option></select>
-              <label v-else-if="field.type === 'boolean'" class="admin-checkbox" :for="`cms-field-${field.key}`"><input :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" type="checkbox" /><span>Show an “Illustrative visual” disclosure with this image</span></label>
+              <label v-else-if="field.type === 'boolean'" class="admin-checkbox" :for="`cms-field-${field.key}`"><input :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" type="checkbox" /><span>{{ field.booleanLabel || 'Show an “Illustrative visual” disclosure with this image' }}</span></label>
               <section v-else-if="field.type === 'team'" class="admin-team-editor" aria-label="Department team members">
                 <div class="admin-team-editor__heading">
                   <p>{{ editor.payload.team.length }} {{ editor.payload.team.length === 1 ? 'team member' : 'team members' }}</p>
@@ -678,9 +696,9 @@ onMounted(async () => {
                   <a :href="editor.payload[field.key]" target="_blank" rel="noreferrer">Open file <PhArrowSquareOut :size="16" /></a>
                 </div>
                 <label class="admin-document-upload">
-                  <input :id="`cms-field-${field.key}`" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt" @change="uploadDocument($event, field)" />
+                  <input :id="`cms-field-${field.key}`" type="file" :accept="selectedCollection === 'publications' ? '.pdf,application/pdf' : '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt'" @change="uploadDocument($event, field)" />
                   <PhCloudArrowUp :size="19" />
-                  <span><strong>{{ editor.payload[field.key] ? 'Replace document' : 'Choose document' }}</strong><small>PDF, Word, Excel, PowerPoint, CSV or text</small></span>
+                  <span><strong>{{ editor.payload[field.key] ? 'Replace document' : 'Choose document' }}</strong><small>{{ selectedCollection === 'publications' ? 'PDF only · maximum 25 MB' : 'PDF, Word, Excel, PowerPoint, CSV or text' }}</small></span>
                 </label>
               </div>
               <input v-else :id="`cms-field-${field.key}`" v-model="editor.payload[field.key]" :type="field.type || 'text'" :required="field.required" :min="field.min" :max="field.max" :step="field.step" />
@@ -792,11 +810,12 @@ onMounted(async () => {
 
             <article v-else-if="selectedCollection === 'departments'" class="cms-preview-department">
               <header><p>Municipal department</p><h3>{{ previewItem.name || 'Department name' }}</h3><div>{{ previewItem.summary || 'Department introduction' }}</div></header>
+              <section v-if="previewItem.hodName || previewItem.hodTitle || previewItem.hodPhoto"><span>Head of Department</span><div class="cms-preview-team"><article><img v-if="previewItem.hodPhoto" :src="previewItem.hodPhoto" :alt="previewItem.hodName || 'Head of Department'" /><div v-else class="cms-preview-placeholder">Portrait</div><div><p>{{ previewItem.hodTitle || previewItem.lead || 'Official title' }}</p><h4>{{ previewItem.hodName || 'Name awaiting confirmation' }}</h4></div></article></div></section>
               <section><span>Mandate</span><p>{{ previewItem.mandate || 'Department mandate' }}</p></section>
               <section><span>Sectors under the department</span><p>{{ previewItem.sectors?.map((sector) => sector.name).filter(Boolean).join(' · ') || previewItem.units?.join(' · ') || 'Add sectors' }}</p></section>
               <section><span>Frequently asked questions</span><p>{{ previewItem.faqs?.length || 0 }} approved {{ previewItem.faqs?.length === 1 ? 'question' : 'questions' }}</p></section>
-              <section v-if="previewItem.publicBodies?.length"><span>Public forums and committees</span><p>{{ previewItem.publicBodies.map((body) => `${body.name} · ${body.members?.length || 0} members`).join(' · ') }}</p></section>
-              <section><span>Department team</span>
+              <section v-if="previewItem.publicBodies?.length"><span>Public forums and committees</span><p>{{ previewItem.publicBodies.map((body) => `${body.name} · ${body.documentUrl ? 'PDF linked' : 'PDF link required'}`).join(' · ') }}</p></section>
+              <section><span>{{ previewItem.featureTeamAsLeadership ? 'Featured department leadership' : 'Department team' }}</span>
                 <div v-if="previewItem.team?.length" class="cms-preview-team">
                   <article v-for="(member, index) in previewItem.team" :key="index">
                     <img v-if="member.photo" :src="member.photo" :alt="member.name || 'Team member'" /><div v-else class="cms-preview-placeholder">Photo</div>
