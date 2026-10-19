@@ -186,13 +186,18 @@ test('Community-Based Services includes the confirmed MDF directory and public F
 test('department Notice Boards receive only documents assigned to that department', () => {
   const community = departments.find(({ slug }) => slug === 'community-services')
   const administration = departments.find(({ slug }) => slug === 'administration')
+  const finance = departments.find(({ slug }) => slug === 'finance-planning')
+  const planning = departments.find(({ slug }) => slug === 'planning-unit')
   const naturalResources = departments.find(({ slug }) => slug === 'natural-resources')
   const works = departments.find(({ slug }) => slug === 'works-engineering')
   assert.deepEqual(departmentPublications(community, publications).map(({ title }) => title), ['MSMC Metropolitan Development Forum member directory'])
-  assert.equal(departmentPublications(administration, publications).length, 2)
+  assert.equal(departmentPublications(administration, publications).length, 3)
+  assert.deepEqual(departmentPublications(administration, publications).filter(({ url }) => url).map(({ title }) => title), ['e-Government Procurement (e-GP 2.0) Frequently Asked Questions and Answers'])
+  assert.deepEqual(departmentPublications(finance, publications).filter(({ url }) => url).map(({ title }) => title), ['Final Budget FY 2026/2027'])
+  assert.deepEqual(departmentPublications(planning, publications).filter(({ url }) => url).map(({ title }) => title), ['List of Proposed Road Names Forwarded to PPC for Approval'])
   assert.equal(departmentPublications(naturalResources, publications).length, 24)
   assert.deepEqual(departmentPublications(works, publications).map(({ title }) => title), ['GKMA Community and Contractors’ Grievance Redress Committees'])
-  assert.equal(publications.filter(({ url }) => url).length, 26)
+  assert.equal(publications.filter(({ url }) => url).length, 29)
 })
 
 test('every published Notice Board download is a bundled PDF', () => {
