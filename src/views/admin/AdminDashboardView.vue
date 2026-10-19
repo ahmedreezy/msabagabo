@@ -284,7 +284,7 @@ const serializePayload = () => {
   })
   if (selectedCollection.value === 'departments') {
     payload.sectors = (payload.sectors || []).map((sector) => ({ id: sector.id, name: String(sector.name || '').trim(), summary: String(sector.summary || '').trim() })).filter((sector) => sector.name)
-    payload.faqs = (payload.faqs || []).map((faq) => ({ id: faq.id, question: String(faq.question || '').trim(), answer: String(faq.answer || '').trim(), sectorId: faq.sectorId || '' })).filter((faq) => faq.question || faq.answer)
+    payload.faqs = (payload.faqs || []).map((faq) => ({ id: faq.id, question: String(faq.question || '').trim(), answer: String(faq.answer || '').trim(), sectorId: faq.sectorId || '', sectionTitle: String(faq.sectionTitle || '').trim() })).filter((faq) => faq.question || faq.answer)
   }
   if (selectedCollection.value === 'projects') {
     payload.contracts = (payload.contracts || []).map((contract) => ({ ...contract, works: String(contract.works || '').trim() })).filter((contract) => contract.lot || contract.works)

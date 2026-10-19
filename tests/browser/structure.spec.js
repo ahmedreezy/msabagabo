@@ -97,12 +97,16 @@ test('FAQ directory includes collected answers and supports search and departmen
   await useFallbackContent(page)
   await page.goto('/faqs')
   await expect(page.locator('.page-hero h1')).toHaveText('Straight answers. Useful next steps.')
-  await expect(page.locator('.faq-answer')).toHaveCount(31)
-  await expect(page.locator('.faq-search__summary')).toContainText('31 answers')
+  await expect(page.locator('.faq-answer')).toHaveCount(74)
+  await expect(page.locator('.faq-search__summary')).toContainText('74 answers')
 
   await page.getByRole('searchbox', { name: 'Search frequently asked questions' }).fill('property rates')
   await expect(page.locator('.faq-answer')).toHaveCount(1)
   await expect(page.locator('.faq-answer')).toContainText('property rates')
+
+  await page.getByRole('searchbox', { name: 'Search frequently asked questions' }).fill('Guest Access Viewing')
+  await expect(page.locator('.faq-answer')).toHaveCount(1)
+  await expect(page.locator('.faq-answer')).toContainText('government procurement information')
 
   await page.getByRole('button', { name: /Clear FAQ search/ }).click()
   await page.getByRole('button', { name: /Community Services/ }).click()
@@ -126,9 +130,8 @@ test('Community-Based Services publishes the confirmed MDF member directory', as
 test('Municipal and departmental Notice Boards publish the supplied PDF packs', async ({ page }) => {
   await useFallbackContent(page)
   await page.goto('/municipal-notice-board')
-  await expect(page.locator('.notice-board__heading')).toContainText('29 downloadable documents')
-  await expect(page.locator('.notice-document__download')).toHaveCount(29)
-  await expect(page.getByRole('heading', { name: 'e-Government Procurement (e-GP 2.0) Frequently Asked Questions and Answers' })).toBeVisible()
+  await expect(page.locator('.notice-board__heading')).toContainText('28 downloadable documents')
+  await expect(page.locator('.notice-document__download')).toHaveCount(28)
   await expect(page.getByRole('heading', { name: 'Final Budget FY 2026/2027' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'List of Proposed Road Names Forwarded to PPC for Approval' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Bunamwaya Climate Change Vulnerability Assessment' })).toBeVisible()
@@ -138,4 +141,12 @@ test('Municipal and departmental Notice Boards publish the supplied PDF packs', 
   await expect(page.locator('.department-facts')).toContainText('24')
   await expect(page.locator('.department-notice-list article')).toHaveCount(6)
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('Administration shows all e-GP questions under the Procurement heading', async ({ page }) => {
+  await useFallbackContent(page)
+  await page.goto('/departments/administration#department-faqs')
+  await expect(page.locator('.department-faqs article')).toHaveCount(56)
+  await expect(page.locator('.department-faq-section__title')).toHaveText('E-GOVERNMENT PROCUREMENT (e-GP 2.0 )\nFREQUENTLY ASKED QUESTIONS AND ANSWERS')
+  await expect(page.locator('.department-faq-section').last().locator('article')).toHaveCount(43)
 })

@@ -191,13 +191,22 @@ test('department Notice Boards receive only documents assigned to that departmen
   const naturalResources = departments.find(({ slug }) => slug === 'natural-resources')
   const works = departments.find(({ slug }) => slug === 'works-engineering')
   assert.deepEqual(departmentPublications(community, publications).map(({ title }) => title), ['MSMC Metropolitan Development Forum member directory'])
-  assert.equal(departmentPublications(administration, publications).length, 3)
-  assert.deepEqual(departmentPublications(administration, publications).filter(({ url }) => url).map(({ title }) => title), ['e-Government Procurement (e-GP 2.0) Frequently Asked Questions and Answers'])
+  assert.equal(departmentPublications(administration, publications).length, 2)
   assert.deepEqual(departmentPublications(finance, publications).filter(({ url }) => url).map(({ title }) => title), ['Final Budget FY 2026/2027'])
   assert.deepEqual(departmentPublications(planning, publications).filter(({ url }) => url).map(({ title }) => title), ['List of Proposed Road Names Forwarded to PPC for Approval'])
   assert.equal(departmentPublications(naturalResources, publications).length, 24)
   assert.deepEqual(departmentPublications(works, publications).map(({ title }) => title), ['GKMA Community and Contractors’ Grievance Redress Committees'])
-  assert.equal(publications.filter(({ url }) => url).length, 29)
+  assert.equal(publications.filter(({ url }) => url).length, 28)
+})
+
+test('Administration publishes the complete e-GP FAQ collection under Procurement and Disposal', () => {
+  const administration = departments.find(({ slug }) => slug === 'administration')
+  const eGpQuestions = departmentFaqs(administration).filter(({ id }) => id.startsWith('egp-'))
+  assert.equal(eGpQuestions.length, 43)
+  assert.ok(eGpQuestions.every(({ sectorId }) => sectorId === 'procurement'))
+  assert.equal(eGpQuestions[0].sectionTitle, 'E-GOVERNMENT PROCUREMENT (e-GP 2.0 )\nFREQUENTLY ASKED QUESTIONS AND ANSWERS')
+  assert.equal(eGpQuestions[0].question, 'What is e-GP?')
+  assert.match(eGpQuestions[42].question, /Local Governments/)
 })
 
 test('every published Notice Board download is a bundled PDF', () => {

@@ -23,6 +23,7 @@ export const departmentFaqs = (department = {}) => (Array.isArray(department.faq
     question: String(faq.question || '').trim(),
     answer: String(faq.answer || faq.response || '').trim(),
     sectorId: faq.sectorId || '',
+    sectionTitle: String(faq.sectionTitle || '').trim(),
   }))
   .filter((faq) => faq.question && faq.answer)
 
