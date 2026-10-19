@@ -100,3 +100,7 @@ The optimized portrait of Principal Engineer Wilber Mukasa is stored at `public/
 The optimized portrait of Principal Education Officer Nsangi Pauline is stored at `public/images/departments/nsangi-pauline-principal-education-officer.webp`. Apply `supabase/migrations/015_education_principal_officer_profile.sql` after deploying the image to update the live Education & Sports department profile.
 
 The Physical Planning & Natural Resources leadership portraits are stored at `public/images/departments/matia-bisirikirwa-head-physical-planning.webp` and `public/images/departments/ssempala-alaphat-senior-environment-officer.webp`. Apply `supabase/migrations/016_physical_planning_environment_leadership.sql` after deploying the images to publish both technical profiles in the live CMS.
+
+The Finance FY 2026/2027 budget and the Planning Unit list of proposed road names are bundled under `public/documents/finance` and `public/documents/planning`. Apply `supabase/migrations/017_finance_budget_and_proposed_road_names.sql` after deploying the PDFs so both records appear on the Municipal Notice Board and their respective department pages.
+
+The e-Government Procurement FAQ is bundled under `public/documents/procurement`. Apply `supabase/migrations/018_e_gp_procurement_faqs.sql` after deploying the PDF so it appears in the Procurement category on the Municipal Notice Board and in the Procurement and Disposal section of the Administration department page.

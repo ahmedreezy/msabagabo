@@ -126,8 +126,11 @@ test('Community-Based Services publishes the confirmed MDF member directory', as
 test('Municipal and departmental Notice Boards publish the supplied PDF packs', async ({ page }) => {
   await useFallbackContent(page)
   await page.goto('/municipal-notice-board')
-  await expect(page.locator('.notice-board__heading')).toContainText('26 downloadable documents')
-  await expect(page.locator('.notice-document__download')).toHaveCount(26)
+  await expect(page.locator('.notice-board__heading')).toContainText('29 downloadable documents')
+  await expect(page.locator('.notice-document__download')).toHaveCount(29)
+  await expect(page.getByRole('heading', { name: 'e-Government Procurement (e-GP 2.0) Frequently Asked Questions and Answers' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Final Budget FY 2026/2027' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'List of Proposed Road Names Forwarded to PPC for Approval' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Bunamwaya Climate Change Vulnerability Assessment' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'GKMA Community and Contractors’ Grievance Redress Committees' })).toBeVisible()
 
