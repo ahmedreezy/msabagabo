@@ -1,4 +1,5 @@
 import { gkmaProject, officialFaqs, productOwnerProvenance } from './productOwnerContent.js'
+import { eGpFaqs } from './eGpFaqs.js'
 
 export { officialFaqs }
 
@@ -110,6 +111,7 @@ export const departments = [
       { id: 'admin-enforcement-review', question: 'What should I do if I am not satisfied with an enforcement decision?', answer: 'Ask the responsible municipal office to explain the decision and use the applicable review, appeal or dispute-resolution procedure. Independent legal advice may be appropriate where necessary.' },
       { id: 'admin-working-hours', question: 'What are the Municipality’s official working hours?', answer: 'Municipal offices ordinarily serve the public Monday to Friday during the official Government of Uganda working hours. Confirm current opening arrangements with the council before making a special journey.' },
       { id: 'admin-officer-identity', question: 'How can I verify that someone claiming to be a municipal officer is genuine?', answer: 'Ask for official identification and verify the person through the responsible municipal office when in doubt. Do not make payments to an individual or unofficial account.' },
+      ...eGpFaqs,
     ],
     lead: 'Head of Administration',
     contact: 'administration@msabagabo.go.ug',
@@ -677,7 +679,6 @@ export const pagePresentations = [
 ]
 
 export const publications = [
-  { title: 'e-Government Procurement (e-GP 2.0) Frequently Asked Questions and Answers', category: 'Procurement', format: 'PDF', publishedDate: '2026-10-19', department: 'Procurement and Disposal', departmentSlug: 'administration', summary: 'Frequently asked questions and answers about e-GP 2.0, supplier participation, electronic procurement processes, training, payments, security and the applicable public-procurement framework.', url: '/documents/procurement/e-government-procurement-faqs-and-answers.pdf', fileName: 'e-government-procurement-faqs-and-answers.pdf' },
   { title: 'Final Budget FY 2026/2027', category: 'Budget and finance', format: 'PDF', publishedDate: '2026-10-19', department: 'Finance & Planning', departmentSlug: 'finance-planning', summary: 'Final municipal budget document for the 2026/2027 financial year, supplied by the Finance department.', url: '/documents/finance/final-budget-fy-2026-2027.pdf', fileName: 'final-budget-fy-2026-2027.pdf' },
   { title: 'List of Proposed Road Names Forwarded to PPC for Approval', category: 'Planning', format: 'PDF', publishedDate: '2026-10-19', department: 'Planning Unit', departmentSlug: 'planning-unit', summary: 'Proposed municipal road names submitted to the Physical Planning Committee for approval, including locations, starting points and required road-name plates.', url: '/documents/planning/proposed-road-names-for-ppc-approval.pdf', fileName: 'proposed-road-names-for-ppc-approval.pdf' },
   { title: 'Bunamwaya Climate Change Vulnerability Assessment', category: 'Environment and climate', format: 'PDF', publishedDate: '2026-10-15', department: 'Physical Planning & Natural Resources', departmentSlug: 'natural-resources', summary: 'Climate change vulnerability assessment for Bunamwaya Division.', url: '/documents/natural-resources/bunamwaya-climate-change-vulnerability-assessment.pdf', fileName: 'bunamwaya-climate-change-vulnerability-assessment.pdf' },

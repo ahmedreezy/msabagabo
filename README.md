@@ -103,4 +103,4 @@ The Physical Planning & Natural Resources leadership portraits are stored at `pu
 
 The Finance FY 2026/2027 budget and the Planning Unit list of proposed road names are bundled under `public/documents/finance` and `public/documents/planning`. Apply `supabase/migrations/017_finance_budget_and_proposed_road_names.sql` after deploying the PDFs so both records appear on the Municipal Notice Board and their respective department pages.
 
-The e-Government Procurement FAQ is bundled under `public/documents/procurement`. Apply `supabase/migrations/018_e_gp_procurement_faqs.sql` after deploying the PDF so it appears in the Procurement category on the Municipal Notice Board and in the Procurement and Disposal section of the Administration department page.
+The complete e-Government Procurement FAQ collection is maintained in `src/data/eGpFaqs.js`. Apply `supabase/migrations/018_e_gp_procurement_faqs.sql` so all 43 questions appear in the central FAQ directory and under Procurement and Disposal on the Administration department page; the migration also removes the superseded Notice Board record if it existed in a preview deployment.
